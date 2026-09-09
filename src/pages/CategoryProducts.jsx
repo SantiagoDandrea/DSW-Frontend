@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
+import { productoService } from '../services/productoService';
 
 export const CategoryProducts = () => {
   const { categoryId } = useParams();
@@ -8,12 +9,28 @@ export const CategoryProducts = () => {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    setCargando(true);
-    fetch(`http://localhost:3000/api/productos?categoriaId=${categoryId}`)
-      .then(res => res.json())
-      .then(setProductos)
-      .catch(err => console.error(err))
-      .finally(() => setCargando(false));
+    let ignore = false;
+
+    productoService.getProductosByCategoria(categoryId)
+      .then((data) => {
+        if (!ignore) {
+          setProductos(data);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setCargando(false);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [categoryId]);
 
   return (
