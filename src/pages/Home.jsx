@@ -5,6 +5,8 @@ import colchonImg from '../assets/colchon.jpg';
 import electroImg from '../assets/electro.jpg';
 import tecnoImg from '../assets/tecno.jpg';
 
+import { categoriaService } from '../services/categoriaService';
+
 const imagenPorDefecto = electroImg;
 const imagenesPorCategoria = {
   "Colchones": colchonImg,
@@ -19,8 +21,7 @@ export const Home = () => {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/categorias")
-      .then(res => res.json())
+    categoriaService.getCategorias()
       .then(setCategorias)
       .catch(err => console.error(err))
       .finally(() => setCargando(false));

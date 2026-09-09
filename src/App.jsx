@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { Home } from './pages/Home';
 import { CategoryProducts } from './pages/CategoryProducts';
+
+const CategoryProductsWrapper = () => {
+  const { categoryId } = useParams();
+  return <CategoryProducts key={categoryId} />;
+};
 
 export function App() {
   const [cart, setCart] = useState([]);
@@ -18,7 +23,7 @@ export function App() {
         {/* Renderizado dinámico según la URL */}
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/categoria/:categoryId" element={<CategoryProducts />} />
+          <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
         </Routes>
       </div>
     </BrowserRouter>
