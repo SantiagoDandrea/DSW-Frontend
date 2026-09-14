@@ -15,14 +15,14 @@ export const Header = ({ cartCount = 0 }) => {
       <div className="flex items-center gap-4">
         {isAuthenticated ? (
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">
+            <Link to="/perfil" className="text-sm font-medium text-gray-700 hover:text-indigo-600">
               {usuario?.nombre || 'Usuario'}
               {esAdmin && (
                 <span className="ml-1.5 px-1.5 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded">
                   Admin
                 </span>
               )}
-            </span>
+            </Link>
             <button
               onClick={logout}
               className="text-xs font-medium text-gray-500 hover:text-red-600 px-2 py-1 rounded border border-gray-200 hover:border-red-200 transition cursor-pointer"

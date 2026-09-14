@@ -33,6 +33,27 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const register = async (datos) => {
+    const data = await authService.register(datos);
+
+    setToken(data.token);
+    setUsuario(data.usuario);
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+    return data;
+  };
+
+  const actualizarPerfil = async (datos) => {
+    const usuarioActualizado = await authService.actualizarPerfil(datos);
+
+    setUsuario(usuarioActualizado);
+    localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+
+    return usuarioActualizado;
+  };
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -52,6 +73,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: Boolean(token),
     esAdmin: usuario?.esAdmin ?? false,
     login,
+    register,
+    actualizarPerfil,
     logout,
   };
 
