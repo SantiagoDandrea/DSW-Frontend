@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { Home } from './pages/Home';
 import { CategoryProducts } from './pages/CategoryProducts';
+import { ProductDetail } from './pages/ProductDetail';
 
 import { AuthProvider } from './context/AuthContext';
 import { Login } from './pages/Login';
@@ -28,6 +29,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
+            <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
           </Routes>
         </div>
