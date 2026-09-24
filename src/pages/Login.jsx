@@ -93,8 +93,8 @@ export const Login = () => {
 
         <div className="mt-6 text-center text-sm text-gray-600">
           ¿No tenés una cuenta?{' '}
-          <Link to="/" className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Volver a la tienda
+          <Link to="/registro" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            Registrate
           </Link>
         </div>
       </div>

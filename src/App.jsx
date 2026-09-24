@@ -8,6 +8,8 @@ import { ProductDetail } from './pages/ProductDetail';
 
 import { AuthProvider } from './context/AuthContext';
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { Profile } from './pages/Profile';
 
 const CategoryProductsWrapper = () => {
   const { categoryId } = useParams();
@@ -31,6 +33,8 @@ export function App() {
             <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Register />} />
+            <Route path="/perfil" element={<Profile />} />
           </Routes>
         </div>
       </AuthProvider>
