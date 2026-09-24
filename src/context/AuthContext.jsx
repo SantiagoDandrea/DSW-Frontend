@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AuthContext } from './auth-context';
 import { authService } from '../services/authService';
+import { Usuario } from '../models/Usuario';
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     const usuarioGuardado = localStorage.getItem('usuario');
     if (usuarioGuardado) {
       try {
-        return JSON.parse(usuarioGuardado);
+        return Usuario.fromJSON(JSON.parse(usuarioGuardado));
       } catch (err) {
         console.error('Error al parsear usuario de localStorage:', err);
         return null;
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     usuario,
     token,
     isAuthenticated: Boolean(token),
-    esAdmin: usuario?.rol === 'ADMIN',
+    esAdmin: usuario?.esAdmin ?? false,
     login,
     logout,
   };

@@ -1,4 +1,5 @@
 import { apiFetch } from './api';
+import { Usuario } from '../models/Usuario';
 
 /**
  * Servicio para operaciones de autenticación de usuarios.
@@ -7,21 +8,23 @@ export const authService = {
   /**
    * Inicia sesión con credenciales de usuario.
    * @param {{ email: string, password: string }} credenciales
-   * @returns {Promise<{ token: string, usuario: Object }>}
+   * @returns {Promise<{ token: string, usuario: Usuario }>}
    */
   async login({ email, password }) {
-    return apiFetch('/auth/login', {
+    const data = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
+    return { token: data.token, usuario: Usuario.fromJSON(data.usuario) };
   },
 
   /**
    * Obtiene los datos del usuario autenticado actualmente.
-   * @returns {Promise<Object>} Datos del perfil del usuario.
+   * @returns {Promise<Usuario>} Datos del perfil del usuario.
    */
   async getPerfil() {
-    return apiFetch('/auth/me');
+    const data = await apiFetch('/auth/me');
+    return Usuario.fromJSON(data);
   },
 
   /**

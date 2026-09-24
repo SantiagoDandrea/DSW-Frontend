@@ -1,4 +1,5 @@
 import { apiFetch } from './api';
+import { Producto } from '../models/Producto';
 
 /**
  * Servicio para operaciones sobre el recurso Productos.
@@ -7,7 +8,7 @@ export const productoService = {
   /**
    * Obtiene la lista de productos con filtros opcionales.
    * @param {Object} [filtros={}] - Filtros opcionales (categoriaId, marcaId, nombre, etc.).
-   * @returns {Promise<Array>} Lista de productos.
+   * @returns {Promise<Producto[]>} Lista de productos.
    */
   async getProductos(filtros = {}) {
     const params = new URLSearchParams();
@@ -21,13 +22,14 @@ export const productoService = {
     const queryString = params.toString();
     const endpoint = queryString ? `/productos?${queryString}` : '/productos';
 
-    return apiFetch(endpoint);
+    const data = await apiFetch(endpoint);
+    return data.map(Producto.fromJSON);
   },
 
   /**
    * Obtiene los productos correspondientes a una categoría específica.
    * @param {number|string} categoriaId - Identificador de la categoría.
-   * @returns {Promise<Array>} Lista de productos de la categoría.
+   * @returns {Promise<Producto[]>} Lista de productos de la categoría.
    */
   async getProductosByCategoria(categoriaId) {
     return this.getProductos({ categoriaId });
@@ -36,9 +38,10 @@ export const productoService = {
   /**
    * Obtiene el detalle de un producto por su ID.
    * @param {number|string} id - Identificador del producto.
-   * @returns {Promise<Object>} Detalle del producto.
+   * @returns {Promise<Producto>} Detalle del producto.
    */
   async getProductoById(id) {
-    return apiFetch(`/productos/${id}`);
+    const data = await apiFetch(`/productos/${id}`);
+    return Producto.fromJSON(data);
   },
 };

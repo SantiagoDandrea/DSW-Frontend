@@ -7,6 +7,7 @@ export const CategoryProducts = () => {
   const { categoryId } = useParams();
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -19,7 +20,7 @@ export const CategoryProducts = () => {
       })
       .catch((err) => {
         if (!ignore) {
-          console.error(err);
+          setError(err.message);
         }
       })
       .finally(() => {
@@ -37,6 +38,10 @@ export const CategoryProducts = () => {
     <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
       {cargando ? (
         <p>Cargando productos...</p>
+      ) : error ? (
+        <p className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
+          No pudimos cargar los productos: {error}
+        </p>
       ) : productos.length === 0 ? (
         <p>No hay productos en esta categoría.</p>
       ) : (
