@@ -19,7 +19,7 @@ export const authService = {
   },
 
   /**
-   * Registra un nuevo usuario cliente en el sistema.
+   * Registra una cuenta de cliente nueva.
    * @param {{ dni: string, nombre: string, apellido: string, email: string, telefono: string, localidadId: number, password: string }} datos
    * @returns {Promise<{ token: string, usuario: Usuario }>}
    */
@@ -37,6 +37,19 @@ export const authService = {
    */
   async getPerfil() {
     const data = await apiFetch('/auth/me');
+    return Usuario.fromJSON(data);
+  },
+
+  /**
+   * Actualiza el perfil del usuario autenticado.
+   * @param {Object} datos - Campos a actualizar (nombre, apellido, email, telefono, localidadId, password opcional).
+   * @returns {Promise<Usuario>} Perfil actualizado.
+   */
+  async actualizarPerfil(datos) {
+    const data = await apiFetch('/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify(datos),
+    });
     return Usuario.fromJSON(data);
   },
 

@@ -10,6 +10,8 @@ import { AuthContext } from './auth-context';
  *   esAdmin: boolean,
  *   loading: boolean,
  *   login: Function,
+ *   register: Function,
+ *   actualizarPerfil: Function,
  *   logout: Function
  * }}
  */

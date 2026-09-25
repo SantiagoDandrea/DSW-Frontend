@@ -3,6 +3,8 @@ import { Home } from '../pages/Home';
 import { CategoryProducts } from '../pages/CategoryProducts';
 import { ProductDetail } from '../pages/ProductDetail';
 import { Login } from '../pages/Login';
+import { Register } from '../pages/Register';
+import { Profile } from '../pages/Profile';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
 
@@ -53,10 +55,7 @@ export const AppRoutes = () => {
       <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
       <Route path="/producto/:id" element={<ProductDetail />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/registro"
-        element={<PlaceholderPage title="Registro" description="Pantalla de registro de nuevos usuarios en construcción." />}
-      />
+      <Route path="/registro" element={<Register />} />
       {/* Alias en inglés para compatibilidad */}
       <Route path="/register" element={<Navigate to="/registro" replace />} />
 
@@ -67,7 +66,7 @@ export const AppRoutes = () => {
         path="/perfil"
         element={
           <ProtectedRoute>
-            <PlaceholderPage title="Mi Perfil" description="Gestión de datos de cuenta y preferencias personales." />
+            <Profile />
           </ProtectedRoute>
         }
       />

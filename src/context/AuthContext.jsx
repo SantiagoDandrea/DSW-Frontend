@@ -91,6 +91,32 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const register = useCallback(async (datos) => {
+    setLoading(true);
+    try {
+      const data = await authService.register(datos);
+
+      setToken(data.token);
+      setUsuario(data.usuario);
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const actualizarPerfil = useCallback(async (datos) => {
+    const usuarioActualizado = await authService.actualizarPerfil(datos);
+
+    setUsuario(usuarioActualizado);
+    localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+
+    return usuarioActualizado;
+  }, []);
+
   const value = useMemo(
     () => ({
       usuario,
@@ -99,9 +125,11 @@ export const AuthProvider = ({ children }) => {
       esAdmin: usuario?.esAdmin ?? (usuario?.rol === 'ADMIN'),
       loading,
       login,
+      register,
+      actualizarPerfil,
       logout,
     }),
-    [usuario, token, loading, login, logout]
+    [usuario, token, loading, login, register, actualizarPerfil, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
