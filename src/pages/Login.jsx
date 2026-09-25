@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 export const Login = () => {
@@ -8,12 +8,14 @@ export const Login = () => {
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated, esAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirige al destino previo si venía de una ruta protegida, o al inicio
-  const redirectTo = location.state?.from?.pathname || '/';
+  // Si ya se encuentra autenticado, redirigir automáticamente
+  if (isAuthenticated) {
+    return <Navigate to={esAdmin ? '/admin' : '/'} replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,8 +23,17 @@ export const Login = () => {
     setCargando(true);
 
     try {
-      await login(email, password);
-      navigate(redirectTo, { replace: true });
+      const res = await login(email, password);
+      const user = res?.usuario;
+      const isAdmin = user?.esAdmin ?? (user?.rol === 'ADMIN');
+
+      // Redirige respetando query params/hash si venía de ruta protegida, o según su rol
+      const from = location.state?.from;
+      const destination = from
+        ? `${from.pathname}${from.search || ''}${from.hash || ''}`
+        : (isAdmin ? '/admin' : '/');
+
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(err.message || 'Credenciales inválidas. Verifica tu email y contraseña.');
     } finally {
@@ -91,11 +102,18 @@ export const Login = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          ¿No tenés una cuenta?{' '}
-          <Link to="/" className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Volver a la tienda
-          </Link>
+        <div className="mt-6 flex flex-col items-center gap-2 text-sm text-gray-600">
+          <div>
+            ¿No tenés una cuenta?{' '}
+            <Link to="/registro" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              Registrate acá
+            </Link>
+          </div>
+          <div>
+            <Link to="/" className="text-xs text-gray-500 hover:text-gray-700">
+              ← Volver a la tienda
+            </Link>
+          </div>
         </div>
       </div>
     </main>

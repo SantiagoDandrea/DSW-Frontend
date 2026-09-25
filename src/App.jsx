@@ -1,38 +1,39 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
-import { Home } from './pages/Home';
-import { CategoryProducts } from './pages/CategoryProducts';
-import { ProductDetail } from './pages/ProductDetail';
+import { AppRoutes } from './routes/AppRoutes';
 
-import { AuthProvider } from './context/AuthContext';
-import { Login } from './pages/Login';
+function AppLayout() {
+  const location = useLocation();
 
-const CategoryProductsWrapper = () => {
-  const { categoryId } = useParams();
-  return <CategoryProducts key={categoryId} />;
-};
+  // Ocultar SearchBar en páginas donde no corresponde navegación de catálogo
+  const hideSearchBarRoutes = ['/login', '/registro', '/register', '/checkout', '/admin', '/carrito'];
+  const showSearchBar = !hideSearchBarRoutes.some((path) => location.pathname.startsWith(path));
 
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Header persistente */}
+      <Header />
+
+      {/* SearchBar condicional para catálogo */}
+      {showSearchBar && <SearchBar onSearch={(query) => console.log('Búsqueda:', query)} />}
+
+      {/* Rutas centralizadas */}
+      <AppRoutes />
+    </div>
+  );
+}
+
+/**
+ * Componente raíz de la aplicación.
+ * Actúa como contenedor de Providers globales y Layout general persistente.
+ */
 export function App() {
-  const [cart] = useState([]);
-
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-100 flex flex-col">
-          {/* Componentes persistentes en todas las páginas */}
-          <Header cartCount={cart.length} />
-          <SearchBar onSearch={(query) => console.log(query)} />
-          
-          {/* Renderizado dinámico según la URL */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
-            <Route path="/producto/:id" element={<ProductDetail />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </div>
+        <AppLayout />
       </AuthProvider>
     </BrowserRouter>
   );
