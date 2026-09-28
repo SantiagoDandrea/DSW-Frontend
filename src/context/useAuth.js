@@ -8,7 +8,10 @@ import { AuthContext } from './auth-context';
  *   token: string|null,
  *   isAuthenticated: boolean,
  *   esAdmin: boolean,
+ *   loading: boolean,
  *   login: Function,
+ *   register: Function,
+ *   actualizarPerfil: Function,
  *   logout: Function
  * }}
  */

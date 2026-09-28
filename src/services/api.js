@@ -35,6 +35,14 @@ export async function apiFetch(endpoint, options = {}) {
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
+    // Solo 401 Unauthorized invalida credenciales por expiración/token inválido.
+    // Se excluye /auth/login para no disparar el evento si el usuario ingresa credenciales erróneas.
+    if (response.status === 401 && !endpoint.includes('/auth/login')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { status: 401 } }));
+    }
+
     const errorMessage = data?.message || data?.error || `Error HTTP ${response.status}: ${response.statusText}`;
     const error = new Error(errorMessage);
     error.status = response.status;
@@ -44,3 +52,4 @@ export async function apiFetch(endpoint, options = {}) {
 
   return data;
 }
+

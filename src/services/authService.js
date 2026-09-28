@@ -20,7 +20,7 @@ export const authService = {
 
   /**
    * Registra una cuenta de cliente nueva.
-   * @param {Object} datos - dni, nombre, apellido, email, password, telefono, localidadId.
+   * @param {{ dni: string, nombre: string, apellido: string, email: string, telefono: string, localidadId: number, password: string }} datos
    * @returns {Promise<{ token: string, usuario: Usuario }>}
    */
   async register(datos) {
