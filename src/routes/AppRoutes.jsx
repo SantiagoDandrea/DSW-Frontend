@@ -7,6 +7,12 @@ import { Register } from '../pages/Register';
 import { Profile } from '../pages/Profile';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
+import { AdminLayout } from '../components/admin/AdminLayout';
+import { AdminTablasPage } from '../pages/admin/AdminTablasPage';
+import { AdminProductosPage } from '../pages/admin/AdminProductosPage';
+import { AdminInventarioPage } from '../pages/admin/AdminInventarioPage';
+import { AdminPedidosPage } from '../pages/admin/AdminPedidosPage';
+import { AdminUsuariosPage } from '../pages/admin/AdminUsuariosPage';
 
 // Wrapper con key para reiniciar el estado de CategoryProducts al cambiar de categoría
 // (Patrón recomendado por React 19 para evitar set-state-in-effect en cascading renders)
@@ -108,13 +114,20 @@ export const AppRoutes = () => {
       {/* 3. Rutas Protegidas de Administración (ADMIN)           */}
       {/* ======================================================== */}
       <Route
-        path="/admin/*"
+        path="/admin"
         element={
           <AdminRoute>
-            <PlaceholderPage title="Panel de Administración" description="Gestión de catálogo, stock y usuarios del sistema." />
+            <AdminLayout />
           </AdminRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="/admin/productos" replace />} />
+        <Route path="tablas" element={<AdminTablasPage />} />
+        <Route path="productos" element={<AdminProductosPage />} />
+        <Route path="inventario" element={<AdminInventarioPage />} />
+        <Route path="pedidos" element={<AdminPedidosPage />} />
+        <Route path="usuarios" element={<AdminUsuariosPage />} />
+      </Route>
 
       {/* ======================================================== */}
       {/* 4. Ruta Comodín (404 Not Found)                         */}
