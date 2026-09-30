@@ -169,6 +169,22 @@ if (pedidoCreado) {
     </main>
   );
 }
+if (items.length === 0) {
+  return (
+    <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">
+      <h1 className="text-2xl font-bold text-gray-900">
+        Tu carrito está vacío
+      </h1>
+
+      <Link
+        to="/"
+        className="inline-block mt-4 text-indigo-600"
+      >
+        Ir a la tienda
+      </Link>
+    </main>
+  );
+}
   return (
     <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">
