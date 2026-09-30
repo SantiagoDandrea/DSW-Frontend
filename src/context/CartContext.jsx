@@ -1,0 +1,130 @@
+import { useEffect, useState } from 'react';
+import { CartContext } from './cart-context';
+
+const STORAGE_KEY = 'carrito';
+
+function cargarCarrito() {
+  try {
+    const guardado = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) || '[]'
+    );
+
+    if (!Array.isArray(guardado)) return [];
+
+    return guardado.filter(
+      (item) =>
+        item &&
+        item.producto &&
+        item.producto.id != null &&
+        Number.isInteger(item.cantidad) &&
+        item.cantidad > 0
+    );
+  } catch {
+    return [];
+  }
+}
+
+export function CartProvider({ children }) {
+  const [items, setItems] = useState(cargarCarrito);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(items)
+      );
+    } catch (error) {
+      console.warn('No pudimos guardar el carrito:', error);
+    }
+  }, [items]);
+
+  function agregarProducto(producto, cantidad = 1) {
+    if (
+      !producto?.disponible ||
+      producto.precioActual == null ||
+      !Number.isInteger(cantidad) ||
+      cantidad <= 0
+    ) {
+      return false;
+    }
+
+    setItems((anteriores) => {
+      const existe = anteriores.some(
+        (item) => item.producto.id === producto.id
+      );
+
+      if (existe) {
+        return anteriores.map((item) =>
+          item.producto.id === producto.id
+            ? {
+                producto,
+                cantidad: item.cantidad + cantidad,
+              }
+            : item
+        );
+      }
+
+      return [
+        ...anteriores,
+        { producto, cantidad },
+      ];
+    });
+
+    return true;
+  }
+
+  function cambiarCantidad(productoId, cantidad) {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      return;
+    }
+
+    setItems((anteriores) =>
+      anteriores.map((item) =>
+        item.producto.id === productoId
+          ? { ...item, cantidad }
+          : item
+      )
+    );
+  }
+
+  function eliminarProducto(productoId) {
+    setItems((anteriores) =>
+      anteriores.filter(
+        (item) => item.producto.id !== productoId
+      )
+    );
+  }
+
+  function vaciarCarrito() {
+    setItems([]);
+  }
+
+  const cantidadTotal = items.reduce(
+    (total, item) => total + item.cantidad,
+    0
+  );
+
+  const subtotal = items.reduce(
+    (total, item) =>
+      total +
+      Number(item.producto.precioActual ?? 0) *
+        item.cantidad,
+    0
+  );
+
+  return (
+    <CartContext.Provider
+      value={{
+        items,
+        cantidadTotal,
+        subtotal,
+        agregarProducto,
+        cambiarCantidad,
+        eliminarProducto,
+        vaciarCarrito,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
+}

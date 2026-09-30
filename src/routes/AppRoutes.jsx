@@ -7,12 +7,21 @@ import { Register } from '../pages/Register';
 import { Profile } from '../pages/Profile';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
+import { Cart } from '../pages/Cart';
+import { Checkout } from '../pages/Checkout';
+import { MyOrders } from '../pages/MyOrders';
+import { OrderDetail } from '../pages/OrderDetail';
 
 // Wrapper con key para reiniciar el estado de CategoryProducts al cambiar de categoría
 // (Patrón recomendado por React 19 para evitar set-state-in-effect en cascading renders)
 const CategoryProductsWrapper = () => {
   const { categoryId } = useParams();
   return <CategoryProducts key={categoryId} />;
+};
+
+const OrderDetailWrapper = () => {
+  const { id } = useParams();
+  return <OrderDetail key={id} />;
 };
 
 // Componente placeholder para rutas en desarrollo
@@ -77,7 +86,7 @@ export const AppRoutes = () => {
         path="/mis-pedidos"
         element={
           <ProtectedRoute>
-            <PlaceholderPage title="Mis Pedidos" description="Historial de compras y seguimiento de entregas." />
+            <MyOrders />
           </ProtectedRoute>
         }
       />
@@ -85,25 +94,21 @@ export const AppRoutes = () => {
         path="/pedidos/:id"
         element={
           <ProtectedRoute>
-            <PlaceholderPage title="Detalle del Pedido" description="Detalle exhaustivo del pedido, productos, datos de envío y estado." />
+            <OrderDetailWrapper />
           </ProtectedRoute>
         }
       />
       <Route
         path="/carrito"
-        element={
-          <PlaceholderPage title="Carrito de Compras" description="Revisión de productos seleccionados previo a la compra." />
-        }
-      />
+        element={<Cart />} />
       <Route
         path="/checkout"
         element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Checkout" description="Finalización de compra y procesamiento de pagos." />
-          </ProtectedRoute>
-        }
-      />
-
+    <ProtectedRoute>
+      <Checkout />
+    </ProtectedRoute>
+  }
+/>
       {/* ======================================================== */}
       {/* 3. Rutas Protegidas de Administración (ADMIN)           */}
       {/* ======================================================== */}
