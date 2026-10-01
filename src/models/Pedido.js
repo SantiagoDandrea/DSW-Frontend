@@ -1,3 +1,5 @@
+import { Envio } from './Envio';
+
 export class Pedido {
   constructor({ id, fecha, estado, total, cliente, medioPago, detalles, envio }) {
     this.id = id;
@@ -7,7 +9,7 @@ export class Pedido {
     this.cliente = cliente;
     this.medioPago = medioPago;
     this.detalles = detalles ?? [];
-    this.envio = envio ?? null;
+    this.envio = Envio.fromJSON(envio);
   }
 
   static fromJSON(json) {
