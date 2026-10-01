@@ -1,11 +1,31 @@
+import { useEffect, useRef, useState } from 'react';
+
 export const SearchBar = ({ onSearch }) => {
+  const [valor, setValor] = useState('');
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
+
+  const handleChange = (e) => {
+    const nuevoValor = e.target.value;
+    setValor(nuevoValor);
+
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      onSearch?.(nuevoValor);
+    }, 300);
+  };
+
   return (
     <div className="w-full px-4 py-3 bg-gray-50">
       <div className="relative max-w-md mx-auto">
         <input
           type="text"
+          value={valor}
+          onChange={handleChange}
           placeholder="Buscar productos..."
-          onChange={(e) => onSearch && onSearch(e.target.value)}
           className="w-full px-4 py-2 pl-10 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
         />
         <svg className="absolute w-5 h-5 text-gray-400 left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

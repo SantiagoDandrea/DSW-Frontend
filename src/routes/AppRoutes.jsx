@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useParams, Link } from 'react-router-dom';
 import { Home } from '../pages/Home';
 import { CategoryProducts } from '../pages/CategoryProducts';
 import { ProductDetail } from '../pages/ProductDetail';
+import { SearchResults } from '../pages/SearchResults';
 import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
 import { Profile } from '../pages/Profile';
@@ -56,6 +57,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
       <Route path="/producto/:id" element={<ProductDetail />} />
+      <Route path="/buscar" element={<SearchResults />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       {/* Alias en inglés para compatibilidad */}
