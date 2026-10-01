@@ -44,4 +44,42 @@ export const productoService = {
     const data = await apiFetch(`/productos/${id}`);
     return Producto.fromJSON(data);
   },
+
+  /**
+   * Crea un nuevo producto y su precio inicial.
+   * @param {{ nombre: string, descripcion: string, categoriaId: number, marcaId: number, proveedorId: number, precio: number, imagenUrl?: string }} data
+   * @returns {Promise<Producto>}
+   */
+  async crearProducto(data) {
+    const res = await apiFetch('/productos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return Producto.fromJSON(res);
+  },
+
+  /**
+   * Actualiza los datos de un producto (sin modificar precio).
+   * @param {number|string} id
+   * @param {{ nombre: string, descripcion: string, categoriaId: number, marcaId: number, proveedorId: number }} data
+   * @returns {Promise<Producto>}
+   */
+  async actualizarProducto(id, data) {
+    const res = await apiFetch(`/productos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return Producto.fromJSON(res);
+  },
+
+  /**
+   * Elimina un producto por su ID.
+   * @param {number|string} id
+   * @returns {Promise<null>}
+   */
+  async eliminarProducto(id) {
+    return apiFetch(`/productos/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };

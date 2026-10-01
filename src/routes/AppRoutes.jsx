@@ -7,6 +7,12 @@ import { Register } from '../pages/Register';
 import { Profile } from '../pages/Profile';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminRoute } from './AdminRoute';
+import { AdminLayout } from '../components/admin/AdminLayout';
+import { AdminTablasPage } from '../pages/admin/AdminTablasPage';
+import { AdminProductosPage } from '../pages/admin/AdminProductosPage';
+import { AdminInventarioPage } from '../pages/admin/AdminInventarioPage';
+import { AdminPedidosPage } from '../pages/admin/AdminPedidosPage';
+import { AdminUsuariosPage } from '../pages/admin/AdminUsuariosPage';
 import { Cart } from '../pages/Cart';
 import { Checkout } from '../pages/Checkout';
 import { MyOrders } from '../pages/MyOrders';
@@ -23,19 +29,6 @@ const OrderDetailWrapper = () => {
   const { id } = useParams();
   return <OrderDetail key={id} />;
 };
-
-// Componente placeholder para rutas en desarrollo
-const PlaceholderPage = ({ title, description }) => (
-  <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 max-w-md w-full">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">{title}</h1>
-      <p className="text-gray-600 mb-6">{description}</p>
-      <Link to="/" className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-        Volver al inicio
-      </Link>
-    </div>
-  </main>
-);
 
 // Componente 404 Not Found
 const NotFoundPage = () => (
@@ -113,13 +106,20 @@ export const AppRoutes = () => {
       {/* 3. Rutas Protegidas de Administración (ADMIN)           */}
       {/* ======================================================== */}
       <Route
-        path="/admin/*"
+        path="/admin"
         element={
           <AdminRoute>
-            <PlaceholderPage title="Panel de Administración" description="Gestión de catálogo, stock y usuarios del sistema." />
+            <AdminLayout />
           </AdminRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="/admin/productos" replace />} />
+        <Route path="tablas" element={<AdminTablasPage />} />
+        <Route path="productos" element={<AdminProductosPage />} />
+        <Route path="inventario" element={<AdminInventarioPage />} />
+        <Route path="pedidos" element={<AdminPedidosPage />} />
+        <Route path="usuarios" element={<AdminUsuariosPage />} />
+      </Route>
 
       {/* ======================================================== */}
       {/* 4. Ruta Comodín (404 Not Found)                         */}
