@@ -1,5 +1,6 @@
 import { apiFetch } from './api';
 import { Producto } from '../models/Producto';
+import { Imagen } from '../models/Imagen';
 
 /**
  * Servicio para operaciones sobre el recurso Productos.
@@ -79,6 +80,31 @@ export const productoService = {
    */
   async eliminarProducto(id) {
     return apiFetch(`/productos/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Agrega una imagen a un producto.
+   * @param {number|string} productoId
+   * @param {{ url: string, orden?: number }} data
+   * @returns {Promise<Imagen>}
+   */
+  async agregarImagen(productoId, data) {
+    const res = await apiFetch(`/productos/${productoId}/imagenes`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return Imagen.fromJSON(res);
+  },
+
+  /**
+   * Elimina una imagen por su propio ID (no requiere el ID del producto).
+   * @param {number|string} imagenId
+   * @returns {Promise<null>}
+   */
+  async eliminarImagen(imagenId) {
+    return apiFetch(`/productos/imagenes/${imagenId}`, {
       method: 'DELETE',
     });
   },

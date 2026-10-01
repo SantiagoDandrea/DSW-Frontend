@@ -1,4 +1,5 @@
 import { Categoria } from './Categoria';
+import { Imagen } from './Imagen';
 
 export class Producto {
   constructor({ id, nombre, descripcion, categoria, marca, proveedor, precioActual, disponible, imagenes }) {
@@ -10,7 +11,7 @@ export class Producto {
     this.proveedor = proveedor;
     this.precioActual = precioActual;
     this.disponible = disponible;
-    this.imagenes = imagenes ?? [];
+    this.imagenes = (imagenes ?? []).map(Imagen.fromJSON);
   }
 
   static fromJSON(json) {
