@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 export const Login = () => {
@@ -9,12 +9,19 @@ export const Login = () => {
   const [cargando, setCargando] = useState(false);
 
   const { login, isAuthenticated, esAdmin } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  // Si ya se encuentra autenticado, redirigir automáticamente
+  // Si venía de una ruta protegida, siempre volvemos ahí; si no, según el rol.
+  // Se recalcula en cada render, así que ya refleja el usuario recién logueado.
+  const from = location.state?.from;
+  const destino = from
+    ? `${from.pathname}${from.search || ''}${from.hash || ''}`
+    : (esAdmin ? '/admin' : '/');
+
+  // Apenas isAuthenticated pasa a true (login exitoso), este componente se
+  // vuelve a renderizar por el cambio en AuthContext y redirige acá.
   if (isAuthenticated) {
-    return <Navigate to={esAdmin ? '/admin' : '/'} replace />;
+    return <Navigate to={destino} replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -23,17 +30,7 @@ export const Login = () => {
     setCargando(true);
 
     try {
-      const res = await login(email, password);
-      const user = res?.usuario;
-      const isAdmin = user?.esAdmin ?? (user?.rol === 'ADMIN');
-
-      // Redirige respetando query params/hash si venía de ruta protegida, o según su rol
-      const from = location.state?.from;
-      const destination = from
-        ? `${from.pathname}${from.search || ''}${from.hash || ''}`
-        : (isAdmin ? '/admin' : '/');
-
-      navigate(destination, { replace: true });
+      await login(email, password);
     } catch (err) {
       setError(err.message || 'Credenciales inválidas. Verifica tu email y contraseña.');
     } finally {
