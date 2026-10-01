@@ -34,8 +34,16 @@ export const AdminPedidosPage = () => {
     estado: '',
     fechaDesde: '',
     fechaHasta: '',
-    usuario: '',
   });
+  const [usuarioInput, setUsuarioInput] = useState('');
+  const [usuarioDebounced, setUsuarioDebounced] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setUsuarioDebounced(usuarioInput);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [usuarioInput]);
 
   // Modales
   const [pedidoDetalle, setPedidoDetalle] = useState(null);
@@ -55,13 +63,15 @@ export const AdminPedidosPage = () => {
 
     const params = {};
     if (filtros.estado) params.estado = filtros.estado;
-    if (filtros.fechaDesde) params.fechaDesde = new Date(filtros.fechaDesde).toISOString();
-    if (filtros.fechaHasta) {
-      const d = new Date(filtros.fechaHasta);
-      d.setHours(23, 59, 59, 999);
-      params.fechaHasta = d.toISOString();
+    if (filtros.fechaDesde) {
+      const [y, m, d] = filtros.fechaDesde.split('-').map(Number);
+      params.fechaDesde = new Date(y, m - 1, d, 0, 0, 0, 0).toISOString();
     }
-    if (filtros.usuario.trim()) params.usuario = filtros.usuario.trim();
+    if (filtros.fechaHasta) {
+      const [y, m, d] = filtros.fechaHasta.split('-').map(Number);
+      params.fechaHasta = new Date(y, m - 1, d, 23, 59, 59, 999).toISOString();
+    }
+    if (usuarioDebounced.trim()) params.usuario = usuarioDebounced.trim();
 
     pedidoService
       .getPedidos(params)
@@ -81,7 +91,7 @@ export const AdminPedidosPage = () => {
     return () => {
       ignore = true;
     };
-  }, [filtros, refreshKey]);
+  }, [filtros, usuarioDebounced, refreshKey]);
 
   // Limpieza de mensajes automáticos
   useEffect(() => {
@@ -99,7 +109,9 @@ export const AdminPedidosPage = () => {
   };
 
   const handleLimpiarFiltros = () => {
-    setFiltros({ estado: '', fechaDesde: '', fechaHasta: '', usuario: '' });
+    setFiltros({ estado: '', fechaDesde: '', fechaHasta: '' });
+    setUsuarioInput('');
+    setUsuarioDebounced('');
   };
 
   // Detalle
@@ -159,7 +171,6 @@ export const AdminPedidosPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Cabecera */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Gestión de Pedidos</h2>
@@ -175,11 +186,9 @@ export const AdminPedidosPage = () => {
         </button>
       </div>
 
-      {/* Alertas */}
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      {/* Barra de Filtros */}
       <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Filtros de Búsqueda</h3>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -220,8 +229,8 @@ export const AdminPedidosPage = () => {
             <input
               type="text"
               name="usuario"
-              value={filtros.usuario}
-              onChange={handleFiltroChange}
+              value={usuarioInput}
+              onChange={(e) => setUsuarioInput(e.target.value)}
               placeholder="DNI o nombre de cliente..."
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
@@ -237,7 +246,6 @@ export const AdminPedidosPage = () => {
         </div>
       </div>
 
-      {/* Tabla de Pedidos */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
         {cargando ? (
           <div className="p-12 text-center text-gray-500">
@@ -332,7 +340,6 @@ export const AdminPedidosPage = () => {
         )}
       </div>
 
-      {/* Modal Detalle Exhaustivo */}
       <AdminModal
         isOpen={Boolean(pedidoDetalle)}
         onClose={() => setPedidoDetalle(null)}
@@ -404,7 +411,6 @@ export const AdminPedidosPage = () => {
         )}
       </AdminModal>
 
-      {/* Modal Cambio de Estado */}
       <AdminModal
         isOpen={Boolean(pedidoACambiarEstado)}
         onClose={() => setPedidoACambiarEstado(null)}
@@ -453,7 +459,6 @@ export const AdminPedidosPage = () => {
         </form>
       </AdminModal>
 
-      {/* Modal Cancelación */}
       <ConfirmModal
         isOpen={Boolean(pedidoACancelar)}
         onClose={() => setPedidoACancelar(null)}

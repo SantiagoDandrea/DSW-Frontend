@@ -68,8 +68,21 @@ export const SimpleCrudTable = ({
     const q = busqueda.toLowerCase().trim();
     return items.filter((item) =>
       columns.some((col) => {
-        const val = item[col.key];
-        return val !== undefined && val !== null && String(val).toLowerCase().includes(q);
+        let texto = '';
+        if (col.searchValue) {
+          texto = col.searchValue(item);
+        } else if (item[col.key] !== undefined && item[col.key] !== null) {
+          texto = String(item[col.key]);
+        } else if (col.render) {
+          const rendered = col.render(item);
+          if (typeof rendered === 'string' || typeof rendered === 'number') {
+            texto = String(rendered);
+          } else if (rendered && rendered.props && rendered.props.children) {
+            const ch = rendered.props.children;
+            texto = Array.isArray(ch) ? ch.join(' ') : String(ch);
+          }
+        }
+        return String(texto).toLowerCase().includes(q);
       })
     );
   }, [items, busqueda, columns]);
@@ -88,7 +101,15 @@ export const SimpleCrudTable = ({
   const handleAbrirEditar = (item) => {
     const editData = {};
     fields.forEach((f) => {
-      editData[f.name] = item[f.name] !== undefined && item[f.name] !== null ? item[f.name] : '';
+      let val = item[f.name] !== undefined && item[f.name] !== null ? item[f.name] : '';
+      if (f.type === 'datetime-local' && val) {
+        const d = val instanceof Date ? val : new Date(val);
+        if (!isNaN(d.getTime())) {
+          const pad = (n) => String(n).padStart(2, '0');
+          val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+      }
+      editData[f.name] = val;
     });
     setFormData(editData);
     setItemAEditar(item);
@@ -146,7 +167,6 @@ export const SimpleCrudTable = ({
 
   return (
     <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden space-y-4">
-      {/* Cabecera */}
       <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
@@ -161,13 +181,11 @@ export const SimpleCrudTable = ({
         </button>
       </div>
 
-      {/* Alertas */}
       <div className="px-5 space-y-2">
         <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
         <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
       </div>
 
-      {/* Búsqueda */}
       <div className="px-5">
         <input
           type="text"
@@ -178,7 +196,6 @@ export const SimpleCrudTable = ({
         />
       </div>
 
-      {/* Tabla */}
       <div className="overflow-x-auto">
         {cargando ? (
           <div className="p-12 text-center text-gray-500">
@@ -231,7 +248,6 @@ export const SimpleCrudTable = ({
         )}
       </div>
 
-      {/* Modal Formulario */}
       <AdminModal
         isOpen={modalAbierto}
         onClose={() => setModalAbierto(false)}
@@ -296,7 +312,6 @@ export const SimpleCrudTable = ({
         </form>
       </AdminModal>
 
-      {/* Modal Confirmación */}
       <ConfirmModal
         isOpen={Boolean(itemAEliminar)}
         onClose={() => setItemAEliminar(null)}

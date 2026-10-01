@@ -30,19 +30,6 @@ const OrderDetailWrapper = () => {
   return <OrderDetail key={id} />;
 };
 
-// Componente placeholder para rutas en desarrollo
-const PlaceholderPage = ({ title, description }) => (
-  <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 max-w-md w-full">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">{title}</h1>
-      <p className="text-gray-600 mb-6">{description}</p>
-      <Link to="/" className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-        Volver al inicio
-      </Link>
-    </div>
-  </main>
-);
-
 // Componente 404 Not Found
 const NotFoundPage = () => (
   <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">

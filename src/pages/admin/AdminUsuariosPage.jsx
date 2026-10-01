@@ -30,22 +30,39 @@ const InputField = ({ label, required, ...props }) => (
   </div>
 );
 
-const SelectField = ({ label, required, options = [], ...props }) => (
+const SelectField = ({ label, required, options = [], helperText, ...props }) => (
   <div>
     <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
       {label} {required && '*'}
     </label>
     <select
       required={required}
-      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
       {...props}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}
     </select>
+    {helperText && <p className="text-[11px] text-amber-600 mt-1">{helperText}</p>}
   </div>
 );
+
+const validarPasswordFrontend = (password) => {
+  if (!password || password.length < 8) {
+    return 'La contraseña debe tener al menos 8 caracteres.';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'La contraseña debe tener al menos una mayúscula.';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'La contraseña debe tener al menos una minúscula.';
+  }
+  if (!/[0-9]/.test(password)) {
+    return 'La contraseña debe tener al menos un número.';
+  }
+  return null;
+};
 
 export const AdminUsuariosPage = () => {
   const { usuario: usuarioActual } = useAuth();
@@ -77,7 +94,11 @@ export const AdminUsuariosPage = () => {
           setLocalidades(ordenadas);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!ignore) {
+          setErrorGlobal(err.message || 'Error al cargar localidades para los formularios.');
+        }
+      });
     return () => {
       ignore = true;
     };
@@ -160,17 +181,34 @@ export const AdminUsuariosPage = () => {
       setErrorModal('Nombre, Apellido y Email son campos obligatorios.');
       return;
     }
-    if (!usuarioAEditar && !formData.dni.trim()) {
-      setErrorModal('El DNI es obligatorio.');
+    if (usuarioAEditar && usuarioAEditar.dni === usuarioActual?.dni && formData.rol !== 'ADMIN') {
+      setErrorModal('No podés remover tu propio rol de ADMIN mientras estás en sesión.');
       return;
     }
-    if (!usuarioAEditar && (!formData.password || formData.password.length < 6)) {
-      setErrorModal('La contraseña inicial debe tener al menos 6 caracteres.');
-      return;
+    if (!usuarioAEditar) {
+      const dniLimpio = formData.dni.trim();
+      if (!dniLimpio) {
+        setErrorModal('El DNI es obligatorio.');
+        return;
+      }
+      if (!/^\d{7,8}$/.test(dniLimpio)) {
+        setErrorModal('El DNI debe tener entre 7 y 8 dígitos numéricos.');
+        return;
+      }
     }
-    if (usuarioAEditar && formData.password && formData.password.length < 6) {
-      setErrorModal('La nueva contraseña debe tener al menos 6 caracteres.');
-      return;
+    if (!usuarioAEditar) {
+      const errorPass = validarPasswordFrontend(formData.password);
+      if (errorPass) {
+        setErrorModal(errorPass);
+        return;
+      }
+    }
+    if (usuarioAEditar && formData.password.trim()) {
+      const errorPass = validarPasswordFrontend(formData.password.trim());
+      if (errorPass) {
+        setErrorModal(errorPass);
+        return;
+      }
     }
     if (!formData.localidadId) {
       setErrorModal('Seleccione una localidad.');
@@ -242,7 +280,6 @@ export const AdminUsuariosPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Cabecera */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Gestión de Usuarios</h2>
@@ -258,11 +295,9 @@ export const AdminUsuariosPage = () => {
         </button>
       </div>
 
-      {/* Alertas */}
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      {/* Filtros */}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
         <div className="sm:col-span-2">
           <input
@@ -286,7 +321,6 @@ export const AdminUsuariosPage = () => {
         </div>
       </div>
 
-      {/* Tabla */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
         {cargando ? (
           <div className="p-12 text-center text-gray-500">
@@ -368,7 +402,6 @@ export const AdminUsuariosPage = () => {
         )}
       </div>
 
-      {/* Modal Crear / Editar */}
       <AdminModal
         isOpen={modalAbierto}
         onClose={() => setModalAbierto(false)}
@@ -396,6 +429,12 @@ export const AdminUsuariosPage = () => {
               required
               value={formData.rol}
               onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
+              disabled={Boolean(usuarioAEditar && usuarioAEditar.dni === usuarioActual?.dni)}
+              helperText={
+                usuarioAEditar && usuarioAEditar.dni === usuarioActual?.dni
+                  ? 'No podés modificar tu propio rol en sesión.'
+                  : undefined
+              }
               options={[
                 { value: 'CLIENTE', label: 'CLIENTE' },
                 { value: 'ADMIN', label: 'ADMIN' },
@@ -449,7 +488,7 @@ export const AdminUsuariosPage = () => {
               label={usuarioAEditar ? 'Nueva Contraseña (opcional)' : 'Contraseña'}
               type="password"
               required={!usuarioAEditar}
-              placeholder={usuarioAEditar ? 'Dejar en blanco para no modificar' : 'Mínimo 6 caracteres'}
+              placeholder={usuarioAEditar ? 'Dejar en blanco para no modificar' : 'Mín. 8 caracteres (mayús, minús, núm)'}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
@@ -475,7 +514,6 @@ export const AdminUsuariosPage = () => {
         </form>
       </AdminModal>
 
-      {/* Modal Confirmar Eliminación */}
       <ConfirmModal
         isOpen={Boolean(usuarioAEliminar)}
         onClose={() => setUsuarioAEliminar(null)}

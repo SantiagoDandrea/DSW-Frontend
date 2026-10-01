@@ -55,9 +55,17 @@ export const AdminProductosPage = () => {
   const [cargando, setCargando] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const [busquedaInput, setBusquedaInput] = useState('');
   const [filtroNombre, setFiltroNombre] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroMarca, setFiltroMarca] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFiltroNombre(busquedaInput);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [busquedaInput]);
 
   const [modalFormAbierto, setModalFormAbierto] = useState(false);
   const [productoAEditar, setProductoAEditar] = useState(null);
@@ -71,15 +79,22 @@ export const AdminProductosPage = () => {
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([
-      categoriaService.getCategorias().catch(() => []),
-      marcaService.getMarcas().catch(() => []),
-      proveedorService.getProveedores().catch(() => []),
-    ]).then(([cats, mrcs, provs]) => {
-      if (!ignore) {
-        setCategorias(cats);
-        setMarcas(mrcs);
-        setProveedores(provs);
+    Promise.allSettled([
+      categoriaService.getCategorias(),
+      marcaService.getMarcas(),
+      proveedorService.getProveedores(),
+    ]).then(([catsResult, mrcsResult, provsResult]) => {
+      if (ignore) return;
+      const errores = [];
+      if (catsResult.status === 'fulfilled') setCategorias(catsResult.value || []);
+      else errores.push('categorías');
+      if (mrcsResult.status === 'fulfilled') setMarcas(mrcsResult.value || []);
+      else errores.push('marcas');
+      if (provsResult.status === 'fulfilled') setProveedores(provsResult.value || []);
+      else errores.push('proveedores');
+
+      if (errores.length > 0) {
+        setErrorGlobal(`No se pudieron cargar los datos de ${errores.join(', ')} para los selectores.`);
       }
     });
     return () => {
@@ -218,7 +233,6 @@ export const AdminProductosPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Cabecera */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Catálogo de Productos</h2>
@@ -234,17 +248,15 @@ export const AdminProductosPage = () => {
         </button>
       </div>
 
-      {/* Alertas */}
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      {/* Filtros */}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
         <input
           type="text"
           placeholder="Buscar por nombre..."
-          value={filtroNombre}
-          onChange={(e) => setFiltroNombre(e.target.value)}
+          value={busquedaInput}
+          onChange={(e) => setBusquedaInput(e.target.value)}
           className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
         />
         <select
@@ -268,14 +280,13 @@ export const AdminProductosPage = () => {
           ))}
         </select>
         <button
-          onClick={() => { setFiltroNombre(''); setFiltroCategoria(''); setFiltroMarca(''); }}
+          onClick={() => { setBusquedaInput(''); setFiltroNombre(''); setFiltroCategoria(''); setFiltroMarca(''); }}
           className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold border border-gray-200 transition cursor-pointer"
         >
           Limpiar filtros
         </button>
       </div>
 
-      {/* Tabla */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
         {cargando ? (
           <div className="p-12 text-center text-gray-500">
@@ -353,7 +364,6 @@ export const AdminProductosPage = () => {
         )}
       </div>
 
-      {/* Modal Crear / Editar */}
       <AdminModal
         isOpen={modalFormAbierto}
         onClose={() => setModalFormAbierto(false)}
@@ -452,7 +462,6 @@ export const AdminProductosPage = () => {
         </form>
       </AdminModal>
 
-      {/* Modal Confirmar Eliminación */}
       <ConfirmModal
         isOpen={Boolean(productoAEliminar)}
         onClose={() => setProductoAEliminar(null)}

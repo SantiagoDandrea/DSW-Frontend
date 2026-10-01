@@ -88,7 +88,6 @@ export const AdminTablasPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Selector de pestañas */}
       <div className="bg-white p-2 rounded-xl shadow-xs border border-gray-200 overflow-x-auto">
         <div className="flex gap-1.5 min-w-max">
           {tabs.map((tab) => (
@@ -108,7 +107,6 @@ export const AdminTablasPage = () => {
         </div>
       </div>
 
-      {/* Contenido según la pestaña activa */}
       {tabActiva === 'categorias' && (
         <SimpleCrudTable
           key="crud-categorias"

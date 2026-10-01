@@ -4,21 +4,34 @@ import { precioService } from '../../services/precioService';
 import { productoService } from '../../services/productoService';
 import { almacenService } from '../../services/almacenService';
 import { SimpleCrudTable } from '../../components/admin/SimpleCrudTable';
+import { AdminAlert } from '../../components/admin/AdminAlert';
 
 export const AdminInventarioPage = () => {
   const [tabActiva, setTabActiva] = useState('stock'); // 'stock' | 'precios'
   const [productos, setProductos] = useState([]);
   const [almacenes, setAlmacenes] = useState([]);
+  const [errorCatalogo, setErrorCatalogo] = useState(null);
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([
-      productoService.getProductos().catch(() => []),
-      almacenService.getAlmacenes().catch(() => []),
-    ]).then(([prods, alms]) => {
-      if (!ignore) {
-        setProductos(prods);
-        setAlmacenes(alms);
+    Promise.allSettled([
+      productoService.getProductos(),
+      almacenService.getAlmacenes(),
+    ]).then(([prodsResult, almsResult]) => {
+      if (ignore) return;
+      const errores = [];
+      if (prodsResult.status === 'fulfilled') {
+        setProductos(prodsResult.value || []);
+      } else {
+        errores.push('productos');
+      }
+      if (almsResult.status === 'fulfilled') {
+        setAlmacenes(almsResult.value || []);
+      } else {
+        errores.push('almacenes');
+      }
+      if (errores.length > 0) {
+        setErrorCatalogo(`No se pudieron cargar los datos de ${errores.join(' y ')} para los selectores.`);
       }
     });
     return () => {
@@ -91,16 +104,19 @@ export const AdminInventarioPage = () => {
       {
         key: 'producto',
         label: 'Producto',
+        searchValue: (s) => mapaProductos[s.productoId]?.nombre || s.producto?.nombre || '',
         render: (s) => mapaProductos[s.productoId]?.nombre || s.producto?.nombre || `ID #${s.productoId}`,
       },
       {
         key: 'almacen',
         label: 'Almacén',
+        searchValue: (s) => mapaAlmacenes[s.almacenId]?.descripcion || s.almacen?.descripcion || '',
         render: (s) => mapaAlmacenes[s.almacenId]?.descripcion || s.almacen?.descripcion || `Almacén #${s.almacenId}`,
       },
       {
         key: 'cantidad',
         label: 'Cantidad',
+        searchValue: (s) => String(s.cantidad),
         render: (s) => <span className="font-bold text-gray-900">{s.cantidad} un.</span>,
       },
     ],
@@ -120,11 +136,13 @@ export const AdminInventarioPage = () => {
       {
         key: 'producto',
         label: 'Producto',
+        searchValue: (p) => mapaProductos[p.productoId]?.nombre || '',
         render: (p) => mapaProductos[p.productoId]?.nombre || `ID #${p.productoId}`,
       },
       {
         key: 'valor',
         label: 'Valor ($)',
+        searchValue: (p) => String(p.valor),
         render: (p) => (
           <span className="font-bold text-gray-900">
             ${Number(p.valor).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -134,6 +152,7 @@ export const AdminInventarioPage = () => {
       {
         key: 'fechaDesde',
         label: 'Vigencia Desde',
+        searchValue: (p) => (p.fechaDesde ? new Date(p.fechaDesde).toLocaleString('es-AR') : ''),
         render: (p) => (p.fechaDesde ? new Date(p.fechaDesde).toLocaleString('es-AR') : '-'),
       },
     ],
@@ -147,7 +166,8 @@ export const AdminInventarioPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Selector de pestañas */}
+      <AdminAlert type="error" message={errorCatalogo} onClose={() => setErrorCatalogo(null)} />
+
       <div className="bg-white p-2 rounded-xl shadow-xs border border-gray-200 overflow-x-auto">
         <div className="flex gap-2 min-w-max">
           <button
@@ -175,7 +195,6 @@ export const AdminInventarioPage = () => {
         </div>
       </div>
 
-      {/* Tabla ABM activa */}
       {tabActiva === 'stock' ? (
         <SimpleCrudTable key="stock" {...configStock} />
       ) : (
