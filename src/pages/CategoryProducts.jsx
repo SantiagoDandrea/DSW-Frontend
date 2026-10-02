@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
+import { ProductFilters } from '../components/ProductFilters';
+import { useFiltrosProducto } from '../hooks/useFiltrosProducto';
 import { productoService } from '../services/productoService';
 
 export const CategoryProducts = () => {
@@ -34,6 +36,19 @@ export const CategoryProducts = () => {
     };
   }, [categoryId]);
 
+  const {
+    productosFiltrados,
+    marcas,
+    marcaId,
+    setMarcaId,
+    precioMin,
+    setPrecioMin,
+    precioMax,
+    setPrecioMax,
+    limpiarFiltros,
+    hayFiltrosActivos,
+  } = useFiltrosProducto(productos);
+
   return (
     <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
       {cargando ? (
@@ -45,11 +60,28 @@ export const CategoryProducts = () => {
       ) : productos.length === 0 ? (
         <p>No hay productos en esta categoría.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {productos.map((producto) => (
-            <ProductCard key={producto.id} producto={producto} />
-          ))}
-        </div>
+        <>
+          <ProductFilters
+            marcas={marcas}
+            marcaId={marcaId}
+            setMarcaId={setMarcaId}
+            precioMin={precioMin}
+            setPrecioMin={setPrecioMin}
+            precioMax={precioMax}
+            setPrecioMax={setPrecioMax}
+            hayFiltrosActivos={hayFiltrosActivos}
+            limpiarFiltros={limpiarFiltros}
+          />
+          {productosFiltrados.length === 0 ? (
+            <p>No hay productos que coincidan con los filtros.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {productosFiltrados.map((producto) => (
+                <ProductCard key={producto.id} producto={producto} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </main>
   );

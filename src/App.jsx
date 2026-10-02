@@ -1,4 +1,4 @@
-import { BrowserRouter, useLocation } from 'react-router-dom';
+import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { useCart } from './context/useCart';
@@ -8,7 +8,16 @@ import { AppRoutes } from './routes/AppRoutes';
 
 function AppLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { cantidadTotal } = useCart();
+
+  const handleSearch = (query) => {
+    const termino = query.trim();
+    if (!termino) return;
+    navigate(`/buscar?q=${encodeURIComponent(termino)}`, {
+      replace: location.pathname.startsWith('/buscar'),
+    });
+  };
 
   const hideSearchBarRoutes = [
     '/login',
@@ -28,9 +37,7 @@ function AppLayout() {
       <Header cartCount={cantidadTotal} />
 
       {showSearchBar && (
-        <SearchBar
-          onSearch={(query) => console.log('Búsqueda:', query)}
-        />
+        <SearchBar onSearch={handleSearch} />
       )}
 
       <AppRoutes />

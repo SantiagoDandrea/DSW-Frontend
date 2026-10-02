@@ -29,6 +29,12 @@ export const Header = ({ cartCount = 0 }) => {
                 </Link>
               )}
             </span>
+            <Link
+              to="/mis-pedidos"
+              className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
+            >
+              Mis pedidos
+            </Link>
             <button
               onClick={logout}
               className="text-xs font-medium text-gray-500 hover:text-red-600 px-2 py-1 rounded border border-gray-200 hover:border-red-200 transition cursor-pointer"

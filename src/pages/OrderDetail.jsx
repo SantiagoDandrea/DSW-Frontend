@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { checkoutService } from '../services/checkoutService';
+import { envioService } from '../services/envioService';
 
 const ESTADOS_CANCELABLES = [
   'PENDIENTE',
   'CONFIRMADO',
   'EN_PREPARACION',
 ];
+
+const ESTADOS_ENVIO_CANCELABLE = ['PENDIENTE', 'EN_PREPARACION'];
 
 function mostrarPrecio(valor) {
   return Number(valor).toLocaleString('es-AR', {
@@ -27,6 +30,12 @@ export function OrderDetail() {
   const [cancelando, setCancelando] = useState(false);
   const [errorCancelacion, setErrorCancelacion] = useState('');
   const solicitudEnCurso = useRef(false);
+
+  const [editandoDomicilio, setEditandoDomicilio] = useState(false);
+  const [nuevoDomicilio, setNuevoDomicilio] = useState('');
+  const [guardandoDomicilio, setGuardandoDomicilio] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState('');
+  const [cancelandoEnvio, setCancelandoEnvio] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -84,6 +93,45 @@ export function OrderDetail() {
     }
   }
 
+  async function handleGuardarDomicilio(envioId) {
+    if (!nuevoDomicilio.trim()) return;
+
+    setGuardandoDomicilio(true);
+    setErrorEnvio('');
+
+    try {
+      await envioService.actualizarDomicilio(envioId, nuevoDomicilio.trim());
+      const pedido = await checkoutService.getPedidoById(id);
+      setResultado({ id, pedido, error: '' });
+      setEditandoDomicilio(false);
+    } catch (error) {
+      setErrorEnvio(error.message || 'No pudimos actualizar el domicilio.');
+    } finally {
+      setGuardandoDomicilio(false);
+    }
+  }
+
+  async function handleCancelarEnvio(envioId) {
+    const confirmado = window.confirm(
+      '¿Querés cancelar el envío a domicilio? El pedido sigue activo, pero vas a tener que retirarlo en el local.'
+    );
+
+    if (!confirmado) return;
+
+    setCancelandoEnvio(true);
+    setErrorEnvio('');
+
+    try {
+      await envioService.cancelarEnvio(envioId);
+      const pedido = await checkoutService.getPedidoById(id);
+      setResultado({ id, pedido, error: '' });
+    } catch (error) {
+      setErrorEnvio(error.message || 'No pudimos cancelar el envío.');
+    } finally {
+      setCancelandoEnvio(false);
+    }
+  }
+
   if (resultado.id !== id) {
     return (
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
@@ -111,6 +159,12 @@ export function OrderDetail() {
 
   const pedido = resultado.pedido;
   const puedeCancelar = ESTADOS_CANCELABLES.includes(pedido.estado);
+  const puedeEditarDomicilio =
+    pedido.envio?.estado === 'PENDIENTE' && pedido.estado === 'PENDIENTE';
+  const puedeCancelarEnvio =
+    pedido.envio &&
+    ESTADOS_ENVIO_CANCELABLE.includes(pedido.envio.estado) &&
+    ESTADOS_CANCELABLES.includes(pedido.estado);
 
   return (
     <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
@@ -161,9 +215,48 @@ export function OrderDetail() {
 
           {pedido.envio ? (
             <>
-              <p>
-                Domicilio: {pedido.envio.domicilioEntrega}
-              </p>
+              {editandoDomicilio ? (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={nuevoDomicilio}
+                    onChange={(e) => setNuevoDomicilio(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Nuevo domicilio de entrega"
+                  />
+                  <button
+                    type="button"
+                    disabled={guardandoDomicilio}
+                    onClick={() => handleGuardarDomicilio(pedido.envio.id)}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    {guardandoDomicilio ? 'Guardando...' : 'Guardar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditandoDomicilio(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <p>
+                  Domicilio: {pedido.envio.domicilioEntrega}
+                  {puedeEditarDomicilio && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNuevoDomicilio(pedido.envio.domicilioEntrega);
+                        setEditandoDomicilio(true);
+                      }}
+                      className="ml-2 text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                    >
+                      Editar
+                    </button>
+                  )}
+                </p>
+              )}
 
               <p>
                 Estado del envío:{' '}
@@ -173,6 +266,23 @@ export function OrderDetail() {
               <p>
                 Costo del envío: {mostrarPrecio(pedido.envio.costo)}
               </p>
+
+              {errorEnvio && (
+                <p role="alert" className="text-red-700">
+                  {errorEnvio}
+                </p>
+              )}
+
+              {puedeCancelarEnvio && (
+                <button
+                  type="button"
+                  disabled={cancelandoEnvio}
+                  onClick={() => handleCancelarEnvio(pedido.envio.id)}
+                  className="text-sm text-red-700 hover:text-red-800 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  {cancelandoEnvio ? 'Cancelando envío...' : 'Cancelar envío (retirar en el local)'}
+                </button>
+              )}
             </>
           ) : (
             <p>Entrega: retiro en el local.</p>

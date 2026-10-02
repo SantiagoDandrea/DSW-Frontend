@@ -372,7 +372,7 @@ export const AdminUsuariosPage = () => {
                         </span>
                       </td>
                       <td className="px-5 py-3">
-                        {u.localidad ? `${u.localidad.nombre} (${u.localidad.provincia})` : '-'}
+                        {u.localidad?.nombre || '-'}
                       </td>
                       <td className="px-5 py-3">{u.telefono || '-'}</td>
                       <td className="px-5 py-3 text-right">

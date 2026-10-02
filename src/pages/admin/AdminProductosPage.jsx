@@ -75,6 +75,11 @@ export const AdminProductosPage = () => {
   const [guardando, setGuardando] = useState(false);
   const [errorGlobal, setErrorGlobal] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
+
+  const [imagenesProducto, setImagenesProducto] = useState([]);
+  const [nuevaImagenUrl, setNuevaImagenUrl] = useState('');
+  const [guardandoImagen, setGuardandoImagen] = useState(false);
+  const [errorImagen, setErrorImagen] = useState('');
   const [errorModal, setErrorModal] = useState(null);
 
   useEffect(() => {
@@ -161,8 +166,46 @@ export const AdminProductosPage = () => {
       precio: '',
       imagenUrl: '',
     });
+    setImagenesProducto(prod.imagenes || []);
+    setNuevaImagenUrl('');
+    setErrorImagen('');
     setErrorModal(null);
     setModalFormAbierto(true);
+  };
+
+  const handleAgregarImagen = async () => {
+    if (!nuevaImagenUrl.trim() || !productoAEditar) return;
+
+    setGuardandoImagen(true);
+    setErrorImagen('');
+
+    try {
+      const imagen = await productoService.agregarImagen(productoAEditar.id, {
+        url: nuevaImagenUrl.trim(),
+      });
+      setImagenesProducto((prev) => [...prev, imagen]);
+      setNuevaImagenUrl('');
+      recargar();
+    } catch (err) {
+      setErrorImagen(err.message || 'No se pudo agregar la imagen.');
+    } finally {
+      setGuardandoImagen(false);
+    }
+  };
+
+  const handleEliminarImagen = async (imagenId) => {
+    setGuardandoImagen(true);
+    setErrorImagen('');
+
+    try {
+      await productoService.eliminarImagen(imagenId);
+      setImagenesProducto((prev) => prev.filter((img) => img.id !== imagenId));
+      recargar();
+    } catch (err) {
+      setErrorImagen(err.message || 'No se pudo eliminar la imagen.');
+    } finally {
+      setGuardandoImagen(false);
+    }
   };
 
   const handleSubmitForm = async (e) => {
@@ -439,6 +482,66 @@ export const AdminProductosPage = () => {
                 onChange={(e) => setFormData({ ...formData, imagenUrl: e.target.value })}
                 placeholder="https://ejemplo.com/foto.jpg"
               />
+            </div>
+          )}
+
+          {productoAEditar && (
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">
+                Imágenes
+              </p>
+
+              {imagenesProducto.length > 0 && (
+                <ul className="space-y-2 mb-3">
+                  {imagenesProducto.map((img) => (
+                    <li
+                      key={img.id}
+                      className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                    >
+                      <img
+                        src={img.url}
+                        alt=""
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <span className="flex-1 text-sm text-gray-700 truncate">
+                        {img.url}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={guardandoImagen}
+                        onClick={() => handleEliminarImagen(img.id)}
+                        className="text-sm text-red-700 hover:text-red-800 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        Eliminar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {errorImagen && (
+                <p role="alert" className="text-sm text-red-700 mb-2">
+                  {errorImagen}
+                </p>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={nuevaImagenUrl}
+                  onChange={(e) => setNuevaImagenUrl(e.target.value)}
+                  placeholder="https://ejemplo.com/foto.jpg"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  disabled={guardandoImagen || !nuevaImagenUrl.trim()}
+                  onClick={handleAgregarImagen}
+                  className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
+                >
+                  Agregar
+                </button>
+              </div>
             </div>
           )}
 
