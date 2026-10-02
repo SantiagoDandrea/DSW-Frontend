@@ -26,6 +26,8 @@ function AppLayout() {
     '/checkout',
     '/admin',
     '/carrito',
+    '/mis-pedidos',
+    '/pedidos',
   ];
 
   const showSearchBar = !hideSearchBarRoutes.some(
