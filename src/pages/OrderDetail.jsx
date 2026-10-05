@@ -1,3 +1,4 @@
+// Pantalla de detalle de un pedido donde el cliente consulta artículos, entrega y puede cancelar o modificar el envío.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { checkoutService } from '../services/checkoutService';

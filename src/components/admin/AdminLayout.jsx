@@ -1,3 +1,4 @@
+// Estructura visual del panel de administración con menú lateral de navegación y área de contenido.
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';

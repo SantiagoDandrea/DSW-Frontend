@@ -1,3 +1,4 @@
+// Pantalla del historial de pedidos del usuario, con filtros por estado, fechas y buscador.
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
@@ -35,7 +36,6 @@ export function MyOrders() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
 
-  // Filtros reactivos
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [fechaDesde, setFechaDesde] = useState('');
@@ -44,15 +44,12 @@ export function MyOrders() {
   useEffect(() => {
     let ignore = false;
 
-    // Si el usuario es ADMIN, el backend por defecto devolvería los pedidos de todos los usuarios
-    // a menos que se filtre explícitamente por su propio DNI. Para CLIENTE el backend ya restringe automáticamente.
     const params = usuario?.dni ? { usuario: usuario.dni } : {};
 
     pedidoService
       .getPedidos(params)
       .then((datos) => {
         if (!ignore) {
-          // Defensa en profundidad: garantizar que en "Mis pedidos" solo se listen las compras propias del usuario logueado
           const pedidosPropios = usuario?.dni
             ? (datos || []).filter((p) => p.cliente?.dni === usuario.dni)
             : datos || [];
@@ -86,7 +83,6 @@ export function MyOrders() {
 
   const pedidosFiltrados = useMemo(() => {
     return pedidos.filter((pedido) => {
-      // 1. Filtro por término de búsqueda (ID, medio de pago o domicilio)
       if (busqueda.trim()) {
         const termino = busqueda.trim().toLowerCase().replace(/^#/, '');
         const idCoincide = String(pedido.id).includes(termino);
@@ -102,19 +98,16 @@ export function MyOrders() {
         }
       }
 
-      // 2. Filtro por Estado
       if (filtroEstado && pedido.estado !== filtroEstado) {
         return false;
       }
 
-      // 3. Filtro por Fecha Desde
       if (fechaDesde) {
         const fechaPedido = new Date(pedido.fecha);
         const desde = new Date(`${fechaDesde}T00:00:00`);
         if (fechaPedido < desde) return false;
       }
 
-      // 4. Filtro por Fecha Hasta (fin del día inclusive)
       if (fechaHasta) {
         const fechaPedido = new Date(pedido.fecha);
         const hasta = new Date(`${fechaHasta}T23:59:59.999`);
@@ -127,7 +120,6 @@ export function MyOrders() {
 
   return (
     <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
-      {/* Cabecera */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
@@ -181,10 +173,8 @@ export function MyOrders() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Panel de Búsqueda y Filtros */}
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-              {/* Buscador de pedidos */}
               <div className="md:col-span-2">
                 <label
                   htmlFor="busqueda-pedidos"
@@ -217,7 +207,6 @@ export function MyOrders() {
                 </div>
               </div>
 
-              {/* Filtro por Estado */}
               <div>
                 <label
                   htmlFor="filtro-estado"
@@ -239,7 +228,6 @@ export function MyOrders() {
                 </select>
               </div>
 
-              {/* Acciones de filtro */}
               <div className="flex items-center gap-2">
                 {hayFiltrosActivos && (
                   <button
@@ -253,7 +241,6 @@ export function MyOrders() {
               </div>
             </div>
 
-            {/* Filtros por fecha */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-gray-100">
               <div>
                 <label
@@ -288,7 +275,6 @@ export function MyOrders() {
               </div>
             </div>
 
-            {/* Contador de resultados */}
             <div className="text-xs text-gray-500 pt-1 flex items-center justify-between">
               <span>
                 Mostrando {pedidosFiltrados.length} de {pedidos.length} pedidos
@@ -301,7 +287,6 @@ export function MyOrders() {
             </div>
           </div>
 
-          {/* Listado de pedidos */}
           {pedidosFiltrados.length === 0 ? (
             <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-10 text-center text-gray-500">
               <p className="text-base font-semibold text-gray-800">
@@ -353,7 +338,6 @@ export function MyOrders() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
-                      {/* Medio de Pago */}
                       <div>
                         <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
                           Medio de Pago
@@ -363,7 +347,6 @@ export function MyOrders() {
                         </p>
                       </div>
 
-                      {/* Modalidad de Entrega */}
                       <div>
                         <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
                           Entrega
@@ -375,7 +358,6 @@ export function MyOrders() {
                         </p>
                       </div>
 
-                      {/* Importe Total */}
                       <div className="sm:text-right">
                         <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
                           Total

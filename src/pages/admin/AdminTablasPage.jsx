@@ -1,3 +1,4 @@
+// Panel de administración para gestionar tablas maestras como categorías, marcas, medios de pago, localidades, almacenes y proveedores.
 import { useState, useMemo } from 'react';
 import { SimpleCrudTable } from '../../components/admin/SimpleCrudTable';
 import { categoriaService } from '../../services/categoriaService';
@@ -46,7 +47,6 @@ export const AdminTablasPage = () => {
     { id: 'proveedores', label: 'Proveedores', icon: '🚚' },
   ];
 
-  // Servicios encapsulados con la interfaz estándar requerida por SimpleCrudTable
   const servicios = useMemo(() => ({
     categorias: {
       getAll: () => categoriaService.getCategorias(),

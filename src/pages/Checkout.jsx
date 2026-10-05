@@ -1,3 +1,4 @@
+// Pantalla de checkout para seleccionar método de pago, envío o retiro y confirmar el pedido.
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
@@ -114,7 +115,6 @@ export function Checkout() {
     }
   }
 
-  // Mostrar la confirmación antes del estado de carrito vacío.
 if (pedidoCreado) {
   return (
     <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">

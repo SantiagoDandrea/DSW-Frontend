@@ -1,6 +1,4 @@
-/**
- * Modal de confirmación para acciones críticas (eliminación, cancelación).
- */
+// Modal de confirmación para pedir seguridad al usuario antes de realizar acciones importantes como borrar o cancelar.
 export const ConfirmModal = ({
   isOpen,
   onClose,
@@ -8,7 +6,7 @@ export const ConfirmModal = ({
   title,
   message,
   confirmText = 'Eliminar',
-  confirmVariant = 'danger', // 'danger' | 'warning' | 'primary'
+  confirmVariant = 'danger',
   loading = false,
 }) => {
   if (!isOpen) return null;

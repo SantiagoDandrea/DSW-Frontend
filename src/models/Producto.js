@@ -1,3 +1,4 @@
+// Modelo principal que representa un producto del catálogo con su precio, marca, categoría e imágenes.
 import { Categoria } from './Categoria';
 import { Imagen } from './Imagen';
 

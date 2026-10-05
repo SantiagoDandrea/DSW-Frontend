@@ -1,3 +1,4 @@
+// Pantalla de inicio de la tienda que muestra las tarjetas de categorías principales.
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CategoryCard } from '../components/CategoryCard';

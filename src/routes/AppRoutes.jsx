@@ -1,3 +1,4 @@
+// Define todas las rutas de navegación de la aplicación (públicas, de clientes y del panel de administración).
 import { Routes, Route, Navigate, useParams, Link } from 'react-router-dom';
 import { Home } from '../pages/Home';
 import { CategoryProducts } from '../pages/CategoryProducts';
@@ -19,8 +20,6 @@ import { Checkout } from '../pages/Checkout';
 import { MyOrders } from '../pages/MyOrders';
 import { OrderDetail } from '../pages/OrderDetail';
 
-// Wrapper con key para reiniciar el estado de CategoryProducts al cambiar de categoría
-// (Patrón recomendado por React 19 para evitar set-state-in-effect en cascading renders)
 const CategoryProductsWrapper = () => {
   const { categoryId } = useParams();
   return <CategoryProducts key={categoryId} />;
@@ -31,7 +30,6 @@ const OrderDetailWrapper = () => {
   return <OrderDetail key={id} />;
 };
 
-// Componente 404 Not Found
 const NotFoundPage = () => (
   <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
     <h1 className="text-6xl font-extrabold text-indigo-600 mb-2">404</h1>
@@ -43,29 +41,17 @@ const NotFoundPage = () => (
   </main>
 );
 
-/**
- * Enrutador principal centralizado de la aplicación.
- * Define y organiza rutas públicas, protegidas por autenticación y protegidas por rol administrador,
- * alineadas con la arquitectura del proyecto (docs/arquitectura-frontend.md).
- */
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* ======================================================== */}
-      {/* 1. Rutas Públicas                                       */}
-      {/* ======================================================== */}
       <Route path="/" element={<Home />} />
       <Route path="/categoria/:categoryId" element={<CategoryProductsWrapper />} />
       <Route path="/producto/:id" element={<ProductDetail />} />
       <Route path="/buscar" element={<SearchResults />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
-      {/* Alias en inglés para compatibilidad */}
       <Route path="/register" element={<Navigate to="/registro" replace />} />
 
-      {/* ======================================================== */}
-      {/* 2. Rutas Protegidas (Clientes Autenticados)              */}
-      {/* ======================================================== */}
       <Route
         path="/perfil"
         element={
@@ -74,7 +60,6 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      {/* Alias en inglés para compatibilidad */}
       <Route path="/profile" element={<Navigate to="/perfil" replace />} />
 
       <Route
@@ -104,9 +89,6 @@ export const AppRoutes = () => {
     </ProtectedRoute>
   }
 />
-      {/* ======================================================== */}
-      {/* 3. Rutas Protegidas de Administración (ADMIN)           */}
-      {/* ======================================================== */}
       <Route
         path="/admin"
         element={
@@ -123,9 +105,6 @@ export const AppRoutes = () => {
         <Route path="usuarios" element={<AdminUsuariosPage />} />
       </Route>
 
-      {/* ======================================================== */}
-      {/* 4. Ruta Comodín (404 Not Found)                         */}
-      {/* ======================================================== */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

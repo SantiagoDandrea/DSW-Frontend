@@ -1,3 +1,4 @@
+// Modelo que representa una categoría para clasificar productos en la tienda.
 export class Categoria {
   constructor({ id, nombre }) {
     this.id = id;

@@ -1,3 +1,4 @@
+// Servicio para procesar compras: obtener formas de pago, crear órdenes y gestionar su estado.
 import { apiFetch } from './api';
 
 export const checkoutService = {

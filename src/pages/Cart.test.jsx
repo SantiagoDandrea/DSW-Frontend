@@ -1,3 +1,4 @@
+// Pruebas unitarias para verificar el funcionamiento y renderizado de la pantalla del carrito.
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

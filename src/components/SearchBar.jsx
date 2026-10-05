@@ -1,3 +1,4 @@
+// Barra de búsqueda con retraso para escribir y encontrar productos por nombre o descripción.
 import { useEffect, useRef, useState } from 'react';
 
 export const SearchBar = ({ onSearch }) => {

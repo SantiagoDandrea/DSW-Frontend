@@ -1,3 +1,4 @@
+// Pantalla del carrito de compras donde el usuario puede ver sus productos, cambiar cantidades o iniciar la compra.
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
 

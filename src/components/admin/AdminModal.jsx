@@ -1,6 +1,4 @@
-/**
- * Modal genérico para formularios y vistas de detalle en el panel de administración.
- */
+// Ventana modal reutilizable para mostrar formularios y detalles en el panel de administración.
 export const AdminModal = ({
   isOpen,
   onClose,

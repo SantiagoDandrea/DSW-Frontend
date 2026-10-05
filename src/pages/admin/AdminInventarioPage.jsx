@@ -1,3 +1,4 @@
+// Panel de administración para gestionar el stock de productos por almacén y los historiales de precios.
 import { useState, useEffect, useMemo } from 'react';
 import { stockService } from '../../services/stockService';
 import { precioService } from '../../services/precioService';
@@ -7,7 +8,7 @@ import { SimpleCrudTable } from '../../components/admin/SimpleCrudTable';
 import { AdminAlert } from '../../components/admin/AdminAlert';
 
 export const AdminInventarioPage = () => {
-  const [tabActiva, setTabActiva] = useState('stock'); // 'stock' | 'precios'
+  const [tabActiva, setTabActiva] = useState('stock');
   const [productos, setProductos] = useState([]);
   const [almacenes, setAlmacenes] = useState([]);
   const [errorCatalogo, setErrorCatalogo] = useState(null);

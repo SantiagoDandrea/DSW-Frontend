@@ -1,3 +1,4 @@
+// Servicio para consultar, crear, modificar y eliminar existencias de stock en la API.
 import { createCrudService } from './crudServiceFactory';
 import { Stock } from '../models/Stock';
 

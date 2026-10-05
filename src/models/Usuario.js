@@ -1,3 +1,4 @@
+// Modelo que representa un usuario del sistema con sus datos personales, contacto y rol.
 export class Usuario {
   constructor({ dni, nombre, apellido, email, telefono, rol, localidad } = {}) {
     this.dni = dni;
@@ -13,10 +14,6 @@ export class Usuario {
     return this.rol === 'ADMIN';
   }
 
-  /**
-   * En el backend la clave primaria del Usuario es el DNI (no existe campo autoincremental id).
-   * Este getter funciona como alias de conveniencia para componentes o listas que requieran un identificador único.
-   */
   get id() {
     return this.dni;
   }

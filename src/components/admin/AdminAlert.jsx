@@ -1,6 +1,4 @@
-/**
- * Cartel de alerta para retroalimentación al usuario (éxito o error).
- */
+// Muestra un mensaje flotante de alerta para avisar al usuario si una operación fue exitosa o si hubo un error.
 export const AdminAlert = ({ type = 'error', message, onClose }) => {
   if (!message) return null;
 

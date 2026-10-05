@@ -1,3 +1,4 @@
+// Configuración general del entorno de pruebas de extremo a extremo (E2E) con Playwright.
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 

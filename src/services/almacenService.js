@@ -1,3 +1,4 @@
+// Servicio para consultar, crear, modificar y eliminar almacenes comunicándose con la API.
 import { createCrudService } from './crudServiceFactory';
 import { Almacen } from '../models/Almacen';
 

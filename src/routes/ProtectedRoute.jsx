@@ -1,12 +1,7 @@
+// Protector de rutas que verifica si el usuario inició sesión antes de dejarlo ingresar a la pantalla.
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
-/**
- * Route Guard para verificar si el usuario se encuentra autenticado.
- * - Si está en estado de carga (verificando persistencia), muestra un spinner.
- * - Si no está autenticado, redirige a /login guardando la ubicación previa en location.state.
- * - Si está autenticado, renderiza los componentes hijos.
- */
 export const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();

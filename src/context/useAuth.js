@@ -1,20 +1,7 @@
+// Hook personalizado para acceder fácilmente a la sesión del usuario y funciones de autenticación.
 import { useContext } from 'react';
 import { AuthContext } from './auth-context';
 
-/**
- * Hook personalizado para acceder al estado y acciones de autenticación.
- * @returns {{
- *   usuario: Object|null,
- *   token: string|null,
- *   isAuthenticated: boolean,
- *   esAdmin: boolean,
- *   loading: boolean,
- *   login: Function,
- *   register: Function,
- *   actualizarPerfil: Function,
- *   logout: Function
- * }}
- */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

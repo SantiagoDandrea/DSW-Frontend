@@ -1,3 +1,4 @@
+// Pantalla de registro de nuevos usuarios donde se completan los datos de la cuenta.
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';

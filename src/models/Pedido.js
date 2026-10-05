@@ -1,3 +1,4 @@
+// Modelo que representa una orden de compra realizada con su detalle, cliente y datos de entrega.
 import { Envio } from './Envio';
 
 export class Pedido {

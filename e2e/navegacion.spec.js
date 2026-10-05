@@ -1,3 +1,4 @@
+// Pruebas de extremo a extremo (E2E) para verificar la navegación básica del carrito y del checkout.
 import { test, expect } from '@playwright/test';
 
 test('un carrito nuevo muestra el estado vacío', async ({ page }) => {

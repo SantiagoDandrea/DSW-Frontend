@@ -1,3 +1,4 @@
+// Configuración de ESLint para mantener la calidad de código y reglas de React en el proyecto.
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'

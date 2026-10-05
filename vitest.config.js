@@ -1,3 +1,4 @@
+// Configuración del ejecutor de pruebas unitarias Vitest con entorno jsdom.
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 

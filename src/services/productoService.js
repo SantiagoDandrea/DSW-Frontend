@@ -1,16 +1,9 @@
+// Servicio para consultar, crear, modificar y eliminar productos y sus fotos en la API.
 import { apiFetch } from './api';
 import { Producto } from '../models/Producto';
 import { Imagen } from '../models/Imagen';
 
-/**
- * Servicio para operaciones sobre el recurso Productos.
- */
 export const productoService = {
-  /**
-   * Obtiene la lista de productos con filtros opcionales.
-   * @param {Object} [filtros={}] - Filtros opcionales (categoriaId, marcaId, nombre, etc.).
-   * @returns {Promise<Producto[]>} Lista de productos.
-   */
   async getProductos(filtros = {}) {
     const params = new URLSearchParams();
 
@@ -27,30 +20,15 @@ export const productoService = {
     return data.map(Producto.fromJSON);
   },
 
-  /**
-   * Obtiene los productos correspondientes a una categoría específica.
-   * @param {number|string} categoriaId - Identificador de la categoría.
-   * @returns {Promise<Producto[]>} Lista de productos de la categoría.
-   */
   async getProductosByCategoria(categoriaId) {
     return this.getProductos({ categoriaId });
   },
 
-  /**
-   * Obtiene el detalle de un producto por su ID.
-   * @param {number|string} id - Identificador del producto.
-   * @returns {Promise<Producto>} Detalle del producto.
-   */
   async getProductoById(id) {
     const data = await apiFetch(`/productos/${id}`);
     return Producto.fromJSON(data);
   },
 
-  /**
-   * Crea un nuevo producto y su precio inicial.
-   * @param {{ nombre: string, descripcion: string, categoriaId: number, marcaId: number, proveedorId: number, precio: number, imagenUrl?: string }} data
-   * @returns {Promise<Producto>}
-   */
   async crearProducto(data) {
     const res = await apiFetch('/productos', {
       method: 'POST',
@@ -59,12 +37,6 @@ export const productoService = {
     return Producto.fromJSON(res);
   },
 
-  /**
-   * Actualiza los datos de un producto (sin modificar precio).
-   * @param {number|string} id
-   * @param {{ nombre: string, descripcion: string, categoriaId: number, marcaId: number, proveedorId: number }} data
-   * @returns {Promise<Producto>}
-   */
   async actualizarProducto(id, data) {
     const res = await apiFetch(`/productos/${id}`, {
       method: 'PUT',
@@ -73,23 +45,12 @@ export const productoService = {
     return Producto.fromJSON(res);
   },
 
-  /**
-   * Elimina un producto por su ID.
-   * @param {number|string} id
-   * @returns {Promise<null>}
-   */
   async eliminarProducto(id) {
     return apiFetch(`/productos/${id}`, {
       method: 'DELETE',
     });
   },
 
-  /**
-   * Agrega una imagen a un producto.
-   * @param {number|string} productoId
-   * @param {{ url: string, orden?: number }} data
-   * @returns {Promise<Imagen>}
-   */
   async agregarImagen(productoId, data) {
     const res = await apiFetch(`/productos/${productoId}/imagenes`, {
       method: 'POST',
@@ -98,14 +59,10 @@ export const productoService = {
     return Imagen.fromJSON(res);
   },
 
-  /**
-   * Elimina una imagen por su propio ID (no requiere el ID del producto).
-   * @param {number|string} imagenId
-   * @returns {Promise<null>}
-   */
   async eliminarImagen(imagenId) {
     return apiFetch(`/productos/imagenes/${imagenId}`, {
       method: 'DELETE',
     });
   },
 };
+

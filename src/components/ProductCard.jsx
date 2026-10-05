@@ -1,3 +1,4 @@
+// Tarjeta individual para mostrar un producto con su foto, nombre, marca y precio.
 import { Link } from 'react-router-dom';
 
 export const ProductCard = ({ producto }) => {

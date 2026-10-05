@@ -1,3 +1,4 @@
+// Panel de filtros que permite buscar productos por marca y rango de precio.
 export const ProductFilters = ({
   marcas,
   marcaId,
