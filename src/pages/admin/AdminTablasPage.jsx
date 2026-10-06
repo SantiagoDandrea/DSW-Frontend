@@ -7,6 +7,7 @@ import { medioPagoService } from '../../services/medioPagoService';
 import { localidadService } from '../../services/localidadService';
 import { almacenService } from '../../services/almacenService';
 import { proveedorService } from '../../services/proveedorService';
+import { formatearCuit } from '../../utils/formatters';
 
 const PROVINCIAS_ARGENTINA = [
   'Buenos Aires',
@@ -261,10 +262,15 @@ export const AdminTablasPage = () => {
             },
             {
               name: 'cuit',
-              label: 'CUIT (con guiones)',
+              label: 'CUIT',
               required: true,
               placeholder: 'Ej: 30-12345678-9',
-              helperText: 'Debe respetar el formato oficial: XX-XXXXXXXX-X',
+              helperText: 'Escribí solo los 11 números, los guiones se agregan solos (XX-XXXXXXXX-X).',
+              formatear: formatearCuit,
+              inputMode: 'numeric',
+              maxLength: 13,
+              pattern: '\\d{2}-\\d{8}-\\d',
+              patternTitle: 'El CUIT debe tener 11 dígitos con el formato XX-XXXXXXXX-X',
             },
             {
               name: 'telefono',

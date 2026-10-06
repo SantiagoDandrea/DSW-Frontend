@@ -12,6 +12,7 @@ export const AdminLayout = () => {
     { to: '/admin/productos', label: 'Productos', icon: '📦' },
     { to: '/admin/inventario', label: 'Inventario & Precios', icon: '📊' },
     { to: '/admin/pedidos', label: 'Pedidos & Ventas', icon: '🛍️' },
+    { to: '/admin/envios', label: 'Envíos', icon: '🚚' },
     { to: '/admin/usuarios', label: 'Usuarios', icon: '👥' },
     { to: '/admin/tablas', label: 'Tablas Maestras', icon: '🗂️' },
   ];
@@ -20,6 +21,7 @@ export const AdminLayout = () => {
     if (location.pathname.startsWith('/admin/productos')) return 'Catálogo de Productos';
     if (location.pathname.startsWith('/admin/inventario')) return 'Gestión de Inventario y Precios';
     if (location.pathname.startsWith('/admin/pedidos')) return 'Ventas y Pedidos';
+    if (location.pathname.startsWith('/admin/envios')) return 'Gestión de Envíos';
     if (location.pathname.startsWith('/admin/usuarios')) return 'Administración de Usuarios';
     if (location.pathname.startsWith('/admin/tablas')) return 'Tablas Maestras y Configuración';
     return 'Panel de Administración';

@@ -1,6 +1,6 @@
 // Modelo que representa los datos de entrega y estado de envío de un pedido.
 export class Envio {
-  constructor({ id, pedidoId, domicilioEntrega, costo, fechaTentativa, fechaEntregado, estado }) {
+  constructor({ id, pedidoId, domicilioEntrega, costo, fechaTentativa, fechaEntregado, estado, pedido }) {
     this.id = id;
     this.pedidoId = pedidoId;
     this.domicilioEntrega = domicilioEntrega;
@@ -8,6 +8,7 @@ export class Envio {
     this.fechaTentativa = fechaTentativa ? new Date(fechaTentativa) : null;
     this.fechaEntregado = fechaEntregado ? new Date(fechaEntregado) : null;
     this.estado = estado;
+    this.pedido = pedido ?? null;
   }
 
   static fromJSON(json) {
