@@ -1,3 +1,4 @@
+// Pantalla que lista y filtra los productos pertenecientes a una categoría específica.
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';

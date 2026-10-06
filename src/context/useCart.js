@@ -1,3 +1,4 @@
+// Hook personalizado para acceder fácilmente a los productos y funciones del carrito de compras.
 import { useContext } from 'react';
 import { CartContext } from './cart-context';
 

@@ -1,3 +1,4 @@
+// Panel de administración para crear, editar, eliminar y listar productos del catálogo junto a sus fotos.
 import { useState, useEffect } from 'react';
 import { productoService } from '../../services/productoService';
 import { categoriaService } from '../../services/categoriaService';

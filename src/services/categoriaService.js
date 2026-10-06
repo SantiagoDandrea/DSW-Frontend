@@ -1,3 +1,4 @@
+// Servicio para consultar, crear, modificar y eliminar categorías en la API.
 import { createCrudService } from './crudServiceFactory';
 import { Categoria } from '../models/Categoria';
 

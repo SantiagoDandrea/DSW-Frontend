@@ -1,3 +1,4 @@
+// Muestra una tarjeta visual de categoría con su imagen y título para navegar a sus productos.
 export const CategoryCard = ({ title, imageUrl, onClick }) => {
   return (
     <div 

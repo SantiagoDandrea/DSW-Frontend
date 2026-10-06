@@ -1,3 +1,4 @@
+// Panel de administración para crear, editar, listar y eliminar usuarios y gestionar sus roles.
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/useAuth';
 import { usuarioService } from '../../services/usuarioService';

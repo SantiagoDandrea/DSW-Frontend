@@ -1,3 +1,4 @@
+// Panel de administración para consultar el estado de envíos, editar domicilios de entrega y cancelar despachos.
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { envioService } from '../../services/envioService';
@@ -13,8 +14,6 @@ const ESTADOS_INFO = {
   CANCELADO: { label: 'Cancelado', color: 'bg-rose-100 text-rose-800 border-rose-200' },
 };
 
-// Reglas del backend: editar domicilio solo con envío y pedido PENDIENTE;
-// cancelar envío con envío PENDIENTE/EN_PREPARACION y pedido PENDIENTE/CONFIRMADO/EN_PREPARACION.
 const ESTADOS_ENVIO_CANCELABLES = ['PENDIENTE', 'EN_PREPARACION'];
 const ESTADOS_PEDIDO_CANCELABLES = ['PENDIENTE', 'CONFIRMADO', 'EN_PREPARACION'];
 
@@ -33,7 +32,6 @@ export const AdminEnviosPage = () => {
   const [cargando, setCargando] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Filtros
   const [estado, setEstado] = useState('');
   const [pedidoIdInput, setPedidoIdInput] = useState('');
   const [pedidoIdDebounced, setPedidoIdDebounced] = useState('');
@@ -43,7 +41,6 @@ export const AdminEnviosPage = () => {
     return () => clearTimeout(timer);
   }, [pedidoIdInput]);
 
-  // Modales y mensajes
   const [envioAEditar, setEnvioAEditar] = useState(null);
   const [nuevoDomicilio, setNuevoDomicilio] = useState('');
   const [envioACancelar, setEnvioACancelar] = useState(null);

@@ -1,3 +1,4 @@
+// Pantalla de resultados de búsqueda que muestra los productos coincidentes y permite filtrarlos.
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
@@ -31,7 +32,6 @@ export const SearchResults = () => {
     };
   }, [query]);
 
-  // Si cambió la búsqueda, esperamos la respuesta de la nueva consulta.
   const cargando = resultado.query !== query;
   const { productos, error } = resultado;
 

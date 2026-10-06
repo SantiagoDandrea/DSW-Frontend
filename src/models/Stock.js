@@ -1,3 +1,4 @@
+// Modelo que registra la cantidad de existencias de un producto en un almacén específico.
 export class Stock {
   constructor({ id, productoId, almacenId, cantidad }) {
     this.id = id;

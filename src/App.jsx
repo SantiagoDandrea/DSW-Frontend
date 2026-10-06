@@ -1,3 +1,4 @@
+// Componente principal que define la estructura global de la app, proveedores de contexto y barra superior.
 import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';

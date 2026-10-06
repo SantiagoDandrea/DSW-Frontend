@@ -1,3 +1,4 @@
+// Pantalla del perfil de usuario para ver y actualizar datos personales, localidad o contraseña.
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/useAuth';
 import { localidadService } from '../services/localidadService';

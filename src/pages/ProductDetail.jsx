@@ -1,3 +1,4 @@
+// Pantalla de detalle de un producto que muestra sus fotos, precio, descripción y botón para agregarlo al carrito.
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { productoService } from '../services/productoService';
@@ -47,7 +48,6 @@ export function ProductDetail() {
     };
   }, [id]);
 
-  // Si cambió la URL, esperamos la respuesta del nuevo producto.
   const cargando = resultado.id !== id;
   const { producto, error } = resultado;
 

@@ -1,3 +1,4 @@
+// Servicio para consultar, crear, modificar y eliminar localidades en la API.
 import { createCrudService } from './crudServiceFactory';
 import { Localidad } from '../models/Localidad';
 

@@ -1,12 +1,6 @@
+// Generador genérico de servicios CRUD para conectar cualquier entidad con sus rutas de la API.
 import { apiFetch } from './api';
 
-/**
- * Fábrica genérica de servicios CRUD para evitar duplicación de endpoints REST estándar.
- *
- * @param {string} endpoint - Ruta base del recurso (ej: '/almacenes')
- * @param {Function|null} Model - Clase o modelo con método estático fromJSON opcional
- * @param {Object} [aliases={}] - Nombres alternativos de métodos para retrocompatibilidad
- */
 export const createCrudService = (endpoint, Model = null, aliases = {}) => {
   const service = {
     async getAll(params = {}) {

@@ -1,10 +1,10 @@
+// Administra el estado global de autenticación, el inicio y cierre de sesión y los datos del usuario actual.
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AuthContext } from './auth-context';
 import { authService } from '../services/authService';
 import { Usuario } from '../models/Usuario';
 
 export const AuthProvider = ({ children }) => {
-  // Inicialización directa para evitar renders en cascada y mantener persistencia síncrona
   const [token, setToken] = useState(() => {
     return localStorage.getItem('token') || null;
   });
@@ -39,7 +39,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Escuchar evento disparado por el cliente apiFetch ante respuestas 401
   useEffect(() => {
     const handleUnauthorized = () => {
       setToken(null);
@@ -54,10 +53,6 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  /**
-   * Permite iniciar sesión tanto pasando credenciales (email, password)
-   * como pasando directamente token y userData ya resueltos.
-   */
   const login = useCallback(async (arg1, arg2) => {
     setLoading(true);
     try {
@@ -65,12 +60,10 @@ export const AuthProvider = ({ children }) => {
       let userValue;
 
       if (typeof arg1 === 'string' && typeof arg2 === 'string') {
-        // Llamada con credenciales: login(email, password)
         const data = await authService.login({ email: arg1, password: arg2 });
         tokenValue = data.token;
         userValue = data.usuario;
       } else {
-        // Llamada con datos resueltos: login(token, userData)
         tokenValue = arg1;
         userValue = arg2 instanceof Usuario ? arg2 : Usuario.fromJSON(arg2);
       }

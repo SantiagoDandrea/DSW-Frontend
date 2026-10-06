@@ -1,3 +1,4 @@
+// Modelo que representa una fotografía de un producto con su enlace y posición en la galería.
 export class Imagen {
   constructor({ id, url, orden }) {
     this.id = id;

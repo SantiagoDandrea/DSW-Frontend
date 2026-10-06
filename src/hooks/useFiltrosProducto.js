@@ -1,9 +1,6 @@
+// Hook personalizado para filtrar una lista de productos en memoria por marca y rango de precios.
 import { useMemo, useState } from 'react';
 
-/**
- * Filtra una lista de productos ya cargada por marca y rango de precio (client-side,
- * igual criterio que usa el panel de admin para listas chicas).
- */
 export function useFiltrosProducto(productos) {
   const [marcaId, setMarcaId] = useState('');
   const [precioMin, setPrecioMin] = useState('');

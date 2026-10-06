@@ -1,3 +1,4 @@
+// Barra de navegación superior que muestra el logo de la tienda, los accesos de usuario y el carrito de compras.
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
@@ -6,12 +7,10 @@ export const Header = ({ cartCount = 0 }) => {
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
-      {/* Logo */}
       <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">
         MiTienda
       </Link>
 
-      {/* Usuario y Carrito */}
       <div className="flex items-center gap-4">
         {isAuthenticated ? (
           <div className="flex items-center gap-3">

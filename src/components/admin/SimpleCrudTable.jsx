@@ -1,12 +1,9 @@
+// Tabla genérica para listar, buscar, crear, editar y eliminar datos de cualquier entidad en el panel de administración.
 import { useState, useEffect, useMemo } from 'react';
 import { AdminModal } from './AdminModal';
 import { ConfirmModal } from './ConfirmModal';
 import { AdminAlert } from './AdminAlert';
 
-/**
- * Componente genérico y reutilizable para vistas ABM (Alta, Baja, Modificación)
- * de entidades simples en el panel de administración.
- */
 export const SimpleCrudTable = ({
   title,
   description,
@@ -22,7 +19,6 @@ export const SimpleCrudTable = ({
   const [errorGlobal, setErrorGlobal] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
 
-  // Estados de modales
   const [modalAbierto, setModalAbierto] = useState(false);
   const [itemAEditar, setItemAEditar] = useState(null);
   const [itemAEliminar, setItemAEliminar] = useState(null);
@@ -62,7 +58,6 @@ export const SimpleCrudTable = ({
 
   const recargar = () => setRefreshKey((k) => k + 1);
 
-  // Filtrado en vivo
   const itemsFiltrados = useMemo(() => {
     if (!busqueda.trim()) return items;
     const q = busqueda.toLowerCase().trim();

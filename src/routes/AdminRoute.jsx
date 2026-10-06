@@ -1,13 +1,7 @@
+// Protector de rutas que asegura que solo los usuarios administradores puedan acceder a la pantalla.
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
-/**
- * Route Guard para verificar si el usuario está autenticado y tiene rol de administrador.
- * - Si está en estado de carga (verificando persistencia), muestra un spinner.
- * - Si no está autenticado, redirige a /login guardando la ubicación previa.
- * - Si está autenticado pero no es admin, redirige al Home (o vista no autorizada).
- * - Si es admin, renderiza los componentes hijos.
- */
 export const AdminRoute = ({ children }) => {
   const { isAuthenticated, esAdmin, loading } = useAuth();
   const location = useLocation();

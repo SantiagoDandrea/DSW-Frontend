@@ -1,9 +1,4 @@
-/**
- * Da formato de CUIT (XX-XXXXXXXX-X) a lo que el usuario va escribiendo.
- * Descarta todo lo que no sea dígito y agrega los guiones solos.
- * @param {string} valor
- * @returns {string}
- */
+// Funciones de utilidad para formatear valores y entradas de texto en formularios.
 export function formatearCuit(valor) {
   const digitos = String(valor ?? '').replace(/\D/g, '').slice(0, 11);
 

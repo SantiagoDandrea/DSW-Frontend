@@ -1,3 +1,4 @@
+// Prueba de extremo a extremo (E2E) que simula el flujo completo de compra de un producto y su posterior consulta.
 import process from 'node:process';
 import { test, expect } from '@playwright/test';
 
@@ -18,7 +19,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     );
   }
 
-  // Iniciar sesión mediante el formulario real.
   await page.goto('/login');
 
   await page.getByLabel('Correo Electrónico').fill(email);
@@ -28,7 +28,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
 
   await expect(page).toHaveURL('http://localhost:5173/');
 
-  // Consultar el producto real y agregar una unidad.
   await page.goto('/producto/3');
 
   const botonAgregar = page.getByRole('button', {
@@ -61,7 +60,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     })
   ).toBeVisible();
 
-  // Confirmar la compra con retiro y pago en efectivo.
   await page.getByRole('link', {
     name: 'Continuar compra',
   }).click();
@@ -91,7 +89,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     page.getByText(/^Total:\s*\$\s*450\.000,00$/)
   ).toBeVisible();
 
-  // Consultar el pedido que acaba de crearse.
   const enlaceDetalle = page.getByRole('link', {
     name: /Ver detalle del pedido/,
   });
@@ -131,7 +128,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     page.getByText(/^Total:\s*\$\s*450\.000,00$/)
   ).toBeVisible();
 
-  // Recargar para comprobar que el pedido se recupera del backend.
   await page.reload();
 
   await expect(
@@ -141,7 +137,6 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     })
   ).toBeVisible();
 
-  // El carrito debe haberse vaciado después de la compra.
   await page.goto('/carrito');
 
   await expect(

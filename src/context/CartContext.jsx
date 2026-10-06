@@ -1,3 +1,4 @@
+// Administra los productos del carrito de compras, sus cantidades y los almacena en el navegador.
 import { useEffect, useState } from 'react';
 import { CartContext } from './cart-context';
 

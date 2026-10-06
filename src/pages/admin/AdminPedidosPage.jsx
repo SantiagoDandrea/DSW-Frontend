@@ -1,3 +1,4 @@
+// Panel de administración para supervisar pedidos, cambiar sus estados de entrega o cancelarlos.
 import { useState, useEffect } from 'react';
 import { pedidoService } from '../../services/pedidoService';
 import { AdminModal } from '../../components/admin/AdminModal';
@@ -29,7 +30,6 @@ export const AdminPedidosPage = () => {
   const [cargando, setCargando] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Filtros
   const [filtros, setFiltros] = useState({
     estado: '',
     fechaDesde: '',
@@ -45,19 +45,16 @@ export const AdminPedidosPage = () => {
     return () => clearTimeout(timer);
   }, [usuarioInput]);
 
-  // Modales
   const [pedidoDetalle, setPedidoDetalle] = useState(null);
   const [pedidoACambiarEstado, setPedidoACambiarEstado] = useState(null);
   const [nuevoEstadoSeleccionado, setNuevoEstadoSeleccionado] = useState('');
   const [pedidoACancelar, setPedidoACancelar] = useState(null);
 
-  // Mensajes y estados
   const [guardando, setGuardando] = useState(false);
   const [errorGlobal, setErrorGlobal] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
   const [errorModal, setErrorModal] = useState(null);
 
-  // Carga reactiva de pedidos
   useEffect(() => {
     let ignore = false;
 
@@ -93,7 +90,6 @@ export const AdminPedidosPage = () => {
     };
   }, [filtros, usuarioDebounced, refreshKey]);
 
-  // Limpieza de mensajes automáticos
   useEffect(() => {
     if (mensajeExito) {
       const timer = setTimeout(() => setMensajeExito(null), 4000);
@@ -114,7 +110,6 @@ export const AdminPedidosPage = () => {
     setUsuarioDebounced('');
   };
 
-  // Detalle
   const handleVerDetalle = async (pedidoId) => {
     try {
       const fullPedido = await pedidoService.getPedidoById(pedidoId);
@@ -124,7 +119,6 @@ export const AdminPedidosPage = () => {
     }
   };
 
-  // Cambio de estado
   const handleAbrirCambiarEstado = (p) => {
     const permitidos = TRANSICIONES_PERMITIDAS[p.estado] || [];
     setPedidoACambiarEstado(p);
@@ -150,7 +144,6 @@ export const AdminPedidosPage = () => {
     }
   };
 
-  // Cancelación de pedido
   const handleConfirmarCancelacion = async () => {
     if (!pedidoACancelar) return;
 

@@ -1,3 +1,4 @@
+// Modelo que representa los datos de entrega y estado de envío de un pedido.
 export class Envio {
   constructor({ id, pedidoId, domicilioEntrega, costo, fechaTentativa, fechaEntregado, estado, pedido }) {
     this.id = id;
@@ -7,7 +8,6 @@ export class Envio {
     this.fechaTentativa = fechaTentativa ? new Date(fechaTentativa) : null;
     this.fechaEntregado = fechaEntregado ? new Date(fechaEntregado) : null;
     this.estado = estado;
-    // Resumen del pedido (con su cliente); solo viene en los listados de /envios
     this.pedido = pedido ?? null;
   }
 
