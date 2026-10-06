@@ -6,6 +6,25 @@ import { Envio } from '../models/Envio';
  */
 export const envioService = {
   /**
+   * Lista envíos. El ADMIN ve todos; el CLIENTE solo los de sus pedidos.
+   * @param {{ estado?: string, pedidoId?: number|string }} [filtros={}]
+   * @returns {Promise<Envio[]>}
+   */
+  async getEnvios(filtros = {}) {
+    const params = new URLSearchParams();
+
+    Object.entries(filtros).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value);
+      }
+    });
+
+    const queryString = params.toString();
+    const data = await apiFetch(queryString ? `/envios?${queryString}` : '/envios');
+    return data.map(Envio.fromJSON);
+  },
+
+  /**
    * Actualiza el domicilio de entrega de un envío (solo si envío y pedido siguen PENDIENTE).
    * @param {number|string} id
    * @param {string} domicilioEntrega

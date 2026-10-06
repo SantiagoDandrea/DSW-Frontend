@@ -13,6 +13,7 @@ import { AdminTablasPage } from '../pages/admin/AdminTablasPage';
 import { AdminProductosPage } from '../pages/admin/AdminProductosPage';
 import { AdminInventarioPage } from '../pages/admin/AdminInventarioPage';
 import { AdminPedidosPage } from '../pages/admin/AdminPedidosPage';
+import { AdminEnviosPage } from '../pages/admin/AdminEnviosPage';
 import { AdminUsuariosPage } from '../pages/admin/AdminUsuariosPage';
 import { Cart } from '../pages/Cart';
 import { Checkout } from '../pages/Checkout';
@@ -120,6 +121,7 @@ export const AppRoutes = () => {
         <Route path="productos" element={<AdminProductosPage />} />
         <Route path="inventario" element={<AdminInventarioPage />} />
         <Route path="pedidos" element={<AdminPedidosPage />} />
+        <Route path="envios" element={<AdminEnviosPage />} />
         <Route path="usuarios" element={<AdminUsuariosPage />} />
       </Route>
 

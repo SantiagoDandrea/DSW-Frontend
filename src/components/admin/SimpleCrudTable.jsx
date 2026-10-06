@@ -119,7 +119,9 @@ export const SimpleCrudTable = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const campo = fields.find((f) => f.name === name);
+    const valorFinal = campo?.formatear ? campo.formatear(value) : value;
+    setFormData((prev) => ({ ...prev, [name]: valorFinal }));
   };
 
   const handleSubmitForm = async (e) => {
@@ -283,6 +285,10 @@ export const SimpleCrudTable = ({
                   type={f.type || 'text'}
                   required={f.required}
                   placeholder={f.placeholder || ''}
+                  pattern={f.pattern}
+                  title={f.patternTitle}
+                  maxLength={f.maxLength}
+                  inputMode={f.inputMode}
                   value={formData[f.name] ?? ''}
                   onChange={handleInputChange}
                   className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
