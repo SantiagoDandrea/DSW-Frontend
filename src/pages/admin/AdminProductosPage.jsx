@@ -1,5 +1,5 @@
 // Panel de administración para crear, editar, eliminar y listar productos del catálogo junto a sus fotos.
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { productoService } from '../../services/productoService';
 import { categoriaService } from '../../services/categoriaService';
 import { marcaService } from '../../services/marcaService';
@@ -18,35 +18,45 @@ const INITIAL_FORM = {
   imagenUrl: '',
 };
 
-const InputField = ({ label, required, ...props }) => (
-  <div>
-    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-      {label} {required && '*'}
-    </label>
-    <input
-      required={required}
-      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-      {...props}
-    />
-  </div>
-);
+const InputField = ({ label, required, ...props }) => {
+  const id = useId();
 
-const SelectField = ({ label, required, options = [], ...props }) => (
-  <div>
-    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-      {label} {required && '*'}
-    </label>
-    <select
-      required={required}
-      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-      {...props}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
-      ))}
-    </select>
-  </div>
-);
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+        {label} {required && '*'}
+      </label>
+      <input
+        id={id}
+        required={required}
+        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        {...props}
+      />
+    </div>
+  );
+};
+
+const SelectField = ({ label, required, options = [], ...props }) => {
+  const id = useId();
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+        {label} {required && '*'}
+      </label>
+      <select
+        id={id}
+        required={required}
+        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        {...props}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 export const AdminProductosPage = () => {
   const [productos, setProductos] = useState([]);
@@ -299,11 +309,13 @@ export const AdminProductosPage = () => {
         <input
           type="text"
           placeholder="Buscar por nombre..."
+          aria-label="Buscar productos por nombre"
           value={busquedaInput}
           onChange={(e) => setBusquedaInput(e.target.value)}
           className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
         />
         <select
+          aria-label="Filtrar por categoría"
           value={filtroCategoria}
           onChange={(e) => setFiltroCategoria(e.target.value)}
           className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -314,6 +326,7 @@ export const AdminProductosPage = () => {
           ))}
         </select>
         <select
+          aria-label="Filtrar por marca"
           value={filtroMarca}
           onChange={(e) => setFiltroMarca(e.target.value)}
           className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -340,19 +353,19 @@ export const AdminProductosPage = () => {
         ) : productos.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="text-base font-semibold">No se encontraron productos</p>
-            <p className="text-xs text-gray-400 mt-1">Intente ajustar los filtros o cree un nuevo producto.</p>
+            <p className="text-xs text-gray-500 mt-1">Intente ajustar los filtros o cree un nuevo producto.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
               <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
                 <tr>
-                  <th className="px-5 py-3">Producto</th>
-                  <th className="px-5 py-3">Categoría</th>
-                  <th className="px-5 py-3">Marca</th>
-                  <th className="px-5 py-3">Proveedor</th>
-                  <th className="px-5 py-3">Precio Actual</th>
-                  <th className="px-5 py-3 text-right">Acciones</th>
+                  <th scope="col" className="px-5 py-3">Producto</th>
+                  <th scope="col" className="px-5 py-3">Categoría</th>
+                  <th scope="col" className="px-5 py-3">Marca</th>
+                  <th scope="col" className="px-5 py-3">Proveedor</th>
+                  <th scope="col" className="px-5 py-3">Precio Actual</th>
+                  <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -366,13 +379,13 @@ export const AdminProductosPage = () => {
                             {fotoMini ? (
                               <img src={fotoMini} alt={prod.nombre} className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-xs text-gray-400">Sin foto</span>
+                              <span className="text-xs text-gray-500">Sin foto</span>
                             )}
                           </div>
                           <div>
                             <p className="font-semibold text-gray-900 leading-snug">{prod.nombre}</p>
                             {prod.descripcion && (
-                              <p className="text-xs text-gray-400 line-clamp-1">{prod.descripcion}</p>
+                              <p className="text-xs text-gray-500 line-clamp-1">{prod.descripcion}</p>
                             )}
                           </div>
                         </div>
@@ -430,8 +443,9 @@ export const AdminProductosPage = () => {
           />
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Descripción</label>
+            <label htmlFor="producto-descripcion" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Descripción</label>
             <textarea
+              id="producto-descripcion"
               rows={2}
               value={formData.descripcion}
               onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
@@ -529,6 +543,7 @@ export const AdminProductosPage = () => {
               <div className="flex gap-2">
                 <input
                   type="url"
+                  aria-label="Dirección (URL) de la nueva imagen"
                   value={nuevaImagenUrl}
                   onChange={(e) => setNuevaImagenUrl(e.target.value)}
                   placeholder="https://ejemplo.com/foto.jpg"

@@ -1,5 +1,5 @@
 // Panel de administración para supervisar pedidos, cambiar sus estados de entrega o cancelarlos.
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { pedidoService } from '../../services/pedidoService';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
@@ -35,15 +35,12 @@ export const AdminPedidosPage = () => {
     fechaDesde: '',
     fechaHasta: '',
   });
+  // El backend solo filtra por DNI exacto, así que el cliente se filtra acá sobre la lista ya cargada
   const [usuarioInput, setUsuarioInput] = useState('');
-  const [usuarioDebounced, setUsuarioDebounced] = useState('');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setUsuarioDebounced(usuarioInput);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [usuarioInput]);
+  const rangoFechasInvalido = Boolean(
+    filtros.fechaDesde && filtros.fechaHasta && filtros.fechaDesde > filtros.fechaHasta
+  );
 
   const [pedidoDetalle, setPedidoDetalle] = useState(null);
   const [pedidoACambiarEstado, setPedidoACambiarEstado] = useState(null);
@@ -56,6 +53,8 @@ export const AdminPedidosPage = () => {
   const [errorModal, setErrorModal] = useState(null);
 
   useEffect(() => {
+    if (rangoFechasInvalido) return;
+
     let ignore = false;
 
     const params = {};
@@ -68,7 +67,6 @@ export const AdminPedidosPage = () => {
       const [y, m, d] = filtros.fechaHasta.split('-').map(Number);
       params.fechaHasta = new Date(y, m - 1, d, 23, 59, 59, 999).toISOString();
     }
-    if (usuarioDebounced.trim()) params.usuario = usuarioDebounced.trim();
 
     pedidoService
       .getPedidos(params)
@@ -88,7 +86,24 @@ export const AdminPedidosPage = () => {
     return () => {
       ignore = true;
     };
-  }, [filtros, usuarioDebounced, refreshKey]);
+  }, [filtros, rangoFechasInvalido, refreshKey]);
+
+  const pedidosVisibles = useMemo(() => {
+    if (rangoFechasInvalido) return [];
+
+    const texto = usuarioInput.trim().toLowerCase();
+    if (!texto) return pedidos;
+
+    return pedidos.filter((p) => {
+      const cliente = p.cliente;
+      if (!cliente) return false;
+      const nombreCompleto = `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.toLowerCase();
+      return (
+        nombreCompleto.includes(texto) ||
+        String(cliente.dni ?? '').includes(texto)
+      );
+    });
+  }, [pedidos, usuarioInput, rangoFechasInvalido]);
 
   useEffect(() => {
     if (mensajeExito) {
@@ -107,7 +122,6 @@ export const AdminPedidosPage = () => {
   const handleLimpiarFiltros = () => {
     setFiltros({ estado: '', fechaDesde: '', fechaHasta: '' });
     setUsuarioInput('');
-    setUsuarioDebounced('');
   };
 
   const handleVerDetalle = async (pedidoId) => {
@@ -188,6 +202,7 @@ export const AdminPedidosPage = () => {
           <div>
             <select
               name="estado"
+              aria-label="Filtrar por estado del pedido"
               value={filtros.estado}
               onChange={handleFiltroChange}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -203,9 +218,11 @@ export const AdminPedidosPage = () => {
               type="date"
               name="fechaDesde"
               value={filtros.fechaDesde}
+              max={filtros.fechaHasta || undefined}
               onChange={handleFiltroChange}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               title="Fecha Desde"
+              aria-label="Pedidos desde la fecha"
             />
           </div>
           <div>
@@ -213,9 +230,11 @@ export const AdminPedidosPage = () => {
               type="date"
               name="fechaHasta"
               value={filtros.fechaHasta}
+              min={filtros.fechaDesde || undefined}
               onChange={handleFiltroChange}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               title="Fecha Hasta"
+              aria-label="Pedidos hasta la fecha"
             />
           </div>
           <div>
@@ -225,10 +244,16 @@ export const AdminPedidosPage = () => {
               value={usuarioInput}
               onChange={(e) => setUsuarioInput(e.target.value)}
               placeholder="DNI o nombre de cliente..."
+              aria-label="Buscar por DNI o nombre del cliente"
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
           </div>
         </div>
+        {rangoFechasInvalido && (
+          <p role="alert" className="text-sm text-rose-700">
+            La fecha «Desde» no puede ser posterior a la fecha «Hasta». Corregí el rango para ver los pedidos.
+          </p>
+        )}
         <div className="flex justify-end">
           <button
             onClick={handleLimpiarFiltros}
@@ -245,26 +270,26 @@ export const AdminPedidosPage = () => {
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
             <p className="text-sm">Cargando órdenes de compra...</p>
           </div>
-        ) : pedidos.length === 0 ? (
+        ) : pedidosVisibles.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="text-base font-semibold">No se encontraron pedidos</p>
-            <p className="text-xs text-gray-400 mt-1">Intente cambiar los filtros de fecha o estado.</p>
+            <p className="text-xs text-gray-500 mt-1">Intente cambiar los filtros de fecha o estado.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
               <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
                 <tr>
-                  <th className="px-5 py-3">Nº Orden / Fecha</th>
-                  <th className="px-5 py-3">Cliente</th>
-                  <th className="px-5 py-3">Total</th>
-                  <th className="px-5 py-3">Estado</th>
-                  <th className="px-5 py-3">Entrega</th>
-                  <th className="px-5 py-3 text-right">Acciones</th>
+                  <th scope="col" className="px-5 py-3">Nº Orden / Fecha</th>
+                  <th scope="col" className="px-5 py-3">Cliente</th>
+                  <th scope="col" className="px-5 py-3">Total</th>
+                  <th scope="col" className="px-5 py-3">Estado</th>
+                  <th scope="col" className="px-5 py-3">Entrega</th>
+                  <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {pedidos.map((p) => {
+                {pedidosVisibles.map((p) => {
                   const est = ESTADOS_INFO[p.estado] || { label: p.estado, color: 'bg-gray-100 text-gray-800' };
                   const transiciones = TRANSICIONES_PERMITIDAS[p.estado] || [];
                   const cancelable = ESTADOS_CANCELABLES.includes(p.estado);
@@ -273,7 +298,7 @@ export const AdminPedidosPage = () => {
                     <tr key={p.id} className="hover:bg-gray-50 transition">
                       <td className="px-5 py-3">
                         <div className="font-bold text-gray-900">#{p.id}</div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-500">
                           {p.fecha ? new Date(p.fecha).toLocaleDateString('es-AR') : '-'}
                         </div>
                       </td>
@@ -281,7 +306,7 @@ export const AdminPedidosPage = () => {
                         <div className="font-semibold text-gray-900">
                           {p.cliente ? `${p.cliente.nombre} ${p.cliente.apellido}` : 'Cliente'}
                         </div>
-                        <div className="text-xs text-gray-400">{p.cliente?.email || p.cliente?.dni}</div>
+                        <div className="text-xs text-gray-500">{p.cliente?.email || p.cliente?.dni}</div>
                       </td>
                       <td className="px-5 py-3 font-extrabold text-gray-900">
                         ${Number(p.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -292,8 +317,10 @@ export const AdminPedidosPage = () => {
                         </span>
                       </td>
                       <td className="px-5 py-3 text-xs text-gray-600">
-                        {p.envio ? (
+                        {p.envio && p.envio.estado !== 'CANCELADO' ? (
                           <span>🚚 Domicilio ({p.envio.domicilioEntrega || 'Dirección registrada'})</span>
+                        ) : p.envio ? (
+                          <span>🏬 Retiro en sucursal (envío cancelado)</span>
                         ) : (
                           <span>🏬 Retiro en sucursal</span>
                         )}
@@ -353,21 +380,26 @@ export const AdminPedidosPage = () => {
                 <p className="font-bold text-gray-700 uppercase tracking-wider mb-1">Pago & Entrega</p>
                 <p className="text-gray-700"><strong>Medio de pago:</strong> {pedidoDetalle.medioPago?.nombre || 'Efectivo / Transferencia'}</p>
                 <p className="text-gray-700">
-                  <strong>Entrega:</strong> {pedidoDetalle.envio ? `Envío a domicilio (${pedidoDetalle.envio.domicilioEntrega})` : 'Retiro en sucursal'}
+                  <strong>Entrega:</strong>{' '}
+                  {pedidoDetalle.envio && pedidoDetalle.envio.estado !== 'CANCELADO'
+                    ? `Envío a domicilio (${pedidoDetalle.envio.domicilioEntrega})`
+                    : pedidoDetalle.envio
+                      ? 'Retiro en sucursal (envío cancelado)'
+                      : 'Retiro en sucursal'}
                 </p>
               </div>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({pedidoDetalle.detalles?.length || 0})</h4>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({pedidoDetalle.detalles?.length || 0})</h3>
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-gray-50 font-bold text-gray-600 border-b border-gray-200">
                     <tr>
-                      <th className="p-3">Producto</th>
-                      <th className="p-3 text-center">Cant.</th>
-                      <th className="p-3 text-right">Precio Unit.</th>
-                      <th className="p-3 text-right">Subtotal</th>
+                      <th scope="col" className="p-3">Producto</th>
+                      <th scope="col" className="p-3 text-center">Cant.</th>
+                      <th scope="col" className="p-3 text-right">Precio Unit.</th>
+                      <th scope="col" className="p-3 text-right">Subtotal</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -412,14 +444,15 @@ export const AdminPedidosPage = () => {
       >
         <form onSubmit={handleConfirmarCambioEstado} className="space-y-4">
           {errorModal && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
+            <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
           )}
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+            <label htmlFor="pedido-nuevo-estado" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
               Nuevo Estado Autorizado:
             </label>
             <select
+              id="pedido-nuevo-estado"
               value={nuevoEstadoSeleccionado}
               onChange={(e) => setNuevoEstadoSeleccionado(e.target.value)}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"

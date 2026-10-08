@@ -31,6 +31,7 @@ export const AdminLayout = () => {
     <div className="flex-1 flex min-h-[calc(100vh-65px)] bg-gray-100">
       {sidebarAbierto && (
         <div
+          aria-hidden="true"
           onClick={() => setSidebarAbierto(false)}
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs md:hidden"
         />
@@ -54,14 +55,16 @@ export const AdminLayout = () => {
             </div>
           </div>
           <button
+            type="button"
             onClick={() => setSidebarAbierto(false)}
-            className="md:hidden text-slate-400 hover:text-white text-xl font-bold cursor-pointer"
+            aria-label="Cerrar menú"
+            className="md:hidden text-slate-300 hover:text-white text-xl font-bold cursor-pointer"
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav aria-label="Menú de administración" className="flex-1 p-3 space-y-1 overflow-y-auto">
           <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
             Módulos del Sistema
           </div>
@@ -78,7 +81,7 @@ export const AdminLayout = () => {
                 }`
               }
             >
-              <span className="text-base">{item.icon}</span>
+              <span aria-hidden="true" className="text-base">{item.icon}</span>
               <span>{item.label}</span>
             </NavLink>
           ))}
@@ -89,7 +92,7 @@ export const AdminLayout = () => {
             to="/"
             className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition"
           >
-            <span>🏪</span>
+            <span aria-hidden="true">🏪</span>
             <span>Volver a la Tienda</span>
           </Link>
 
@@ -99,18 +102,20 @@ export const AdminLayout = () => {
               <p className="text-[11px] text-slate-400 truncate">{usuario?.email}</p>
             </div>
             <button
+              type="button"
               onClick={logout}
               title="Cerrar sesión"
+              aria-label="Cerrar sesión"
               className="p-1.5 hover:text-rose-400 hover:bg-slate-800 rounded transition cursor-pointer"
             >
-              🚪
+              <span aria-hidden="true">🚪</span>
             </button>
           </div>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-2xs">
+        <div role="region" aria-label="Sección actual del panel" className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarAbierto(true)}
@@ -135,7 +140,7 @@ export const AdminLayout = () => {
               Sistema Conectado
             </span>
           </div>
-        </header>
+        </div>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
