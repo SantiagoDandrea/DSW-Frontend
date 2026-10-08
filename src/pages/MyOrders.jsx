@@ -81,7 +81,13 @@ export function MyOrders() {
     busqueda.trim() || filtroEstado || fechaDesde || fechaHasta
   );
 
+  const rangoFechasInvalido = Boolean(
+    fechaDesde && fechaHasta && fechaDesde > fechaHasta
+  );
+
   const pedidosFiltrados = useMemo(() => {
+    if (rangoFechasInvalido) return [];
+
     return pedidos.filter((pedido) => {
       if (busqueda.trim()) {
         const termino = busqueda.trim().toLowerCase().replace(/^#/, '');
@@ -116,14 +122,14 @@ export function MyOrders() {
 
       return true;
     });
-  }, [pedidos, busqueda, filtroEstado, fechaDesde, fechaHasta]);
+  }, [pedidos, busqueda, filtroEstado, fechaDesde, fechaHasta, rangoFechasInvalido]);
 
   return (
     <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Historial de compras, estados de entrega y seguimiento.
           </p>
         </div>
@@ -192,7 +198,7 @@ export function MyOrders() {
                     className="w-full px-3.5 py-2 pl-9 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   />
                   <svg
-                    className="w-4 h-4 text-gray-400 absolute left-3 top-2.5"
+                    className="w-4 h-4 text-gray-500 absolute left-3 top-2.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -253,6 +259,7 @@ export function MyOrders() {
                   id="fecha-desde"
                   type="date"
                   value={fechaDesde}
+                  max={fechaHasta || undefined}
                   onChange={(e) => setFechaDesde(e.target.value)}
                   className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
@@ -269,11 +276,18 @@ export function MyOrders() {
                   id="fecha-hasta"
                   type="date"
                   value={fechaHasta}
+                  min={fechaDesde || undefined}
                   onChange={(e) => setFechaHasta(e.target.value)}
                   className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
+
+            {rangoFechasInvalido && (
+              <p role="alert" className="text-sm text-rose-700">
+                La fecha «Desde» no puede ser posterior a la fecha «Hasta». Corregí el rango para ver tus pedidos.
+              </p>
+            )}
 
             <div className="text-xs text-gray-500 pt-1 flex items-center justify-between">
               <span>
@@ -287,12 +301,12 @@ export function MyOrders() {
             </div>
           </div>
 
-          {pedidosFiltrados.length === 0 ? (
+          {pedidosFiltrados.length === 0 && rangoFechasInvalido ? null : pedidosFiltrados.length === 0 ? (
             <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-10 text-center text-gray-500">
               <p className="text-base font-semibold text-gray-800">
                 No encontramos pedidos con los filtros aplicados
               </p>
-              <p className="text-xs text-gray-400 mt-1 mb-4">
+              <p className="text-xs text-gray-500 mt-1 mb-4">
                 Probá cambiando los términos de búsqueda o limpiando los filtros.
               </p>
               <button
@@ -339,7 +353,7 @@ export function MyOrders() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
                       <div>
-                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                           Medio de Pago
                         </span>
                         <p className="font-medium text-gray-800 mt-0.5">
@@ -348,18 +362,20 @@ export function MyOrders() {
                       </div>
 
                       <div>
-                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                           Entrega
                         </span>
                         <p className="font-medium text-gray-800 mt-0.5 truncate">
-                          {tieneEnvio
+                          {tieneEnvio && pedido.envio.estado !== 'CANCELADO'
                             ? `Envío: ${pedido.envio.domicilioEntrega}`
-                            : 'Retiro en sucursal'}
+                            : tieneEnvio
+                              ? 'Retiro en sucursal (envío cancelado)'
+                              : 'Retiro en sucursal'}
                         </p>
                       </div>
 
                       <div className="sm:text-right">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-400">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                           Total
                         </span>
                         <p className="text-lg font-bold text-gray-900 mt-0.5">
