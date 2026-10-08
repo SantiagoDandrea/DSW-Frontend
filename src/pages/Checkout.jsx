@@ -11,6 +11,22 @@ function mostrarPrecio(valor) {
   });
 }
 
+// El backend avisa la falta de stock con un mensaje que incluye cantidades internas; al cliente no se le muestran.
+function mensajeDeCompraFallida(error) {
+  if (error.status === 409 && /^Stock insuficiente/.test(error.message || '')) {
+    const producto = /para el producto "(.+?)"/.exec(error.message)?.[1];
+
+    return producto
+      ? `No hay stock suficiente de "${producto}" para completar tu pedido. Probá con una cantidad menor o quitalo del carrito.`
+      : 'No hay stock suficiente de alguno de los productos para completar tu pedido. Probá con una cantidad menor.';
+  }
+
+  return error.status
+    ? error.message
+    : 'No pudimos confirmar la respuesta del servidor. ' +
+        'Antes de reintentar, verificá si el pedido fue creado.';
+}
+
 export function Checkout() {
   const { items, subtotal, vaciarCarrito } = useCart();
 
@@ -103,12 +119,7 @@ export function Checkout() {
       setPedidoCreado(pedido);
       vaciarCarrito();
     } catch (error) {
-      setErrorCompra(
-        error.status
-          ? error.message
-          : 'No pudimos confirmar la respuesta del servidor. ' +
-            'Antes de reintentar, verificá si el pedido fue creado.'
-      );
+      setErrorCompra(mensajeDeCompraFallida(error));
     } finally {
       solicitudEnCurso.current = false;
       setEnviando(false);

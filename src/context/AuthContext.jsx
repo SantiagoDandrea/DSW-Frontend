@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }) => {
       setUsuario(null);
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
+      window.dispatchEvent(new CustomEvent('auth:logout'));
     }
   }, []);
 
