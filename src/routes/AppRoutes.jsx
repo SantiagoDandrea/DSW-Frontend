@@ -16,6 +16,7 @@ import { AdminInventarioPage } from '../pages/admin/AdminInventarioPage';
 import { AdminPedidosPage } from '../pages/admin/AdminPedidosPage';
 import { AdminEnviosPage } from '../pages/admin/AdminEnviosPage';
 import { AdminUsuariosPage } from '../pages/admin/AdminUsuariosPage';
+import { idDeLaRuta } from '../utils/urls';
 import { Cart } from '../pages/Cart';
 import { Checkout } from '../pages/Checkout';
 import { MyOrders } from '../pages/MyOrders';
@@ -23,7 +24,7 @@ import { OrderDetail } from '../pages/OrderDetail';
 
 const CategoryProductsWrapper = () => {
   const { categoryId } = useParams();
-  return <CategoryProducts key={categoryId} />;
+  return <CategoryProducts key={idDeLaRuta(categoryId)} />;
 };
 
 const OrderDetailWrapper = () => {
@@ -35,7 +36,7 @@ const NotFoundPage = () => (
   <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
     <h1 className="text-6xl font-extrabold text-indigo-600 mb-2">404</h1>
     <h2 className="text-2xl font-semibold text-gray-800 mb-2">Página no encontrada</h2>
-    <p className="text-gray-500 mb-6">El recurso al que intentas acceder no existe o fue movido.</p>
+    <p className="text-gray-600 mb-6">El recurso al que intentas acceder no existe o fue movido.</p>
     <Link to="/" className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
       Ir a la página principal
     </Link>

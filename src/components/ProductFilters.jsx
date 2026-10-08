@@ -9,6 +9,7 @@ export const ProductFilters = ({
   setPrecioMax,
   hayFiltrosActivos,
   limpiarFiltros,
+  rangoPrecioInvalido = false,
 }) => {
   if (marcas.length === 0) {
     return null;
@@ -62,6 +63,12 @@ export const ProductFilters = ({
           className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
+
+      {rangoPrecioInvalido && (
+        <p role="alert" className="w-full text-sm text-rose-700">
+          El precio mínimo no puede ser mayor que el máximo. Corregí el rango para ver los productos.
+        </p>
+      )}
 
       {hayFiltrosActivos && (
         <button
