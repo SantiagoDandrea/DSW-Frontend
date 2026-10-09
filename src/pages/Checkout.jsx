@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
-import { checkoutService } from '../services/checkoutService';
+import { pedidoService } from '../services/pedidoService';
 
 function mostrarPrecio(valor) {
   return Number(valor).toLocaleString('es-AR', {
@@ -31,7 +31,7 @@ export function Checkout() {
   useEffect(() => {
     let ignore = false;
 
-    checkoutService
+    pedidoService
       .getMediosPago()
       .then((datos) => {
         if (!ignore) {
@@ -98,7 +98,7 @@ export function Checkout() {
     setEnviando(true);
 
     try {
-      const pedido = await checkoutService.crearPedido(datos);
+      const pedido = await pedidoService.crearPedido(datos);
 
       setPedidoCreado(pedido);
       vaciarCarrito();

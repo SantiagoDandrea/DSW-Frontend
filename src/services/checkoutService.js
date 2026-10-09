@@ -1,29 +1,4 @@
-// Servicio para procesar compras: obtener formas de pago, crear órdenes y gestionar su estado.
-import { apiFetch } from './api';
+// Servicio unificado: re-exporta pedidoService para mantener compatibilidad y centralizar la lógica de órdenes de compra.
+import { pedidoService } from './pedidoService';
 
-export const checkoutService = {
-  getMediosPago() {
-    return apiFetch('/medios-pago');
-  },
-
-  crearPedido(datos) {
-    return apiFetch('/pedidos', {
-      method: 'POST',
-      body: JSON.stringify(datos),
-    });
-  },
-
-  getPedidos() {
-    return apiFetch('/pedidos');
-  },
-
-  getPedidoById(id) {
-    return apiFetch(`/pedidos/${id}`);
-  },
-
-  cancelarPedido(id) {
-    return apiFetch(`/pedidos/${id}/cancelar`, {
-      method: 'POST',
-    });
-  },
-};
+export const checkoutService = pedidoService;

@@ -3,6 +3,10 @@ import { apiFetch } from './api';
 import { Pedido } from '../models/Pedido';
 
 export const pedidoService = {
+  async getMediosPago() {
+    return apiFetch('/medios-pago');
+  },
+
   async getPedidos(filtros = {}) {
     const params = new URLSearchParams();
     if (filtros.estado) params.append('estado', filtros.estado);
