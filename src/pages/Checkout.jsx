@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
-import { useAuth } from '../context/useAuth';
 import { pedidoService } from '../services/pedidoService';
 
 function mostrarPrecio(valor) {
@@ -14,7 +13,6 @@ function mostrarPrecio(valor) {
 
 export function Checkout() {
   const { items, subtotal, vaciarCarrito } = useCart();
-  const { usuario } = useAuth();
 
   const [mediosPago, setMediosPago] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -29,7 +27,6 @@ export function Checkout() {
   const [localidadDestino, setLocalidadDestino] = useState('');
   const [provinciaDestino, setProvinciaDestino] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
-  const [usarDomicilioRegistrado, setUsarDomicilioRegistrado] = useState(false);
 
   const costoEnvioEstimado = requiereEnvio
     ? tipoEnvio === 'LOCAL'
@@ -290,11 +287,6 @@ if (items.length === 0) {
           </div>
         </div>
 
-        <p className="mt-2 text-sm text-gray-600">
-          El importe definitivo se calcula al confirmar el pedido
-          con los precios vigentes y el envío correspondiente.
-        </p>
-
         {cargando ? (
           <p role="status" className="mt-6">
             Cargando medios de pago...
@@ -400,42 +392,10 @@ if (items.length === 0) {
 
                   {tipoEnvio && (
                     <div className="pt-2 border-t border-gray-200 space-y-4">
-                      <div className="flex items-center justify-between">
+                      <div>
                         <span className="text-sm font-semibold text-gray-800">
                           Dirección de entrega {tipoEnvio === 'LOCAL' ? '(Las Parejas)' : ''}
                         </span>
-
-                        {usuario?.domicilio && (
-                          <label
-                            className="text-xs flex items-center gap-1.5 cursor-pointer text-indigo-700 hover:text-indigo-900 font-medium"
-                            title="Autocompletar con los datos guardados en tu perfil"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={usarDomicilioRegistrado}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                setUsarDomicilioRegistrado(checked);
-                                if (checked && usuario?.domicilio) {
-                                  const match = String(usuario.domicilio).trim().match(/^(.*?)(?:\s+(\d+))$/);
-                                  if (match) {
-                                    setCalle(match[1]);
-                                    setNumero(match[2]);
-                                  } else {
-                                    setCalle(usuario.domicilio);
-                                  }
-                                  if (tipoEnvio === 'NACIONAL') {
-                                    if (usuario?.localidad?.nombre) {
-                                      setLocalidadDestino(usuario.localidad.nombre);
-                                    }
-                                  }
-                                }
-                              }}
-                              className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                            />
-                            <span>Usar mi domicilio registrado</span>
-                          </label>
-                        )}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

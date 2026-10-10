@@ -219,10 +219,10 @@ export function OrderDetail() {
           {new Date(pedido.fecha).toLocaleString('es-AR')}
         </p>
 
-        <p role="status" className="mt-3 font-semibold text-gray-800">
+        <p role="status" className="mt-3 font-semibold text-gray-800 print:hidden">
           Estado:{' '}
           <span className="font-bold text-indigo-700">
-            {pedido.estado === 'ENVIADO' && !pedido.envio
+            {pedido.estado === 'ENVIADO' && (!pedido.envio || pedido.envio.estado === 'CANCELADO')
               ? 'Listo para retiro'
               : pedido.estado.replaceAll('_', ' ')}
           </span>
@@ -256,7 +256,7 @@ export function OrderDetail() {
             Medio de pago: {pedido.medioPago?.descripcion}
           </p>
 
-          {pedido.envio ? (
+          {pedido.envio && pedido.envio.estado !== 'CANCELADO' ? (
             <>
               {editandoDomicilio ? (
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -328,7 +328,10 @@ export function OrderDetail() {
               )}
             </>
           ) : (
-            <p>Entrega: retiro en el local.</p>
+            <p>
+              Entrega: Retiro en sucursal
+              {pedido.envio?.estado === 'CANCELADO' ? ' (Envío cancelado)' : ''}
+            </p>
           )}
 
           <p className="pt-3 text-xl font-bold text-gray-900 border-t print:border-gray-300">

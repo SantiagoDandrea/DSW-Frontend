@@ -10,7 +10,6 @@ export const Profile = () => {
     apellido: usuario?.apellido || '',
     email: usuario?.email || '',
     telefono: usuario?.telefono || '',
-    domicilio: usuario?.domicilio || '',
     localidadId: usuario?.localidad?.id || '',
     password: '',
   });
@@ -55,7 +54,6 @@ export const Profile = () => {
     const datos = {
       ...resto,
       localidadId: Number(resto.localidadId),
-      domicilio: resto.domicilio?.trim() || null,
     };
     if (password) {
       datos.password = password;
@@ -165,24 +163,6 @@ export const Profile = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="domicilio">
-              Domicilio habitual (opcional)
-            </label>
-            <input
-              id="domicilio"
-              name="domicilio"
-              type="text"
-              placeholder="Ej: Calle 20 Nº 1450"
-              value={form.domicilio}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              disabled={cargando}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Podrás usarlo para autocompletar la dirección de entrega al realizar compras.
-            </p>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="localidadId">

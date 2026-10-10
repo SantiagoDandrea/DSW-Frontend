@@ -290,7 +290,8 @@ export const AdminPedidosPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {pedidos.map((p) => {
-                  const est = getEstadoInfo(p.estado, Boolean(p.envio));
+                  const tieneEnvio = Boolean(p.envio) && p.envio.estado !== 'CANCELADO';
+                  const est = getEstadoInfo(p.estado, tieneEnvio);
                   const transiciones = TRANSICIONES_PERMITIDAS[p.estado] || [];
                   const cancelable = ESTADOS_CANCELABLES.includes(p.estado);
 
@@ -317,7 +318,7 @@ export const AdminPedidosPage = () => {
                         </span>
                       </td>
                       <td className="px-5 py-3 text-xs text-gray-600">
-                        {p.envio ? (
+                        {tieneEnvio ? (
                           <span>🚚 Domicilio ({p.envio.domicilioEntrega || 'Dirección registrada'})</span>
                         ) : (
                           <span>🏬 Retiro en sucursal</span>
@@ -378,7 +379,7 @@ export const AdminPedidosPage = () => {
                 <p className="font-bold text-gray-700 uppercase tracking-wider mb-1">Pago & Entrega</p>
                 <p className="text-gray-700"><strong>Medio de pago:</strong> {pedidoDetalle.medioPago?.nombre || 'Efectivo / Transferencia'}</p>
                 <p className="text-gray-700">
-                  <strong>Entrega:</strong> {pedidoDetalle.envio ? `Envío a domicilio (${pedidoDetalle.envio.domicilioEntrega})` : 'Retiro en sucursal'}
+                  <strong>Entrega:</strong> {pedidoDetalle.envio && pedidoDetalle.envio.estado !== 'CANCELADO' ? `Envío a domicilio (${pedidoDetalle.envio.domicilioEntrega})` : 'Retiro en sucursal'}
                 </p>
               </div>
             </div>

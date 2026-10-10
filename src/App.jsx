@@ -29,6 +29,9 @@ function AppLayout() {
     '/carrito',
     '/mis-pedidos',
     '/pedidos',
+    '/perfil',
+    '/producto',
+    '/productos',
   ];
 
   const showSearchBar = !hideSearchBarRoutes.some(

@@ -195,8 +195,7 @@ export function Cart() {
           </div>
 
           <p className="mt-3 text-sm text-gray-500">
-            Los precios y el stock se verificarán al confirmar
-            el pedido. El envío se calculará según la entrega.
+            El envío se calculará según la forma de entrega seleccionada.
           </p>
 
           <Link

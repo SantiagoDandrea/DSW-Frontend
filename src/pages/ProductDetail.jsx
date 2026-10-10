@@ -216,11 +216,6 @@ export function ProductDetail() {
                   +
                 </button>
               </div>
-              {producto.stockDisponible > 1 && (
-                <span className="text-xs text-gray-500">
-                  (Stock: {producto.stockDisponible})
-                </span>
-              )}
             </div>
           )}
 
