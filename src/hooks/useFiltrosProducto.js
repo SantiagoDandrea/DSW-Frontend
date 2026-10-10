@@ -5,7 +5,7 @@ export function useFiltrosProducto(productos) {
   const [marcaId, setMarcaId] = useState('');
   const [precioMin, setPrecioMin] = useState('');
   const [precioMax, setPrecioMax] = useState('');
-  const [orden, setOrden] = useState('');
+  const [orden, setOrden] = useState('nombre-asc');
 
   const marcas = useMemo(() => {
     const vistos = new Map();
@@ -25,8 +25,6 @@ export function useFiltrosProducto(productos) {
       return true;
     });
 
-    if (!orden) return filtrados;
-
     return [...filtrados].sort((a, b) => {
       if (orden === 'precio-asc') {
         return Number(a.precioActual ?? 0) - Number(b.precioActual ?? 0);
@@ -34,10 +32,7 @@ export function useFiltrosProducto(productos) {
       if (orden === 'precio-desc') {
         return Number(b.precioActual ?? 0) - Number(a.precioActual ?? 0);
       }
-      if (orden === 'nombre-asc') {
-        return (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' });
-      }
-      return 0;
+      return (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' });
     });
   }, [productos, marcaId, precioMin, precioMax, orden]);
 
@@ -45,7 +40,7 @@ export function useFiltrosProducto(productos) {
     setMarcaId('');
     setPrecioMin('');
     setPrecioMax('');
-    setOrden('');
+    setOrden('nombre-asc');
   };
 
   return {
@@ -60,6 +55,6 @@ export function useFiltrosProducto(productos) {
     orden,
     setOrden,
     limpiarFiltros,
-    hayFiltrosActivos: Boolean(marcaId || precioMin || precioMax || orden),
+    hayFiltrosActivos: Boolean(marcaId || precioMin || precioMax || (orden && orden !== 'nombre-asc')),
   };
 }

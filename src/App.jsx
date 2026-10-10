@@ -36,11 +36,13 @@ function AppLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col print:bg-white print:min-h-0">
       <Header cartCount={cantidadTotal} />
 
       {showSearchBar && (
-        <SearchBar onSearch={handleSearch} />
+        <div className="print:hidden">
+          <SearchBar onSearch={handleSearch} />
+        </div>
       )}
 
       <AppRoutes />

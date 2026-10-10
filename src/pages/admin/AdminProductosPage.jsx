@@ -236,6 +236,17 @@ export const AdminProductosPage = () => {
       return;
     }
 
+    if (!productoAEditar) {
+      if (formData.stockInicial && Number(formData.stockInicial) > 0 && !formData.almacenId) {
+        setErrorModal('Debe seleccionar un almacén si ingresa stock inicial.');
+        return;
+      }
+      if (formData.almacenId && (!formData.stockInicial || Number(formData.stockInicial) < 0)) {
+        setErrorModal('Debe indicar la cantidad de stock inicial para el almacén seleccionado.');
+        return;
+      }
+    }
+
     setGuardando(true);
     setErrorModal(null);
 
@@ -529,7 +540,10 @@ export const AdminProductosPage = () => {
                 onChange={(e) => setFormData({ ...formData, almacenId: e.target.value })}
                 options={[
                   { value: '', label: 'Sin stock inicial' },
-                  ...almacenes.map((a) => ({ value: a.id, label: a.nombre })),
+                  ...almacenes.map((a) => ({
+                    value: a.id,
+                    label: a.descripcion ? `${a.descripcion} (${a.direccion || ''})` : `Almacén #${a.id}`,
+                  })),
                 ]}
               />
               <InputField

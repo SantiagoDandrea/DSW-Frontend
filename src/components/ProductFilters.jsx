@@ -7,9 +7,9 @@ export const ProductFilters = ({
   setPrecioMin,
   precioMax,
   setPrecioMax,
-  orden = '',
+  orden = 'nombre-asc',
   setOrden,
-  mostrarOrden = false,
+  mostrarOrden = true,
   hayFiltrosActivos,
   limpiarFiltros,
 }) => {
@@ -79,10 +79,9 @@ export const ProductFilters = ({
             onChange={(e) => setOrden?.(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <option value="">Relevancia</option>
+            <option value="nombre-asc">Nombre (A-Z)</option>
             <option value="precio-asc">Menor precio</option>
             <option value="precio-desc">Mayor precio</option>
-            <option value="nombre-asc">Nombre (A-Z)</option>
           </select>
         </div>
       )}

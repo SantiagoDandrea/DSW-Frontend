@@ -46,6 +46,8 @@ export const CategoryProducts = () => {
     setPrecioMin,
     precioMax,
     setPrecioMax,
+    orden,
+    setOrden,
     limpiarFiltros,
     hayFiltrosActivos,
   } = useFiltrosProducto(productos);
@@ -70,6 +72,9 @@ export const CategoryProducts = () => {
             setPrecioMin={setPrecioMin}
             precioMax={precioMax}
             setPrecioMax={setPrecioMax}
+            orden={orden}
+            setOrden={setOrden}
+            mostrarOrden={true}
             hayFiltrosActivos={hayFiltrosActivos}
             limpiarFiltros={limpiarFiltros}
           />
