@@ -5,15 +5,23 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductFilters } from '../components/ProductFilters';
 import { useFiltrosProducto } from '../hooks/useFiltrosProducto';
 import { productoService } from '../services/productoService';
+import { categoriaService } from '../services/categoriaService';
 
 export const CategoryProducts = () => {
   const { categoryId } = useParams();
   const [productos, setProductos] = useState([]);
+  const [categoria, setCategoria] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let ignore = false;
+
+    categoriaService.getCategoriaById(categoryId)
+      .then((cat) => {
+        if (!ignore) setCategoria(cat);
+      })
+      .catch(() => {});
 
     productoService.getProductosByCategoria(categoryId)
       .then((data) => {
@@ -52,8 +60,21 @@ export const CategoryProducts = () => {
     hayFiltrosActivos,
   } = useFiltrosProducto(productos);
 
+  const nombreCategoria = categoria?.nombre || productos[0]?.categoria?.nombre || '';
+
   return (
     <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
+      {nombreCategoria && (
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+            {nombreCategoria}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Explorá los productos disponibles en esta categoría.
+          </p>
+        </div>
+      )}
+
       {cargando ? (
         <p>Cargando productos...</p>
       ) : error ? (

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
+import { useAuth } from '../context/useAuth';
 import { pedidoService } from '../services/pedidoService';
 
 function mostrarPrecio(valor) {
@@ -13,6 +14,7 @@ function mostrarPrecio(valor) {
 
 export function Checkout() {
   const { items, subtotal, vaciarCarrito } = useCart();
+  const { usuario } = useAuth();
 
   const [mediosPago, setMediosPago] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -22,6 +24,12 @@ export function Checkout() {
   const [medioPagoId, setMedioPagoId] = useState('');
   const [requiereEnvio, setRequiereEnvio] = useState(false);
   const [domicilioEntrega, setDomicilioEntrega] = useState('');
+  const [usarDomicilioRegistrado, setUsarDomicilioRegistrado] = useState(false);
+
+  const esLasParejas =
+    Boolean(usuario?.localidad?.nombre?.trim().toLowerCase().includes('las parejas'));
+  const costoEnvioEstimado = requiereEnvio ? (esLasParejas ? 3000 : 15000) : 0;
+  const totalEstimado = subtotal + costoEnvioEstimado;
 
   const [enviando, setEnviando] = useState(false);
   const [pedidoCreado, setPedidoCreado] = useState(null);
@@ -211,9 +219,26 @@ if (items.length === 0) {
           ))}
         </ul>
 
-        <p className="mt-4 pt-4 border-t font-bold text-gray-900">
-          Subtotal estimado: {mostrarPrecio(subtotal)}
-        </p>
+        <div className="mt-4 pt-4 border-t space-y-1.5 text-sm">
+          <div className="flex justify-between text-gray-700">
+            <span>Subtotal de productos:</span>
+            <span>{mostrarPrecio(subtotal)}</span>
+          </div>
+          <div className="flex justify-between text-gray-700">
+            <span>Costo de envío estimado:</span>
+            <span>
+              {requiereEnvio
+                ? `${mostrarPrecio(costoEnvioEstimado)} ${
+                    usuario?.localidad?.nombre ? `(${usuario.localidad.nombre})` : ''
+                  }`
+                : 'Gratis (Retiro en el local)'}
+            </span>
+          </div>
+          <div className="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-100">
+            <span>Total estimado:</span>
+            <span className="text-indigo-600">{mostrarPrecio(totalEstimado)}</span>
+          </div>
+        </div>
 
         <p className="mt-2 text-sm text-gray-600">
           El importe definitivo se calcula al confirmar el pedido
@@ -291,30 +316,80 @@ if (items.length === 0) {
                   }
                   className="w-full border border-gray-300 rounded-lg p-3"
                 >
-                  <option value="retiro">Retiro en el local</option>
+                  <option value="retiro">Retiro en el local (Gratis)</option>
                   <option value="envio">Envío a domicilio</option>
                 </select>
               </div>
 
               {requiereEnvio && (
-                <div>
-                  <label
-                    htmlFor="domicilio"
-                    className="block font-medium text-gray-700 mb-2"
-                  >
-                    Domicilio de entrega
-                  </label>
+                <div className="space-y-3 bg-gray-50 border border-gray-200 p-4 rounded-xl">
+                  <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span>
+                      🚚 <strong>Tarifas fijas de envío:</strong> Las Parejas <strong>$3.000</strong> · Resto del país <strong>$15.000</strong>
+                    </span>
+                    {usuario?.localidad?.nombre && (
+                      <span className="font-semibold text-indigo-700">
+                        Localidad registrada: {usuario.localidad.nombre}
+                      </span>
+                    )}
+                  </div>
 
-                  <input
-                    id="domicilio"
-                    required
-                    value={domicilioEntrega}
-                    onChange={(event) =>
-                      setDomicilioEntrega(event.target.value)
-                    }
-                    className="w-full border border-gray-300 rounded-lg p-3"
-                    placeholder="Calle, número y datos de entrega"
-                  />
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label
+                        htmlFor="domicilio"
+                        className="block font-medium text-gray-700"
+                      >
+                        Domicilio de entrega
+                      </label>
+
+                      <label
+                        className={`text-xs flex items-center gap-1.5 ${
+                          usuario?.domicilio
+                            ? 'cursor-pointer text-indigo-700 hover:text-indigo-900 font-medium'
+                            : 'text-gray-400 cursor-not-allowed'
+                        }`}
+                        title={
+                          usuario?.domicilio
+                            ? 'Cargar tu domicilio registrado automáticamente'
+                            : 'No tenés un domicilio guardado en tu perfil'
+                        }
+                      >
+                        <input
+                          type="checkbox"
+                          disabled={!usuario?.domicilio}
+                          checked={usarDomicilioRegistrado}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setUsarDomicilioRegistrado(checked);
+                            if (checked && usuario?.domicilio) {
+                              setDomicilioEntrega(usuario.domicilio);
+                            }
+                          }}
+                          className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                        />
+                        <span>
+                          {usuario?.domicilio
+                            ? 'Usar mi domicilio registrado'
+                            : 'Sin domicilio en tu perfil'}
+                        </span>
+                      </label>
+                    </div>
+
+                    <input
+                      id="domicilio"
+                      required
+                      value={domicilioEntrega}
+                      onChange={(event) => {
+                        setDomicilioEntrega(event.target.value);
+                        if (usarDomicilioRegistrado && event.target.value !== usuario?.domicilio) {
+                          setUsarDomicilioRegistrado(false);
+                        }
+                      }}
+                      className="w-full border border-gray-300 rounded-lg p-3 bg-white"
+                      placeholder="Calle, número y datos de entrega"
+                    />
+                  </div>
                 </div>
               )}
 

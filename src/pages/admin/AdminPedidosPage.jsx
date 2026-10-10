@@ -14,7 +14,7 @@ const TRANSICIONES_PERMITIDAS = {
   CANCELADO: [],
 };
 
-const ESTADOS_CANCELABLES = ['PENDIENTE', 'CONFIRMADO', 'EN_PREPARACION'];
+const ESTADOS_CANCELABLES = ['PENDIENTE', 'CONFIRMADO'];
 
 const ESTADOS_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-100 text-amber-800 border-amber-200' },
@@ -23,6 +23,13 @@ const ESTADOS_INFO = {
   ENVIADO: { label: 'Enviado', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ENTREGADO: { label: 'Entregado', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
   CANCELADO: { label: 'Cancelado', color: 'bg-rose-100 text-rose-800 border-rose-200' },
+};
+
+const getEstadoInfo = (estado, tieneEnvio) => {
+  if (estado === 'ENVIADO' && !tieneEnvio) {
+    return { label: 'Listo para Retiro', color: 'bg-teal-100 text-teal-800 border-teal-200' };
+  }
+  return ESTADOS_INFO[estado] || { label: estado, color: 'bg-gray-100 text-gray-800' };
 };
 
 export const AdminPedidosPage = () => {
@@ -265,7 +272,7 @@ export const AdminPedidosPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {pedidos.map((p) => {
-                  const est = ESTADOS_INFO[p.estado] || { label: p.estado, color: 'bg-gray-100 text-gray-800' };
+                  const est = getEstadoInfo(p.estado, Boolean(p.envio));
                   const transiciones = TRANSICIONES_PERMITIDAS[p.estado] || [];
                   const cancelable = ESTADOS_CANCELABLES.includes(p.estado);
 
@@ -408,7 +415,11 @@ export const AdminPedidosPage = () => {
         isOpen={Boolean(pedidoACambiarEstado)}
         onClose={() => setPedidoACambiarEstado(null)}
         title={`Cambiar Estado - Pedido #${pedidoACambiarEstado?.id}`}
-        subtitle={`Estado actual: ${pedidoACambiarEstado?.estado}`}
+        subtitle={`Estado actual: ${
+          pedidoACambiarEstado
+            ? getEstadoInfo(pedidoACambiarEstado.estado, Boolean(pedidoACambiarEstado.envio)).label
+            : ''
+        }`}
       >
         <form onSubmit={handleConfirmarCambioEstado} className="space-y-4">
           {errorModal && (
@@ -424,11 +435,18 @@ export const AdminPedidosPage = () => {
               onChange={(e) => setNuevoEstadoSeleccionado(e.target.value)}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             >
-              {(TRANSICIONES_PERMITIDAS[pedidoACambiarEstado?.estado] || []).map((trans) => (
-                <option key={trans} value={trans}>
-                  {ESTADOS_INFO[trans]?.label || trans}
-                </option>
-              ))}
+              {(TRANSICIONES_PERMITIDAS[pedidoACambiarEstado?.estado] || []).map((trans) => {
+                let label = ESTADOS_INFO[trans]?.label || trans;
+                if (!pedidoACambiarEstado?.envio) {
+                  if (trans === 'ENVIADO') label = 'Listo para retiro';
+                  if (trans === 'ENTREGADO') label = 'Entregado en sucursal';
+                }
+                return (
+                  <option key={trans} value={trans}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

@@ -3,7 +3,7 @@ import { Categoria } from './Categoria';
 import { Imagen } from './Imagen';
 
 export class Producto {
-  constructor({ id, nombre, descripcion, categoria, marca, proveedor, precioActual, disponible, imagenes }) {
+  constructor({ id, nombre, descripcion, categoria, marca, proveedor, precioActual, disponible, stockDisponible, imagenes }) {
     this.id = id;
     this.nombre = nombre;
     this.descripcion = descripcion;
@@ -12,6 +12,7 @@ export class Producto {
     this.proveedor = proveedor;
     this.precioActual = precioActual;
     this.disponible = disponible;
+    this.stockDisponible = Number(stockDisponible ?? (disponible ? 1 : 0));
     this.imagenes = (imagenes ?? []).map(Imagen.fromJSON);
   }
 

@@ -89,12 +89,20 @@ export function Cart() {
                 </Link>
 
                 <div className="flex-1">
-                  <Link
-                    to={`/producto/${producto.id}`}
-                    className="font-semibold text-gray-900 hover:text-indigo-600"
-                  >
-                    {producto.nombre}
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      to={`/producto/${producto.id}`}
+                      className="font-semibold text-gray-900 hover:text-indigo-600"
+                    >
+                      {producto.nombre}
+                    </Link>
+
+                    {producto.stockDisponible === 1 && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                        ¡Última Unidad!
+                      </span>
+                    )}
+                  </div>
 
                   <p className="mt-1 text-sm text-gray-600">
                     Precio por unidad: {mostrarPrecio(precio)}
@@ -124,21 +132,31 @@ export function Cart() {
 
                       <button
                         type="button"
+                        disabled={
+                          producto.stockDisponible != null &&
+                          cantidad >= producto.stockDisponible
+                        }
                         onClick={() =>
                           cambiarCantidad(producto.id, cantidad + 1)
                         }
                         aria-label={`Agregar una unidad de ${producto.nombre}`}
-                        className="px-3 py-2 hover:bg-gray-100"
+                        className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         +
                       </button>
                     </div>
 
+                    {producto.stockDisponible != null && cantidad >= producto.stockDisponible && (
+                      <span className="text-xs text-gray-500">
+                        (Máximo disponible)
+                      </span>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => eliminarProducto(producto.id)}
                       aria-label={`Eliminar ${producto.nombre} del carrito`}
-                      className="text-sm text-red-600 hover:text-red-800"
+                      className="text-sm text-red-600 hover:text-red-800 cursor-pointer"
                     >
                       Eliminar
                     </button>

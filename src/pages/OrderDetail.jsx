@@ -5,8 +5,6 @@ import { envioService } from '../services/envioService';
 
 const ESTADOS_CANCELABLES = [
   'PENDIENTE',
-  'CONFIRMADO',
-  'EN_PREPARACION',
 ];
 
 const ESTADOS_ENVIO_CANCELABLE = ['PENDIENTE', 'EN_PREPARACION'];
@@ -204,7 +202,12 @@ export function OrderDetail() {
         </p>
 
         <p role="status" className="mt-3 font-semibold text-gray-800">
-          Estado: {pedido.estado.replaceAll('_', ' ')}
+          Estado:{' '}
+          <span className="font-bold text-indigo-700">
+            {pedido.estado === 'ENVIADO' && !pedido.envio
+              ? 'Listo para retiro'
+              : pedido.estado.replaceAll('_', ' ')}
+          </span>
         </p>
 
         <h2 className="mt-6 mb-3 text-lg font-bold text-gray-900">

@@ -158,7 +158,7 @@ export const AdminProductosPage = () => {
       ...INITIAL_FORM,
       categoriaId: categorias[0]?.id || '',
       marcaId: marcas[0]?.id || '',
-      proveedorId: proveedores[0]?.id || '',
+      proveedorId: '',
       almacenId: almacenes[0]?.id || '',
     });
     setProductoAEditar(null);
@@ -173,7 +173,7 @@ export const AdminProductosPage = () => {
       descripcion: prod.descripcion || '',
       categoriaId: prod.categoria?.id || categorias[0]?.id || '',
       marcaId: prod.marca?.id || marcas[0]?.id || '',
-      proveedorId: prod.proveedor?.id || proveedores[0]?.id || '',
+      proveedorId: prod.proveedor?.id ? String(prod.proveedor.id) : '',
       precio: prod.precioActual != null ? String(prod.precioActual) : '',
       imagenUrl: '',
       almacenId: '',
@@ -227,8 +227,8 @@ export const AdminProductosPage = () => {
       setErrorModal('El nombre del producto es obligatorio.');
       return;
     }
-    if (!formData.categoriaId || !formData.marcaId || !formData.proveedorId) {
-      setErrorModal('Debe seleccionar categoría, marca y proveedor.');
+    if (!formData.categoriaId || !formData.marcaId) {
+      setErrorModal('Debe seleccionar categoría y marca.');
       return;
     }
     if (!formData.precio || Number(formData.precio) < 0) {
@@ -250,6 +250,8 @@ export const AdminProductosPage = () => {
     setGuardando(true);
     setErrorModal(null);
 
+    const proveedorIdLimpio = formData.proveedorId ? Number(formData.proveedorId) : null;
+
     try {
       if (productoAEditar) {
         await productoService.actualizarProducto(productoAEditar.id, {
@@ -257,7 +259,7 @@ export const AdminProductosPage = () => {
           descripcion: formData.descripcion.trim(),
           categoriaId: Number(formData.categoriaId),
           marcaId: Number(formData.marcaId),
-          proveedorId: Number(formData.proveedorId),
+          proveedorId: proveedorIdLimpio,
         });
 
         const nuevoPrecio = Number(formData.precio);
@@ -276,7 +278,7 @@ export const AdminProductosPage = () => {
           descripcion: formData.descripcion.trim(),
           categoriaId: Number(formData.categoriaId),
           marcaId: Number(formData.marcaId),
-          proveedorId: Number(formData.proveedorId),
+          proveedorId: proveedorIdLimpio,
           precio: Number(formData.precio),
           ...(formData.imagenUrl.trim() && { imagenUrl: formData.imagenUrl.trim() }),
         });
@@ -502,11 +504,13 @@ export const AdminProductosPage = () => {
               options={marcas.map((m) => ({ value: m.id, label: m.nombre }))}
             />
             <SelectField
-              label="Proveedor"
-              required
+              label="Proveedor (opcional)"
               value={formData.proveedorId}
               onChange={(e) => setFormData({ ...formData, proveedorId: e.target.value })}
-              options={proveedores.map((p) => ({ value: p.id, label: p.nombre }))}
+              options={[
+                { value: '', label: 'Sin proveedor' },
+                ...proveedores.map((p) => ({ value: p.id, label: p.nombre })),
+              ]}
             />
           </div>
 

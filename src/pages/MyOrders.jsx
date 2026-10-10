@@ -324,7 +324,9 @@ export function MyOrders() {
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeClass}`}
                         >
-                          {pedido.estado.replaceAll('_', ' ')}
+                          {pedido.estado === 'ENVIADO' && !pedido.envio
+                            ? 'Listo para retiro'
+                            : pedido.estado.replaceAll('_', ' ')}
                         </span>
                       </div>
                       <span className="text-xs text-gray-500">

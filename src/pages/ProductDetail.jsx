@@ -19,6 +19,8 @@ export function ProductDetail() {
     mensaje: '',
   });
 
+  const [cantidad, setCantidad] = useState(1);
+
   useEffect(() => {
     let ignore = false;
 
@@ -26,6 +28,7 @@ export function ProductDetail() {
       .getProductoById(id)
       .then((producto) => {
         if (!ignore) {
+          setCantidad(1);
           setResultado({
             id,
             producto,
@@ -55,12 +58,12 @@ export function ProductDetail() {
     avisoCarrito.id === id ? avisoCarrito.mensaje : '';
 
   function handleAgregarAlCarrito() {
-    const agregado = agregarProducto(producto);
+    const agregado = agregarProducto(producto, cantidad);
 
     setAvisoCarrito({
       id,
       mensaje: agregado
-        ? 'Producto agregado al carrito.'
+        ? `${cantidad > 1 ? `${cantidad} unidades agregadas` : 'Producto agregado'} al carrito.`
         : 'No pudimos agregar este producto.',
     });
   }
@@ -165,21 +168,67 @@ export function ProductDetail() {
               : 'Precio no disponible'}
           </p>
 
-          <span
-            className={`inline-block w-fit px-3 py-1 rounded-full text-sm font-medium ${
-              producto.disponible
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}
-          >
-            {producto.disponible ? 'Disponible' : 'Sin stock'}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-block w-fit px-3 py-1 rounded-full text-sm font-medium ${
+                producto.disponible
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {producto.disponible ? 'Disponible' : 'Sin stock'}
+            </span>
+
+            {producto.disponible && producto.stockDisponible === 1 && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                ¡Última Unidad!
+              </span>
+            )}
+          </div>
+
+          {puedeAgregar && (
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-sm font-medium text-gray-700">Cantidad:</span>
+              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <button
+                  type="button"
+                  disabled={cantidad <= 1}
+                  onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
+                  className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-gray-600 transition"
+                  aria-label="Disminuir cantidad"
+                >
+                  −
+                </button>
+                <span className="min-w-10 text-center px-2 font-semibold text-gray-800">
+                  {cantidad}
+                </span>
+                <button
+                  type="button"
+                  disabled={cantidad >= Math.max(1, producto.stockDisponible || 1)}
+                  onClick={() =>
+                    setCantidad((prev) =>
+                      Math.min(Math.max(1, producto.stockDisponible || 1), prev + 1)
+                    )
+                  }
+                  className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-gray-600 transition"
+                  aria-label="Aumentar cantidad"
+                >
+                  +
+                </button>
+              </div>
+              {producto.stockDisponible > 1 && (
+                <span className="text-xs text-gray-500">
+                  (Stock: {producto.stockDisponible})
+                </span>
+              )}
+            </div>
+          )}
 
           <button
             type="button"
             disabled={!puedeAgregar}
             onClick={handleAgregarAlCarrito}
-            className="mt-3 px-5 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-3 px-5 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition shadow-xs"
           >
             Agregar al carrito
           </button>
@@ -192,7 +241,7 @@ export function ProductDetail() {
             {mensajeCarrito}
           </p>
 
-          {mensajeCarrito === 'Producto agregado al carrito.' && (
+          {mensajeCarrito && (
             <Link
               to="/carrito"
               className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
