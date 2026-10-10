@@ -16,6 +16,22 @@ function mostrarPrecio(valor) {
   });
 }
 
+function agruparDetalles(detalles) {
+  if (!Array.isArray(detalles)) return [];
+  const mapa = new Map();
+  for (const det of detalles) {
+    const key = det.productoId ?? det.producto?.id ?? det.id;
+    if (!mapa.has(key)) {
+      mapa.set(key, { ...det });
+    } else {
+      const item = mapa.get(key);
+      item.cantidad = (item.cantidad || 0) + (det.cantidad || 0);
+      item.subtotal = (item.subtotal || 0) + (det.subtotal || 0);
+    }
+  }
+  return Array.from(mapa.values());
+}
+
 export function OrderDetail() {
   const { id } = useParams();
 
@@ -164,6 +180,8 @@ export function OrderDetail() {
     ESTADOS_ENVIO_CANCELABLE.includes(pedido.envio.estado) &&
     ESTADOS_CANCELABLES.includes(pedido.estado);
 
+  const detallesAgrupados = agruparDetalles(pedido.detalles);
+
   return (
     <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8 print:p-0 print:max-w-none">
       <div className="flex items-center justify-between print:hidden mb-3">
@@ -215,8 +233,8 @@ export function OrderDetail() {
         </h2>
 
         <ul className="divide-y">
-          {pedido.detalles.map((detalle) => (
-            <li key={detalle.id} className="py-3">
+          {detallesAgrupados.map((detalle) => (
+            <li key={detalle.productoId ?? detalle.id} className="py-3">
               <p className="font-medium text-gray-900">
                 {detalle.producto?.nombre || 'Producto'}
               </p>

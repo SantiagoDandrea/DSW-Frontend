@@ -5,6 +5,22 @@ import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
 
+function agruparDetalles(detalles) {
+  if (!Array.isArray(detalles)) return [];
+  const mapa = new Map();
+  for (const det of detalles) {
+    const key = det.productoId ?? det.producto?.id ?? det.id;
+    if (!mapa.has(key)) {
+      mapa.set(key, { ...det });
+    } else {
+      const item = mapa.get(key);
+      item.cantidad = (item.cantidad || 0) + (det.cantidad || 0);
+      item.subtotal = (item.subtotal || 0) + (det.subtotal || 0);
+    }
+  }
+  return Array.from(mapa.values());
+}
+
 const TRANSICIONES_PERMITIDAS = {
   PENDIENTE: ['CONFIRMADO', 'CANCELADO'],
   CONFIRMADO: ['EN_PREPARACION', 'CANCELADO'],
@@ -53,6 +69,8 @@ export const AdminPedidosPage = () => {
   }, [usuarioInput]);
 
   const [pedidoDetalle, setPedidoDetalle] = useState(null);
+  const detallesVisuales = agruparDetalles(pedidoDetalle?.detalles);
+
   const [pedidoACambiarEstado, setPedidoACambiarEstado] = useState(null);
   const [nuevoEstadoSeleccionado, setNuevoEstadoSeleccionado] = useState('');
   const [pedidoACancelar, setPedidoACancelar] = useState(null);
@@ -366,7 +384,7 @@ export const AdminPedidosPage = () => {
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({pedidoDetalle.detalles?.length || 0})</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({detallesVisuales.length})</h4>
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-gray-50 font-bold text-gray-600 border-b border-gray-200">
@@ -378,8 +396,8 @@ export const AdminPedidosPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {pedidoDetalle.detalles?.map((det) => (
-                      <tr key={det.id}>
+                    {detallesVisuales.map((det) => (
+                      <tr key={det.productoId ?? det.id}>
                         <td className="p-3 font-semibold text-gray-900">{det.producto?.nombre || `Producto #${det.productoId}`}</td>
                         <td className="p-3 text-center font-bold text-gray-700">{det.cantidad}</td>
                         <td className="p-3 text-right">${Number(det.precioUnitario).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
