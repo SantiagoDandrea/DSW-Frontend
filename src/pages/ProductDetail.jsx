@@ -1,12 +1,17 @@
 // Pantalla de detalle de un producto que muestra sus fotos, precio, descripción y botón para agregarlo al carrito.
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { productoService } from '../services/productoService';
 import { useCart } from '../context/useCart';
+import { idDeLaRuta, rutaCategoria, rutaProducto } from '../utils/urls';
 
 export function ProductDetail() {
-  const { id } = useParams();
+  const { id: parametroId } = useParams();
+  const id = idDeLaRuta(parametroId);
+  const location = useLocation();
+  const navigate = useNavigate();
   const { agregarProducto } = useCart();
+  const [cantidad, setCantidad] = useState(1);
 
   const [resultado, setResultado] = useState({
     id: null,
@@ -51,11 +56,25 @@ export function ProductDetail() {
   const cargando = resultado.id !== id;
   const { producto, error } = resultado;
 
+  // Si se entró con /producto/29 (sin nombre), la dirección se completa con el nombre sin recargar
+  useEffect(() => {
+    if (!producto || resultado.id !== id) return;
+
+    const rutaCompleta = rutaProducto(producto);
+    if (location.pathname !== rutaCompleta) {
+      navigate(rutaCompleta, { replace: true });
+    }
+  }, [producto, resultado.id, id, location.pathname, navigate]);
+
   const mensajeCarrito =
     avisoCarrito.id === id ? avisoCarrito.mensaje : '';
 
   function handleAgregarAlCarrito() {
-    const agregado = agregarProducto(producto);
+    const agregado = agregarProducto(producto, cantidad);
+
+    if (agregado) {
+      setCantidad(1);
+    }
 
     setAvisoCarrito({
       id,
@@ -116,7 +135,7 @@ export function ProductDetail() {
     <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
       {producto.categoria && (
         <Link
-          to={`/categoria/${producto.categoria.id}`}
+          to={rutaCategoria(producto.categoria)}
           className="text-sm text-indigo-600 hover:text-indigo-800"
         >
           ← Volver a {producto.categoria.nombre}
@@ -174,6 +193,36 @@ export function ProductDetail() {
           >
             {producto.disponible ? 'Disponible' : 'Sin stock'}
           </span>
+
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-sm text-gray-700">Cantidad:</span>
+
+            <div className="flex items-center border border-gray-300 rounded-lg">
+              <button
+                type="button"
+                disabled={!puedeAgregar || cantidad <= 1}
+                onClick={() => setCantidad((c) => c - 1)}
+                aria-label="Quitar una unidad"
+                className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                −
+              </button>
+
+              <span className="min-w-10 text-center px-2" aria-live="polite">
+                {cantidad}
+              </span>
+
+              <button
+                type="button"
+                disabled={!puedeAgregar}
+                onClick={() => setCantidad((c) => c + 1)}
+                aria-label="Agregar una unidad"
+                className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                +
+              </button>
+            </div>
+          </div>
 
           <button
             type="button"

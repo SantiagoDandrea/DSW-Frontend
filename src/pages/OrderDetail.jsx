@@ -95,7 +95,10 @@ export function OrderDetail() {
   }
 
   async function handleGuardarDomicilio(envioId) {
-    if (!nuevoDomicilio.trim()) return;
+    if (!nuevoDomicilio.trim()) {
+      setErrorEnvio('Ingresá el domicilio de entrega.');
+      return;
+    }
 
     setGuardandoDomicilio(true);
     setErrorEnvio('');
@@ -160,6 +163,7 @@ export function OrderDetail() {
 
   const pedido = resultado.pedido;
   const puedeCancelar = ESTADOS_CANCELABLES.includes(pedido.estado);
+  const envioActivo = Boolean(pedido.envio) && pedido.envio.estado !== 'CANCELADO';
   const puedeEditarDomicilio =
     pedido.envio?.estado === 'PENDIENTE' && pedido.estado === 'PENDIENTE';
   const puedeCancelarEnvio =
@@ -214,13 +218,14 @@ export function OrderDetail() {
             Medio de pago: {pedido.medioPago?.descripcion}
           </p>
 
-          {pedido.envio ? (
+          {envioActivo ? (
             <>
               {editandoDomicilio ? (
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={nuevoDomicilio}
+                    aria-label="Nuevo domicilio de entrega"
                     onChange={(e) => setNuevoDomicilio(e.target.value)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Nuevo domicilio de entrega"
@@ -286,7 +291,13 @@ export function OrderDetail() {
               )}
             </>
           ) : (
-            <p>Entrega: retiro en el local.</p>
+            <p>
+              {pedido.envio && pedido.estado === 'CANCELADO'
+                ? 'Entrega: el pedido fue cancelado.'
+                : pedido.envio
+                  ? 'Entrega: retiro en el local (el envío a domicilio fue cancelado).'
+                  : 'Entrega: retiro en el local.'}
+            </p>
           )}
 
           <p className="pt-3 text-xl font-bold text-gray-900">

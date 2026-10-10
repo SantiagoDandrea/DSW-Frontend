@@ -46,6 +46,7 @@ export const SearchResults = () => {
     setPrecioMax,
     limpiarFiltros,
     hayFiltrosActivos,
+    rangoPrecioInvalido,
   } = useFiltrosProducto(productos);
 
   return (
@@ -57,7 +58,7 @@ export const SearchResults = () => {
       {cargando ? (
         <p>Buscando productos...</p>
       ) : error ? (
-        <p className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
+        <p role="alert" className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
           No pudimos completar la búsqueda: {error}
         </p>
       ) : productos.length === 0 ? (
@@ -74,9 +75,10 @@ export const SearchResults = () => {
             setPrecioMax={setPrecioMax}
             hayFiltrosActivos={hayFiltrosActivos}
             limpiarFiltros={limpiarFiltros}
+            rangoPrecioInvalido={rangoPrecioInvalido}
           />
           {productosFiltrados.length === 0 ? (
-            <p>No hay productos que coincidan con los filtros.</p>
+            rangoPrecioInvalido ? null : <p>No hay productos que coincidan con los filtros.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {productosFiltrados.map((producto) => (

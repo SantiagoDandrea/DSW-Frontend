@@ -1,5 +1,5 @@
 // Tabla genérica para listar, buscar, crear, editar y eliminar datos de cualquier entidad en el panel de administración.
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { AdminModal } from './AdminModal';
 import { ConfirmModal } from './ConfirmModal';
 import { AdminAlert } from './AdminAlert';
@@ -13,6 +13,7 @@ export const SimpleCrudTable = ({
   fields = [],
   service,
 }) => {
+  const idBase = useId();
   const [items, setItems] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState('');
@@ -187,6 +188,7 @@ export const SimpleCrudTable = ({
         <input
           type="text"
           placeholder={`Buscar en ${title.toLowerCase()}...`}
+          aria-label={`Buscar en ${title.toLowerCase()}`}
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -202,7 +204,7 @@ export const SimpleCrudTable = ({
         ) : itemsFiltrados.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="text-base font-semibold">No se encontraron registros</p>
-            <p className="text-xs text-gray-400 mt-1">Cree un nuevo elemento o modifique la búsqueda.</p>
+            <p className="text-xs text-gray-500 mt-1">Cree un nuevo elemento o modifique la búsqueda.</p>
           </div>
         ) : (
           <table className="w-full text-left text-sm text-gray-600">
@@ -211,7 +213,7 @@ export const SimpleCrudTable = ({
                 {columns.map((col) => (
                   <th key={col.key} className="px-5 py-3">{col.label}</th>
                 ))}
-                <th className="px-5 py-3 text-right">Acciones</th>
+                <th scope="col" className="px-5 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -253,16 +255,20 @@ export const SimpleCrudTable = ({
       >
         <form onSubmit={handleSubmitForm} className="space-y-4">
           {errorModal && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
+            <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
           )}
 
           {fields.map((f) => (
             <div key={f.name}>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+              <label
+                htmlFor={`${idBase}-${f.name}`}
+                className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1"
+              >
                 {f.label} {f.required && <span className="text-rose-500">*</span>}
               </label>
               {f.type === 'select' ? (
                 <select
+                  id={`${idBase}-${f.name}`}
                   name={f.name}
                   required={f.required}
                   value={formData[f.name] ?? ''}
@@ -276,6 +282,7 @@ export const SimpleCrudTable = ({
                 </select>
               ) : (
                 <input
+                  id={`${idBase}-${f.name}`}
                   name={f.name}
                   type={f.type || 'text'}
                   required={f.required}
@@ -289,7 +296,7 @@ export const SimpleCrudTable = ({
                   className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               )}
-              {f.helperText && <p className="text-xs text-gray-400 mt-1">{f.helperText}</p>}
+              {f.helperText && <p className="text-xs text-gray-500 mt-1">{f.helperText}</p>}
             </div>
           ))}
 

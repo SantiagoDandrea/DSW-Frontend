@@ -16,14 +16,20 @@ export function useFiltrosProducto(productos) {
     return Array.from(vistos, ([id, nombre]) => ({ id, nombre }));
   }, [productos]);
 
+  const rangoPrecioInvalido = Boolean(
+    precioMin && precioMax && Number(precioMin) > Number(precioMax)
+  );
+
   const productosFiltrados = useMemo(() => {
+    if (rangoPrecioInvalido) return [];
+
     return productos.filter((p) => {
       if (marcaId && String(p.marca?.id) !== String(marcaId)) return false;
       if (precioMin && Number(p.precioActual) < Number(precioMin)) return false;
       if (precioMax && Number(p.precioActual) > Number(precioMax)) return false;
       return true;
     });
-  }, [productos, marcaId, precioMin, precioMax]);
+  }, [productos, marcaId, precioMin, precioMax, rangoPrecioInvalido]);
 
   const limpiarFiltros = () => {
     setMarcaId('');
@@ -41,6 +47,7 @@ export function useFiltrosProducto(productos) {
     precioMax,
     setPrecioMax,
     limpiarFiltros,
+    rangoPrecioInvalido,
     hayFiltrosActivos: Boolean(marcaId || precioMin || precioMax),
   };
 }

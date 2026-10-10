@@ -138,7 +138,7 @@ export function Cart() {
                       type="button"
                       onClick={() => eliminarProducto(producto.id)}
                       aria-label={`Eliminar ${producto.nombre} del carrito`}
-                      className="text-sm text-red-600 hover:text-red-800"
+                      className="text-sm text-red-700 hover:text-red-900"
                     >
                       Eliminar
                     </button>
@@ -155,7 +155,7 @@ export function Cart() {
           <button
             type="button"
             onClick={vaciarCarrito}
-            className="text-sm text-red-600 hover:text-red-800"
+            className="text-sm text-red-700 hover:text-red-900"
           >
             Vaciar carrito
           </button>
