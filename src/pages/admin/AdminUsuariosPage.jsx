@@ -1,5 +1,5 @@
 // Panel de administración para crear, editar, listar y eliminar usuarios y gestionar sus roles.
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { useAuth } from '../../context/useAuth';
 import { usuarioService } from '../../services/usuarioService';
 import { localidadService } from '../../services/localidadService';
@@ -18,36 +18,46 @@ const INITIAL_FORM = {
   localidadId: '',
 };
 
-const InputField = ({ label, required, ...props }) => (
-  <div>
-    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-      {label} {required && '*'}
-    </label>
-    <input
-      required={required}
-      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
-      {...props}
-    />
-  </div>
-);
+const InputField = ({ label, required, ...props }) => {
+  const id = useId();
 
-const SelectField = ({ label, required, options = [], helperText, ...props }) => (
-  <div>
-    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-      {label} {required && '*'}
-    </label>
-    <select
-      required={required}
-      className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
-      {...props}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
-      ))}
-    </select>
-    {helperText && <p className="text-[11px] text-amber-600 mt-1">{helperText}</p>}
-  </div>
-);
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+        {label} {required && '*'}
+      </label>
+      <input
+        id={id}
+        required={required}
+        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+        {...props}
+      />
+    </div>
+  );
+};
+
+const SelectField = ({ label, required, options = [], helperText, ...props }) => {
+  const id = useId();
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+        {label} {required && '*'}
+      </label>
+      <select
+        id={id}
+        required={required}
+        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+        {...props}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      {helperText && <p className="text-[11px] text-amber-700 mt-1">{helperText}</p>}
+    </div>
+  );
+};
 
 const validarPasswordFrontend = (password) => {
   if (!password || password.length < 8) {
@@ -310,6 +320,7 @@ export const AdminUsuariosPage = () => {
           <input
             type="text"
             placeholder="Buscar por DNI, nombre, apellido o correo..."
+            aria-label="Buscar usuarios por DNI, nombre, apellido o correo"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -317,6 +328,7 @@ export const AdminUsuariosPage = () => {
         </div>
         <div>
           <select
+            aria-label="Filtrar por rol"
             value={filtroRol}
             onChange={(e) => setFiltroRol(e.target.value)}
             className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -337,20 +349,20 @@ export const AdminUsuariosPage = () => {
         ) : usuariosFiltrados.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="text-base font-semibold">No se encontraron usuarios</p>
-            <p className="text-xs text-gray-400 mt-1">Pruebe ajustando los términos de búsqueda.</p>
+            <p className="text-xs text-gray-500 mt-1">Pruebe ajustando los términos de búsqueda.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
               <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
                 <tr>
-                  <th className="px-5 py-3">Usuario</th>
-                  <th className="px-5 py-3">DNI</th>
-                  <th className="px-5 py-3">Rol</th>
-                  <th className="px-5 py-3">Estado</th>
-                  <th className="px-5 py-3">Localidad</th>
-                  <th className="px-5 py-3">Teléfono</th>
-                  <th className="px-5 py-3 text-right">Acciones</th>
+                  <th scope="col" className="px-5 py-3">Usuario</th>
+                  <th scope="col" className="px-5 py-3">DNI</th>
+                  <th scope="col" className="px-5 py-3">Rol</th>
+                  <th scope="col" className="px-5 py-3">Estado</th>
+                  <th scope="col" className="px-5 py-3">Localidad</th>
+                  <th scope="col" className="px-5 py-3">Teléfono</th>
+                  <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -366,7 +378,7 @@ export const AdminUsuariosPage = () => {
                             <span className="text-[10px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 font-bold rounded">Tú</span>
                           )}
                         </div>
-                        <div className="text-xs text-gray-400">{u.email}</div>
+                        <div className="text-xs text-gray-500">{u.email}</div>
                       </td>
                       <td className="px-5 py-3 font-mono text-xs text-gray-700">{u.dni}</td>
                       <td className="px-5 py-3">

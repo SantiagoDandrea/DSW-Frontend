@@ -196,7 +196,7 @@ export const AdminEnviosPage = () => {
         ) : envios.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="text-base font-semibold">No se encontraron envíos</p>
-            <p className="text-xs text-gray-400 mt-1">Probá cambiando el estado o el número de pedido.</p>
+            <p className="text-xs text-gray-500 mt-1">Probá cambiando el estado o el número de pedido.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -221,7 +221,7 @@ export const AdminEnviosPage = () => {
                       <td className="px-5 py-3 font-bold text-gray-900">#{envio.id}</td>
                       <td className="px-5 py-3">
                         <div className="font-semibold text-gray-900">Pedido #{envio.pedidoId}</div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-500">
                           {cliente ? `${cliente.nombre} ${cliente.apellido}` : '-'}
                         </div>
                       </td>

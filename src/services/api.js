@@ -29,9 +29,10 @@ export async function apiFetch(endpoint, options = {}) {
 
   if (!response.ok) {
     if (response.status === 401 && !endpoint.includes('/auth/login')) {
+      const teniaSesion = Boolean(token);
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
-      window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { status: 401 } }));
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { status: 401, teniaSesion } }));
     }
 
     const errorMessage = data?.message || data?.error || `Error HTTP ${response.status}: ${response.statusText}`;

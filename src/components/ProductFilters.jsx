@@ -12,6 +12,7 @@ export const ProductFilters = ({
   mostrarOrden = true,
   hayFiltrosActivos,
   limpiarFiltros,
+  rangoPrecioInvalido = false,
 }) => {
   if (marcas.length === 0 && !mostrarOrden) {
     return null;
@@ -84,6 +85,12 @@ export const ProductFilters = ({
             <option value="precio-desc">Mayor precio</option>
           </select>
         </div>
+      )}
+
+      {rangoPrecioInvalido && (
+        <p role="alert" className="w-full text-sm text-rose-700">
+          El precio mínimo no puede ser mayor que el máximo. Corregí el rango para ver los productos.
+        </p>
       )}
 
       {hayFiltrosActivos && (

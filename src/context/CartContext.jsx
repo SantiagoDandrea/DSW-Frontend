@@ -39,6 +39,16 @@ export function CartProvider({ children }) {
     }
   }, [items]);
 
+  // Al cerrar sesión se vacía el carrito para que no lo herede la próxima persona que use el navegador
+  useEffect(() => {
+    const vaciarAlCerrarSesion = () => setItems([]);
+
+    window.addEventListener('auth:logout', vaciarAlCerrarSesion);
+    return () => {
+      window.removeEventListener('auth:logout', vaciarAlCerrarSesion);
+    };
+  }, []);
+
   function agregarProducto(producto, cantidad = 1) {
     if (
       !producto?.disponible ||
