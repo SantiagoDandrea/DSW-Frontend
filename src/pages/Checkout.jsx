@@ -23,12 +23,21 @@ export function Checkout() {
 
   const [medioPagoId, setMedioPagoId] = useState('');
   const [requiereEnvio, setRequiereEnvio] = useState(false);
-  const [domicilioEntrega, setDomicilioEntrega] = useState('');
+  const [tipoEnvio, setTipoEnvio] = useState(''); // '' | 'LOCAL' | 'NACIONAL'
+  const [calle, setCalle] = useState('');
+  const [numero, setNumero] = useState('');
+  const [localidadDestino, setLocalidadDestino] = useState('');
+  const [provinciaDestino, setProvinciaDestino] = useState('');
+  const [codigoPostal, setCodigoPostal] = useState('');
   const [usarDomicilioRegistrado, setUsarDomicilioRegistrado] = useState(false);
 
-  const esLasParejas =
-    Boolean(usuario?.localidad?.nombre?.trim().toLowerCase().includes('las parejas'));
-  const costoEnvioEstimado = requiereEnvio ? (esLasParejas ? 3000 : 15000) : 0;
+  const costoEnvioEstimado = requiereEnvio
+    ? tipoEnvio === 'LOCAL'
+      ? 3000
+      : tipoEnvio === 'NACIONAL'
+      ? 15000
+      : 0
+    : 0;
   const totalEstimado = subtotal + costoEnvioEstimado;
 
   const [enviando, setEnviando] = useState(false);
@@ -81,9 +90,46 @@ export function Checkout() {
       return;
     }
 
-    if (requiereEnvio && !domicilioEntrega.trim()) {
-      setErrorCompra('Ingresá el domicilio de entrega.');
-      return;
+    if (requiereEnvio) {
+      if (!tipoEnvio) {
+        setErrorCompra('Seleccioná la zona de entrega (Local o Nacional).');
+        return;
+      }
+
+      if (!calle.trim()) {
+        setErrorCompra('Ingresá el nombre de la calle.');
+        return;
+      }
+
+      const numTrim = numero.trim();
+      if (!numTrim || !/^\d+$/.test(numTrim) || Number(numTrim) <= 0) {
+        setErrorCompra('El campo "Número" es obligatorio y debe contener solo números.');
+        return;
+      }
+
+      if (tipoEnvio === 'NACIONAL') {
+        if (!localidadDestino.trim()) {
+          setErrorCompra('Ingresá la localidad de entrega.');
+          return;
+        }
+        if (!provinciaDestino.trim()) {
+          setErrorCompra('Ingresá la provincia de entrega.');
+          return;
+        }
+        if (!codigoPostal.trim()) {
+          setErrorCompra('Ingresá el código postal.');
+          return;
+        }
+      }
+    }
+
+    let domicilioCompleto = '';
+    if (requiereEnvio) {
+      if (tipoEnvio === 'LOCAL') {
+        domicilioCompleto = `${calle.trim()} ${numero.trim()}, Las Parejas`;
+      } else {
+        domicilioCompleto = `${calle.trim()} ${numero.trim()}, ${localidadDestino.trim()}, ${provinciaDestino.trim()} (CP ${codigoPostal.trim()})`;
+      }
     }
 
     const datos = {
@@ -95,7 +141,9 @@ export function Checkout() {
       envio: requiereEnvio
         ? {
             requiereEnvio: true,
-            domicilioEntrega: domicilioEntrega.trim(),
+            tipoEnvio,
+            localidad: tipoEnvio === 'LOCAL' ? 'Las Parejas' : localidadDestino.trim(),
+            domicilioEntrega: domicilioCompleto,
           }
         : {
             requiereEnvio: false,
@@ -227,11 +275,13 @@ if (items.length === 0) {
           <div className="flex justify-between text-gray-700">
             <span>Costo de envío estimado:</span>
             <span>
-              {requiereEnvio
-                ? `${mostrarPrecio(costoEnvioEstimado)} ${
-                    usuario?.localidad?.nombre ? `(${usuario.localidad.nombre})` : ''
-                  }`
-                : 'Gratis (Retiro en el local)'}
+              {!requiereEnvio
+                ? 'Gratis (Retiro en el local)'
+                : !tipoEnvio
+                ? 'Seleccioná la zona de envío'
+                : tipoEnvio === 'LOCAL'
+                ? `${mostrarPrecio(3000)} (Local - Las Parejas)`
+                : `${mostrarPrecio(15000)} (Nacional - Resto del país)`}
             </span>
           </div>
           <div className="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-100">
@@ -322,74 +372,173 @@ if (items.length === 0) {
               </div>
 
               {requiereEnvio && (
-                <div className="space-y-3 bg-gray-50 border border-gray-200 p-4 rounded-xl">
-                  <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span>
-                      🚚 <strong>Tarifas fijas de envío:</strong> Las Parejas <strong>$3.000</strong> · Resto del país <strong>$15.000</strong>
-                    </span>
-                    {usuario?.localidad?.nombre && (
-                      <span className="font-semibold text-indigo-700">
-                        Localidad registrada: {usuario.localidad.nombre}
-                      </span>
-                    )}
-                  </div>
-
+                <div className="space-y-4 bg-gray-50 border border-gray-200 p-4 rounded-xl">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label
-                        htmlFor="domicilio"
-                        className="block font-medium text-gray-700"
-                      >
-                        Domicilio de entrega
-                      </label>
+                    <label
+                      htmlFor="tipoEnvio"
+                      className="block font-medium text-gray-700 mb-2"
+                    >
+                      Zona de entrega
+                    </label>
 
-                      <label
-                        className={`text-xs flex items-center gap-1.5 ${
-                          usuario?.domicilio
-                            ? 'cursor-pointer text-indigo-700 hover:text-indigo-900 font-medium'
-                            : 'text-gray-400 cursor-not-allowed'
-                        }`}
-                        title={
-                          usuario?.domicilio
-                            ? 'Cargar tu domicilio registrado automáticamente'
-                            : 'No tenés un domicilio guardado en tu perfil'
-                        }
-                      >
-                        <input
-                          type="checkbox"
-                          disabled={!usuario?.domicilio}
-                          checked={usarDomicilioRegistrado}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setUsarDomicilioRegistrado(checked);
-                            if (checked && usuario?.domicilio) {
-                              setDomicilioEntrega(usuario.domicilio);
-                            }
-                          }}
-                          className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
-                        />
-                        <span>
-                          {usuario?.domicilio
-                            ? 'Usar mi domicilio registrado'
-                            : 'Sin domicilio en tu perfil'}
-                        </span>
-                      </label>
-                    </div>
-
-                    <input
-                      id="domicilio"
+                    <select
+                      id="tipoEnvio"
                       required
-                      value={domicilioEntrega}
-                      onChange={(event) => {
-                        setDomicilioEntrega(event.target.value);
-                        if (usarDomicilioRegistrado && event.target.value !== usuario?.domicilio) {
-                          setUsarDomicilioRegistrado(false);
-                        }
-                      }}
+                      value={tipoEnvio}
+                      onChange={(event) => setTipoEnvio(event.target.value)}
                       className="w-full border border-gray-300 rounded-lg p-3 bg-white"
-                      placeholder="Calle, número y datos de entrega"
-                    />
+                    >
+                      <option value="">Seleccioná la zona de entrega</option>
+                      <option value="LOCAL">
+                        Envío local (Las Parejas) — $3.000
+                      </option>
+                      <option value="NACIONAL">
+                        Envío nacional (Resto del país) — $15.000
+                      </option>
+                    </select>
                   </div>
+
+                  {tipoEnvio && (
+                    <div className="pt-2 border-t border-gray-200 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-gray-800">
+                          Dirección de entrega {tipoEnvio === 'LOCAL' ? '(Las Parejas)' : ''}
+                        </span>
+
+                        {usuario?.domicilio && (
+                          <label
+                            className="text-xs flex items-center gap-1.5 cursor-pointer text-indigo-700 hover:text-indigo-900 font-medium"
+                            title="Autocompletar con los datos guardados en tu perfil"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={usarDomicilioRegistrado}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setUsarDomicilioRegistrado(checked);
+                                if (checked && usuario?.domicilio) {
+                                  const match = String(usuario.domicilio).trim().match(/^(.*?)(?:\s+(\d+))$/);
+                                  if (match) {
+                                    setCalle(match[1]);
+                                    setNumero(match[2]);
+                                  } else {
+                                    setCalle(usuario.domicilio);
+                                  }
+                                  if (tipoEnvio === 'NACIONAL') {
+                                    if (usuario?.localidad?.nombre) {
+                                      setLocalidadDestino(usuario.localidad.nombre);
+                                    }
+                                  }
+                                }
+                              }}
+                              className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <span>Usar mi domicilio registrado</span>
+                          </label>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="calle"
+                            className="block text-xs font-medium text-gray-700 mb-1"
+                          >
+                            Calle
+                          </label>
+                          <input
+                            id="calle"
+                            type="text"
+                            required
+                            value={calle}
+                            onChange={(e) => setCalle(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                            placeholder="Ej. San Martín"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="numero"
+                            className="block text-xs font-medium text-gray-700 mb-1"
+                          >
+                            Número
+                          </label>
+                          <input
+                            id="numero"
+                            type="text"
+                            inputMode="numeric"
+                            required
+                            value={numero}
+                            onChange={(e) => {
+                              const soloNumeros = e.target.value.replace(/\D/g, '');
+                              setNumero(soloNumeros);
+                            }}
+                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                            placeholder="Ej. 1234"
+                          />
+                        </div>
+                      </div>
+
+                      {tipoEnvio === 'NACIONAL' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label
+                              htmlFor="localidadDestino"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Localidad
+                            </label>
+                            <input
+                              id="localidadDestino"
+                              type="text"
+                              required
+                              value={localidadDestino}
+                              onChange={(e) => setLocalidadDestino(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. Rosario"
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              htmlFor="provinciaDestino"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Provincia
+                            </label>
+                            <input
+                              id="provinciaDestino"
+                              type="text"
+                              required
+                              value={provinciaDestino}
+                              onChange={(e) => setProvinciaDestino(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. Santa Fe"
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              htmlFor="codigoPostal"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Código Postal
+                            </label>
+                            <input
+                              id="codigoPostal"
+                              type="text"
+                              required
+                              value={codigoPostal}
+                              onChange={(e) => setCodigoPostal(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. S2000"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
