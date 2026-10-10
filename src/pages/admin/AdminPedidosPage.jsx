@@ -308,7 +308,7 @@ export const AdminPedidosPage = () => {
                   <th scope="col" className="px-5 py-3">Nº Orden / Fecha</th>
                   <th scope="col" className="px-5 py-3">Cliente</th>
                   <th scope="col" className="px-5 py-3">Total</th>
-                  <th scope="col" className="px-5 py-3">Estado</th>
+                  <th scope="col" className="px-5 py-3 whitespace-nowrap">Estado</th>
                   <th scope="col" className="px-5 py-3">Entrega</th>
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
@@ -337,8 +337,8 @@ export const AdminPedidosPage = () => {
                       <td className="px-5 py-3 font-extrabold text-gray-900">
                         ${Number(p.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-5 py-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${est.color}`}>
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className={`inline-block whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-bold border ${est.color}`}>
                           {est.label}
                         </span>
                       </td>
