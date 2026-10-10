@@ -290,8 +290,17 @@ export const AdminProductosPage = () => {
           marcaId: Number(formData.marcaId),
           proveedorId: proveedorIdLimpio,
           precio: Number(formData.precio),
-          ...(formData.imagenUrl.trim() && { imagenUrl: formData.imagenUrl.trim() }),
         });
+
+        if (formData.imagenUrl && formData.imagenUrl.trim()) {
+          try {
+            await productoService.agregarImagen(nuevoProd.id, {
+              url: formData.imagenUrl.trim(),
+            });
+          } catch (imgErr) {
+            console.error('Error al registrar imagen inicial:', imgErr);
+          }
+        }
 
         if (formData.stockInicial && Number(formData.stockInicial) > 0 && formData.almacenId) {
           try {

@@ -282,7 +282,15 @@ export const AdminUsuariosPage = () => {
         await usuarioService.eliminarUsuario(usuarioAToggleActivo.dni);
         setMensajeExito(`Usuario ${usuarioAToggleActivo.nombre} ${usuarioAToggleActivo.apellido} desactivado.`);
       } else {
-        await usuarioService.actualizarUsuario(usuarioAToggleActivo.dni, { activo: true });
+        await usuarioService.actualizarUsuario(usuarioAToggleActivo.dni, {
+          nombre: usuarioAToggleActivo.nombre,
+          apellido: usuarioAToggleActivo.apellido,
+          email: usuarioAToggleActivo.email,
+          telefono: usuarioAToggleActivo.telefono,
+          rol: usuarioAToggleActivo.rol,
+          localidadId: usuarioAToggleActivo.localidad?.id || localidades[0]?.id,
+          activo: true,
+        });
         setMensajeExito(`Usuario ${usuarioAToggleActivo.nombre} ${usuarioAToggleActivo.apellido} reactivado con éxito.`);
       }
       setUsuarioAToggleActivo(null);
