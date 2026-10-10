@@ -4,6 +4,9 @@ import { productoService } from '../../services/productoService';
 import { categoriaService } from '../../services/categoriaService';
 import { marcaService } from '../../services/marcaService';
 import { proveedorService } from '../../services/proveedorService';
+import { almacenService } from '../../services/almacenService';
+import { stockService } from '../../services/stockService';
+import { precioService } from '../../services/precioService';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
@@ -16,6 +19,8 @@ const INITIAL_FORM = {
   proveedorId: '',
   precio: '',
   imagenUrl: '',
+  almacenId: '',
+  stockInicial: '',
 };
 
 const InputField = ({ label, required, ...props }) => {
@@ -63,6 +68,7 @@ export const AdminProductosPage = () => {
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [proveedores, setProveedores] = useState([]);
+  const [almacenes, setAlmacenes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -99,7 +105,8 @@ export const AdminProductosPage = () => {
       categoriaService.getCategorias(),
       marcaService.getMarcas(),
       proveedorService.getProveedores(),
-    ]).then(([catsResult, mrcsResult, provsResult]) => {
+      almacenService.getAlmacenes(),
+    ]).then(([catsResult, mrcsResult, provsResult, almResult]) => {
       if (ignore) return;
       const errores = [];
       if (catsResult.status === 'fulfilled') setCategorias(catsResult.value || []);
@@ -108,6 +115,8 @@ export const AdminProductosPage = () => {
       else errores.push('marcas');
       if (provsResult.status === 'fulfilled') setProveedores(provsResult.value || []);
       else errores.push('proveedores');
+      if (almResult.status === 'fulfilled') setAlmacenes(almResult.value || []);
+      else errores.push('almacenes');
 
       if (errores.length > 0) {
         setErrorGlobal(`No se pudieron cargar los datos de ${errores.join(', ')} para los selectores.`);
@@ -159,7 +168,8 @@ export const AdminProductosPage = () => {
       ...INITIAL_FORM,
       categoriaId: categorias[0]?.id || '',
       marcaId: marcas[0]?.id || '',
-      proveedorId: proveedores[0]?.id || '',
+      proveedorId: '',
+      almacenId: almacenes[0]?.id || '',
     });
     setProductoAEditar(null);
     setErrorModal(null);
@@ -173,9 +183,11 @@ export const AdminProductosPage = () => {
       descripcion: prod.descripcion || '',
       categoriaId: prod.categoria?.id || categorias[0]?.id || '',
       marcaId: prod.marca?.id || marcas[0]?.id || '',
-      proveedorId: prod.proveedor?.id || proveedores[0]?.id || '',
-      precio: '',
+      proveedorId: prod.proveedor?.id ? String(prod.proveedor.id) : '',
+      precio: prod.precioActual != null ? String(prod.precioActual) : '',
       imagenUrl: '',
+      almacenId: '',
+      stockInicial: '',
     });
     setImagenesProducto(prod.imagenes || []);
     setNuevaImagenUrl('');
@@ -225,17 +237,30 @@ export const AdminProductosPage = () => {
       setErrorModal('El nombre del producto es obligatorio.');
       return;
     }
-    if (!formData.categoriaId || !formData.marcaId || !formData.proveedorId) {
-      setErrorModal('Debe seleccionar categoría, marca y proveedor.');
+    if (!formData.categoriaId || !formData.marcaId) {
+      setErrorModal('Debe seleccionar categoría y marca.');
       return;
     }
-    if (!productoAEditar && (!formData.precio || Number(formData.precio) < 0)) {
-      setErrorModal('Debe ingresar un precio inicial válido.');
+    if (!formData.precio || Number(formData.precio) < 0) {
+      setErrorModal('Debe ingresar un precio válido.');
       return;
+    }
+
+    if (!productoAEditar) {
+      if (formData.stockInicial && Number(formData.stockInicial) > 0 && !formData.almacenId) {
+        setErrorModal('Debe seleccionar un almacén si ingresa stock inicial.');
+        return;
+      }
+      if (formData.almacenId && (!formData.stockInicial || Number(formData.stockInicial) < 0)) {
+        setErrorModal('Debe indicar la cantidad de stock inicial para el almacén seleccionado.');
+        return;
+      }
     }
 
     setGuardando(true);
     setErrorModal(null);
+
+    const proveedorIdLimpio = formData.proveedorId ? Number(formData.proveedorId) : null;
 
     try {
       if (productoAEditar) {
@@ -244,19 +269,51 @@ export const AdminProductosPage = () => {
           descripcion: formData.descripcion.trim(),
           categoriaId: Number(formData.categoriaId),
           marcaId: Number(formData.marcaId),
-          proveedorId: Number(formData.proveedorId),
+          proveedorId: proveedorIdLimpio,
         });
+
+        const nuevoPrecio = Number(formData.precio);
+        if (nuevoPrecio >= 0 && nuevoPrecio !== Number(productoAEditar.precioActual)) {
+          await precioService.crearPrecio({
+            productoId: productoAEditar.id,
+            valor: nuevoPrecio,
+            fechaDesde: new Date().toISOString(),
+          });
+        }
+
         setMensajeExito(`Producto "${formData.nombre}" actualizado.`);
       } else {
-        await productoService.crearProducto({
+        const nuevoProd = await productoService.crearProducto({
           nombre: formData.nombre.trim(),
           descripcion: formData.descripcion.trim(),
           categoriaId: Number(formData.categoriaId),
           marcaId: Number(formData.marcaId),
-          proveedorId: Number(formData.proveedorId),
+          proveedorId: proveedorIdLimpio,
           precio: Number(formData.precio),
-          ...(formData.imagenUrl.trim() && { imagenUrl: formData.imagenUrl.trim() }),
         });
+
+        if (formData.imagenUrl && formData.imagenUrl.trim()) {
+          try {
+            await productoService.agregarImagen(nuevoProd.id, {
+              url: formData.imagenUrl.trim(),
+            });
+          } catch (imgErr) {
+            console.error('Error al registrar imagen inicial:', imgErr);
+          }
+        }
+
+        if (formData.stockInicial && Number(formData.stockInicial) > 0 && formData.almacenId) {
+          try {
+            await stockService.crearStock({
+              productoId: nuevoProd.id,
+              almacenId: Number(formData.almacenId),
+              cantidad: Number(formData.stockInicial),
+            });
+          } catch (stockErr) {
+            console.error('Error al registrar stock inicial:', stockErr);
+          }
+        }
+
         setMensajeExito(`Producto "${formData.nombre}" creado con éxito.`);
       }
       setModalFormAbierto(false);
@@ -470,32 +527,59 @@ export const AdminProductosPage = () => {
               options={marcas.map((m) => ({ value: m.id, label: m.nombre }))}
             />
             <SelectField
-              label="Proveedor"
-              required
+              label="Proveedor (opcional)"
               value={formData.proveedorId}
               onChange={(e) => setFormData({ ...formData, proveedorId: e.target.value })}
-              options={proveedores.map((p) => ({ value: p.id, label: p.nombre }))}
+              options={[
+                { value: '', label: 'Sin proveedor' },
+                ...proveedores.map((p) => ({ value: p.id, label: p.nombre })),
+              ]}
             />
           </div>
 
-          {!productoAEditar && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
-              <InputField
-                label="Precio Inicial ($)"
-                type="number"
-                step="0.01"
-                min="0"
-                required
-                value={formData.precio}
-                onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-                placeholder="0.00"
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+            <InputField
+              label={productoAEditar ? 'Precio ($)' : 'Precio Inicial ($)'}
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              value={formData.precio}
+              onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+              placeholder="0.00"
+            />
+            {!productoAEditar && (
               <InputField
                 label="URL Imagen"
                 type="url"
                 value={formData.imagenUrl}
                 onChange={(e) => setFormData({ ...formData, imagenUrl: e.target.value })}
                 placeholder="https://ejemplo.com/foto.jpg"
+              />
+            )}
+          </div>
+
+          {!productoAEditar && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+              <SelectField
+                label="Almacén para stock inicial"
+                value={formData.almacenId}
+                onChange={(e) => setFormData({ ...formData, almacenId: e.target.value })}
+                options={[
+                  { value: '', label: 'Sin stock inicial' },
+                  ...almacenes.map((a) => ({
+                    value: a.id,
+                    label: a.descripcion || `Almacén #${a.id}`,
+                  })),
+                ]}
+              />
+              <InputField
+                label="Stock Inicial (unidades)"
+                type="number"
+                min="0"
+                value={formData.stockInicial}
+                onChange={(e) => setFormData({ ...formData, stockInicial: e.target.value })}
+                placeholder="0"
               />
             </div>
           )}

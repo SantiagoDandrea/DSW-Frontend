@@ -5,6 +5,22 @@ import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
 
+function agruparDetalles(detalles) {
+  if (!Array.isArray(detalles)) return [];
+  const mapa = new Map();
+  for (const det of detalles) {
+    const key = det.productoId ?? det.producto?.id ?? det.id;
+    if (!mapa.has(key)) {
+      mapa.set(key, { ...det });
+    } else {
+      const item = mapa.get(key);
+      item.cantidad = (item.cantidad || 0) + (det.cantidad || 0);
+      item.subtotal = (item.subtotal || 0) + (det.subtotal || 0);
+    }
+  }
+  return Array.from(mapa.values());
+}
+
 const TRANSICIONES_PERMITIDAS = {
   PENDIENTE: ['CONFIRMADO', 'CANCELADO'],
   CONFIRMADO: ['EN_PREPARACION', 'CANCELADO'],
@@ -14,7 +30,7 @@ const TRANSICIONES_PERMITIDAS = {
   CANCELADO: [],
 };
 
-const ESTADOS_CANCELABLES = ['PENDIENTE', 'CONFIRMADO', 'EN_PREPARACION'];
+const ESTADOS_CANCELABLES = ['PENDIENTE', 'CONFIRMADO'];
 
 const ESTADOS_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-100 text-amber-800 border-amber-200' },
@@ -23,6 +39,13 @@ const ESTADOS_INFO = {
   ENVIADO: { label: 'Enviado', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ENTREGADO: { label: 'Entregado', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
   CANCELADO: { label: 'Cancelado', color: 'bg-rose-100 text-rose-800 border-rose-200' },
+};
+
+const getEstadoInfo = (estado, tieneEnvio) => {
+  if (estado === 'ENVIADO' && !tieneEnvio) {
+    return { label: 'Listo para Retiro', color: 'bg-teal-100 text-teal-800 border-teal-200' };
+  }
+  return ESTADOS_INFO[estado] || { label: estado, color: 'bg-gray-100 text-gray-800' };
 };
 
 export const AdminPedidosPage = () => {
@@ -43,6 +66,8 @@ export const AdminPedidosPage = () => {
   );
 
   const [pedidoDetalle, setPedidoDetalle] = useState(null);
+  const detallesVisuales = agruparDetalles(pedidoDetalle?.detalles);
+
   const [pedidoACambiarEstado, setPedidoACambiarEstado] = useState(null);
   const [nuevoEstadoSeleccionado, setNuevoEstadoSeleccionado] = useState('');
   const [pedidoACancelar, setPedidoACancelar] = useState(null);
@@ -283,14 +308,15 @@ export const AdminPedidosPage = () => {
                   <th scope="col" className="px-5 py-3">Nº Orden / Fecha</th>
                   <th scope="col" className="px-5 py-3">Cliente</th>
                   <th scope="col" className="px-5 py-3">Total</th>
-                  <th scope="col" className="px-5 py-3">Estado</th>
+                  <th scope="col" className="px-5 py-3 whitespace-nowrap">Estado</th>
                   <th scope="col" className="px-5 py-3">Entrega</th>
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {pedidosVisibles.map((p) => {
-                  const est = ESTADOS_INFO[p.estado] || { label: p.estado, color: 'bg-gray-100 text-gray-800' };
+                  const tieneEnvio = Boolean(p.envio) && p.envio.estado !== 'CANCELADO';
+                  const est = getEstadoInfo(p.estado, tieneEnvio);
                   const transiciones = TRANSICIONES_PERMITIDAS[p.estado] || [];
                   const cancelable = ESTADOS_CANCELABLES.includes(p.estado);
 
@@ -311,13 +337,13 @@ export const AdminPedidosPage = () => {
                       <td className="px-5 py-3 font-extrabold text-gray-900">
                         ${Number(p.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-5 py-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${est.color}`}>
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className={`inline-block whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-bold border ${est.color}`}>
                           {est.label}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-xs text-gray-600">
-                        {p.envio && p.envio.estado !== 'CANCELADO' ? (
+                        {tieneEnvio ? (
                           <span>🚚 Domicilio ({p.envio.domicilioEntrega || 'Dirección registrada'})</span>
                         ) : p.envio ? (
                           <span>🏬 Retiro en sucursal (envío cancelado)</span>
@@ -391,7 +417,7 @@ export const AdminPedidosPage = () => {
             </div>
 
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({pedidoDetalle.detalles?.length || 0})</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({detallesVisuales.length})</h3>
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-gray-50 font-bold text-gray-600 border-b border-gray-200">
@@ -403,8 +429,8 @@ export const AdminPedidosPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {pedidoDetalle.detalles?.map((det) => (
-                      <tr key={det.id}>
+                    {detallesVisuales.map((det) => (
+                      <tr key={det.productoId ?? det.id}>
                         <td className="p-3 font-semibold text-gray-900">{det.producto?.nombre || `Producto #${det.productoId}`}</td>
                         <td className="p-3 text-center font-bold text-gray-700">{det.cantidad}</td>
                         <td className="p-3 text-right">${Number(det.precioUnitario).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
@@ -440,7 +466,11 @@ export const AdminPedidosPage = () => {
         isOpen={Boolean(pedidoACambiarEstado)}
         onClose={() => setPedidoACambiarEstado(null)}
         title={`Cambiar Estado - Pedido #${pedidoACambiarEstado?.id}`}
-        subtitle={`Estado actual: ${pedidoACambiarEstado?.estado}`}
+        subtitle={`Estado actual: ${
+          pedidoACambiarEstado
+            ? getEstadoInfo(pedidoACambiarEstado.estado, Boolean(pedidoACambiarEstado.envio)).label
+            : ''
+        }`}
       >
         <form onSubmit={handleConfirmarCambioEstado} className="space-y-4">
           {errorModal && (
@@ -457,11 +487,18 @@ export const AdminPedidosPage = () => {
               onChange={(e) => setNuevoEstadoSeleccionado(e.target.value)}
               className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             >
-              {(TRANSICIONES_PERMITIDAS[pedidoACambiarEstado?.estado] || []).map((trans) => (
-                <option key={trans} value={trans}>
-                  {ESTADOS_INFO[trans]?.label || trans}
-                </option>
-              ))}
+              {(TRANSICIONES_PERMITIDAS[pedidoACambiarEstado?.estado] || []).map((trans) => {
+                let label = ESTADOS_INFO[trans]?.label || trans;
+                if (!pedidoACambiarEstado?.envio) {
+                  if (trans === 'ENVIADO') label = 'Listo para retiro';
+                  if (trans === 'ENTREGADO') label = 'Entregado en sucursal';
+                }
+                return (
+                  <option key={trans} value={trans}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

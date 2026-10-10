@@ -1,6 +1,6 @@
 // Modelo que representa un usuario del sistema con sus datos personales, contacto y rol.
 export class Usuario {
-  constructor({ dni, nombre, apellido, email, telefono, rol, localidad } = {}) {
+  constructor({ dni, nombre, apellido, email, telefono, rol, localidad, activo } = {}) {
     this.dni = dni;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -8,6 +8,7 @@ export class Usuario {
     this.telefono = telefono;
     this.rol = rol;
     this.localidad = localidad;
+    this.activo = activo !== undefined ? activo : true;
   }
 
   get esAdmin() {

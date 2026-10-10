@@ -48,6 +48,12 @@ export const CategoryProducts = () => {
   useEffect(() => {
     let ignore = false;
 
+    categoriaService.getCategoriaById(categoryId)
+      .then((cat) => {
+        if (!ignore) setCategoria(cat);
+      })
+      .catch(() => {});
+
     productoService.getProductosByCategoria(categoryId)
       .then((data) => {
         if (!ignore) {
@@ -79,15 +85,26 @@ export const CategoryProducts = () => {
     setPrecioMin,
     precioMax,
     setPrecioMax,
+    orden,
+    setOrden,
     limpiarFiltros,
     hayFiltrosActivos,
     rangoPrecioInvalido,
   } = useFiltrosProducto(productos);
 
+  const nombreCategoria = categoria?.nombre || productos[0]?.categoria?.nombre || '';
+
   return (
     <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
-      {categoria && (
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">{categoria.nombre}</h1>
+      {nombreCategoria && (
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+            {nombreCategoria}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Explorá los productos disponibles en esta categoría.
+          </p>
+        </div>
       )}
 
       {cargando ? (
@@ -108,6 +125,9 @@ export const CategoryProducts = () => {
             setPrecioMin={setPrecioMin}
             precioMax={precioMax}
             setPrecioMax={setPrecioMax}
+            orden={orden}
+            setOrden={setOrden}
+            mostrarOrden={true}
             hayFiltrosActivos={hayFiltrosActivos}
             limpiarFiltros={limpiarFiltros}
             rangoPrecioInvalido={rangoPrecioInvalido}

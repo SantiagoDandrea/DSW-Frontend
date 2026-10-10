@@ -90,7 +90,7 @@ export const AdminUsuariosPage = () => {
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [usuarioAEditar, setUsuarioAEditar] = useState(null);
-  const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
+  const [usuarioAToggleActivo, setUsuarioAToggleActivo] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState(null);
@@ -266,24 +266,38 @@ export const AdminUsuariosPage = () => {
     }
   };
 
-  const handleConfirmarEliminar = async () => {
-    if (!usuarioAEliminar) return;
-    if (usuarioAEliminar.dni === usuarioActual?.dni) {
-      setErrorGlobal('No podés eliminar tu propia cuenta mientras estás en sesión.');
-      setUsuarioAEliminar(null);
+  const handleConfirmarToggleActivo = async () => {
+    if (!usuarioAToggleActivo) return;
+    if (usuarioAToggleActivo.dni === usuarioActual?.dni) {
+      setErrorGlobal('No podés desactivar tu propia cuenta mientras estás en sesión.');
+      setUsuarioAToggleActivo(null);
       return;
     }
 
     setGuardando(true);
     setErrorGlobal(null);
     try {
-      await usuarioService.eliminarUsuario(usuarioAEliminar.dni);
-      setMensajeExito(`Usuario ${usuarioAEliminar.nombre} ${usuarioAEliminar.apellido} eliminado.`);
-      setUsuarioAEliminar(null);
+      const estaActivo = usuarioAToggleActivo.activo !== false;
+      if (estaActivo) {
+        await usuarioService.eliminarUsuario(usuarioAToggleActivo.dni);
+        setMensajeExito(`Usuario ${usuarioAToggleActivo.nombre} ${usuarioAToggleActivo.apellido} desactivado.`);
+      } else {
+        await usuarioService.actualizarUsuario(usuarioAToggleActivo.dni, {
+          nombre: usuarioAToggleActivo.nombre,
+          apellido: usuarioAToggleActivo.apellido,
+          email: usuarioAToggleActivo.email,
+          telefono: usuarioAToggleActivo.telefono,
+          rol: usuarioAToggleActivo.rol,
+          localidadId: usuarioAToggleActivo.localidad?.id || localidades[0]?.id,
+          activo: true,
+        });
+        setMensajeExito(`Usuario ${usuarioAToggleActivo.nombre} ${usuarioAToggleActivo.apellido} reactivado con éxito.`);
+      }
+      setUsuarioAToggleActivo(null);
       recargar();
     } catch (err) {
-      setErrorGlobal(err.message || 'Error al eliminar el usuario.');
-      setUsuarioAEliminar(null);
+      setErrorGlobal(err.message || 'Error al cambiar el estado del usuario.');
+      setUsuarioAToggleActivo(null);
     } finally {
       setGuardando(false);
     }
@@ -353,6 +367,7 @@ export const AdminUsuariosPage = () => {
                   <th scope="col" className="px-5 py-3">Usuario</th>
                   <th scope="col" className="px-5 py-3">DNI</th>
                   <th scope="col" className="px-5 py-3">Rol</th>
+                  <th scope="col" className="px-5 py-3">Estado</th>
                   <th scope="col" className="px-5 py-3">Localidad</th>
                   <th scope="col" className="px-5 py-3">Teléfono</th>
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
@@ -361,6 +376,7 @@ export const AdminUsuariosPage = () => {
               <tbody className="divide-y divide-gray-100">
                 {usuariosFiltrados.map((u) => {
                   const esActual = u.dni === usuarioActual?.dni;
+                  const estaActivo = u.activo !== false;
                   return (
                     <tr key={u.dni} className="hover:bg-gray-50 transition">
                       <td className="px-5 py-3">
@@ -385,6 +401,17 @@ export const AdminUsuariosPage = () => {
                         </span>
                       </td>
                       <td className="px-5 py-3">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                            estaActivo
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-rose-50 text-rose-700 border-rose-200'
+                          }`}
+                        >
+                          {estaActivo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3">
                         {u.localidad?.nombre || '-'}
                       </td>
                       <td className="px-5 py-3">{u.telefono || '-'}</td>
@@ -397,12 +424,22 @@ export const AdminUsuariosPage = () => {
                             Editar
                           </button>
                           <button
-                            onClick={() => setUsuarioAEliminar(u)}
+                            onClick={() => setUsuarioAToggleActivo(u)}
                             disabled={esActual}
-                            title={esActual ? 'No podés eliminar tu propia cuenta' : 'Eliminar usuario'}
-                            className="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={
+                              esActual
+                                ? 'No podés desactivar tu propia cuenta'
+                                : estaActivo
+                                ? 'Desactivar usuario'
+                                : 'Activar usuario'
+                            }
+                            className={`px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                              estaActivo
+                                ? 'text-amber-700 bg-amber-50 hover:bg-amber-100'
+                                : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                            }`}
                           >
-                            Eliminar
+                            {estaActivo ? 'Desactivar' : 'Activar'}
                           </button>
                         </div>
                       </td>
@@ -528,13 +565,23 @@ export const AdminUsuariosPage = () => {
       </AdminModal>
 
       <ConfirmModal
-        isOpen={Boolean(usuarioAEliminar)}
-        onClose={() => setUsuarioAEliminar(null)}
-        onConfirm={handleConfirmarEliminar}
-        title={`¿Eliminar al usuario ${usuarioAEliminar?.nombre} ${usuarioAEliminar?.apellido}?`}
-        message="Esta acción revocará el acceso del usuario a la plataforma. No se puede revertir."
-        confirmText="Eliminar Cuenta"
-        confirmVariant="danger"
+        isOpen={Boolean(usuarioAToggleActivo)}
+        onClose={() => setUsuarioAToggleActivo(null)}
+        onConfirm={handleConfirmarToggleActivo}
+        title={
+          usuarioAToggleActivo?.activo !== false
+            ? `¿Desactivar al usuario ${usuarioAToggleActivo?.nombre} ${usuarioAToggleActivo?.apellido}?`
+            : `¿Activar al usuario ${usuarioAToggleActivo?.nombre} ${usuarioAToggleActivo?.apellido}?`
+        }
+        message={
+          usuarioAToggleActivo?.activo !== false
+            ? 'El usuario no podrá iniciar sesión en la tienda mientras permanezca inactivo. Sus pedidos históricos se conservarán intactos.'
+            : 'El usuario volverá a tener acceso activo a la plataforma y podrá iniciar sesión normalmente.'
+        }
+        confirmText={
+          usuarioAToggleActivo?.activo !== false ? 'Desactivar Cuenta' : 'Activar Cuenta'
+        }
+        confirmVariant={usuarioAToggleActivo?.activo !== false ? 'danger' : 'primary'}
         loading={guardando}
       />
     </div>

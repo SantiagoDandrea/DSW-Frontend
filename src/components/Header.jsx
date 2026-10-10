@@ -6,7 +6,7 @@ export const Header = ({ cartCount = 0 }) => {
   const { usuario, isAuthenticated, esAdmin, logout } = useAuth();
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-white shadow-md">
+    <header className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-white shadow-md print:hidden">
       <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">
         MiTienda
       </Link>

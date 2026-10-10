@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
-import { checkoutService } from '../services/checkoutService';
+import { pedidoService } from '../services/pedidoService';
 
 function mostrarPrecio(valor) {
   return Number(valor).toLocaleString('es-AR', {
@@ -37,7 +37,21 @@ export function Checkout() {
 
   const [medioPagoId, setMedioPagoId] = useState('');
   const [requiereEnvio, setRequiereEnvio] = useState(false);
-  const [domicilioEntrega, setDomicilioEntrega] = useState('');
+  const [tipoEnvio, setTipoEnvio] = useState(''); // '' | 'LOCAL' | 'NACIONAL'
+  const [calle, setCalle] = useState('');
+  const [numero, setNumero] = useState('');
+  const [localidadDestino, setLocalidadDestino] = useState('');
+  const [provinciaDestino, setProvinciaDestino] = useState('');
+  const [codigoPostal, setCodigoPostal] = useState('');
+
+  const costoEnvioEstimado = requiereEnvio
+    ? tipoEnvio === 'LOCAL'
+      ? 3000
+      : tipoEnvio === 'NACIONAL'
+      ? 15000
+      : 0
+    : 0;
+  const totalEstimado = subtotal + costoEnvioEstimado;
 
   const [enviando, setEnviando] = useState(false);
   const [pedidoCreado, setPedidoCreado] = useState(null);
@@ -47,7 +61,7 @@ export function Checkout() {
   useEffect(() => {
     let ignore = false;
 
-    checkoutService
+    pedidoService
       .getMediosPago()
       .then((datos) => {
         if (!ignore) {
@@ -89,9 +103,46 @@ export function Checkout() {
       return;
     }
 
-    if (requiereEnvio && !domicilioEntrega.trim()) {
-      setErrorCompra('Ingresá el domicilio de entrega.');
-      return;
+    if (requiereEnvio) {
+      if (!tipoEnvio) {
+        setErrorCompra('Seleccioná la zona de entrega (Local o Nacional).');
+        return;
+      }
+
+      if (!calle.trim()) {
+        setErrorCompra('Ingresá el nombre de la calle.');
+        return;
+      }
+
+      const numTrim = numero.trim();
+      if (!numTrim || !/^\d+$/.test(numTrim) || Number(numTrim) <= 0) {
+        setErrorCompra('El campo "Número" es obligatorio y debe contener solo números.');
+        return;
+      }
+
+      if (tipoEnvio === 'NACIONAL') {
+        if (!localidadDestino.trim()) {
+          setErrorCompra('Ingresá la localidad de entrega.');
+          return;
+        }
+        if (!provinciaDestino.trim()) {
+          setErrorCompra('Ingresá la provincia de entrega.');
+          return;
+        }
+        if (!codigoPostal.trim()) {
+          setErrorCompra('Ingresá el código postal.');
+          return;
+        }
+      }
+    }
+
+    let domicilioCompleto = '';
+    if (requiereEnvio) {
+      if (tipoEnvio === 'LOCAL') {
+        domicilioCompleto = `${calle.trim()} ${numero.trim()}, Las Parejas`;
+      } else {
+        domicilioCompleto = `${calle.trim()} ${numero.trim()}, ${localidadDestino.trim()}, ${provinciaDestino.trim()} (CP ${codigoPostal.trim()})`;
+      }
     }
 
     const datos = {
@@ -103,7 +154,9 @@ export function Checkout() {
       envio: requiereEnvio
         ? {
             requiereEnvio: true,
-            domicilioEntrega: domicilioEntrega.trim(),
+            tipoEnvio,
+            localidad: tipoEnvio === 'LOCAL' ? 'Las Parejas' : localidadDestino.trim(),
+            domicilioEntrega: domicilioCompleto,
           }
         : {
             requiereEnvio: false,
@@ -114,7 +167,7 @@ export function Checkout() {
     setEnviando(true);
 
     try {
-      const pedido = await checkoutService.crearPedido(datos);
+      const pedido = await pedidoService.crearPedido(datos);
 
       setPedidoCreado(pedido);
       vaciarCarrito();
@@ -222,14 +275,28 @@ if (items.length === 0) {
           ))}
         </ul>
 
-        <p className="mt-4 pt-4 border-t font-bold text-gray-900">
-          Subtotal estimado: {mostrarPrecio(subtotal)}
-        </p>
-
-        <p className="mt-2 text-sm text-gray-600">
-          El importe definitivo se calcula al confirmar el pedido
-          con los precios vigentes y el envío correspondiente.
-        </p>
+        <div className="mt-4 pt-4 border-t space-y-1.5 text-sm">
+          <div className="flex justify-between text-gray-700">
+            <span>Subtotal de productos:</span>
+            <span>{mostrarPrecio(subtotal)}</span>
+          </div>
+          <div className="flex justify-between text-gray-700">
+            <span>Costo de envío estimado:</span>
+            <span>
+              {!requiereEnvio
+                ? 'Gratis (Retiro en el local)'
+                : !tipoEnvio
+                ? 'Seleccioná la zona de envío'
+                : tipoEnvio === 'LOCAL'
+                ? `${mostrarPrecio(3000)} (Local - Las Parejas)`
+                : `${mostrarPrecio(15000)} (Nacional - Resto del país)`}
+            </span>
+          </div>
+          <div className="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-100">
+            <span>Total estimado:</span>
+            <span className="text-indigo-600">{mostrarPrecio(totalEstimado)}</span>
+          </div>
+        </div>
 
         {cargando ? (
           <p role="status" className="mt-6">
@@ -302,30 +369,147 @@ if (items.length === 0) {
                   }
                   className="w-full border border-gray-300 rounded-lg p-3"
                 >
-                  <option value="retiro">Retiro en el local</option>
+                  <option value="retiro">Retiro en el local (Gratis)</option>
                   <option value="envio">Envío a domicilio</option>
                 </select>
               </div>
 
               {requiereEnvio && (
-                <div>
-                  <label
-                    htmlFor="domicilio"
-                    className="block font-medium text-gray-700 mb-2"
-                  >
-                    Domicilio de entrega
-                  </label>
+                <div className="space-y-4 bg-gray-50 border border-gray-200 p-4 rounded-xl">
+                  <div>
+                    <label
+                      htmlFor="tipoEnvio"
+                      className="block font-medium text-gray-700 mb-2"
+                    >
+                      Zona de entrega
+                    </label>
 
-                  <input
-                    id="domicilio"
-                    required
-                    value={domicilioEntrega}
-                    onChange={(event) =>
-                      setDomicilioEntrega(event.target.value)
-                    }
-                    className="w-full border border-gray-300 rounded-lg p-3"
-                    placeholder="Calle, número y datos de entrega"
-                  />
+                    <select
+                      id="tipoEnvio"
+                      required
+                      value={tipoEnvio}
+                      onChange={(event) => setTipoEnvio(event.target.value)}
+                      className="w-full border border-gray-300 rounded-lg p-3 bg-white"
+                    >
+                      <option value="">Seleccioná la zona de entrega</option>
+                      <option value="LOCAL">
+                        Envío local (Las Parejas) — $3.000
+                      </option>
+                      <option value="NACIONAL">
+                        Envío nacional (Resto del país) — $15.000
+                      </option>
+                    </select>
+                  </div>
+
+                  {tipoEnvio && (
+                    <div className="pt-2 border-t border-gray-200 space-y-4">
+                      <div>
+                        <span className="text-sm font-semibold text-gray-800">
+                          Dirección de entrega {tipoEnvio === 'LOCAL' ? '(Las Parejas)' : ''}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="calle"
+                            className="block text-xs font-medium text-gray-700 mb-1"
+                          >
+                            Calle
+                          </label>
+                          <input
+                            id="calle"
+                            type="text"
+                            required
+                            value={calle}
+                            onChange={(e) => setCalle(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                            placeholder="Ej. San Martín"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="numero"
+                            className="block text-xs font-medium text-gray-700 mb-1"
+                          >
+                            Número
+                          </label>
+                          <input
+                            id="numero"
+                            type="text"
+                            inputMode="numeric"
+                            required
+                            value={numero}
+                            onChange={(e) => {
+                              const soloNumeros = e.target.value.replace(/\D/g, '');
+                              setNumero(soloNumeros);
+                            }}
+                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                            placeholder="Ej. 1234"
+                          />
+                        </div>
+                      </div>
+
+                      {tipoEnvio === 'NACIONAL' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label
+                              htmlFor="localidadDestino"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Localidad
+                            </label>
+                            <input
+                              id="localidadDestino"
+                              type="text"
+                              required
+                              value={localidadDestino}
+                              onChange={(e) => setLocalidadDestino(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. Rosario"
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              htmlFor="provinciaDestino"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Provincia
+                            </label>
+                            <input
+                              id="provinciaDestino"
+                              type="text"
+                              required
+                              value={provinciaDestino}
+                              onChange={(e) => setProvinciaDestino(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. Santa Fe"
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              htmlFor="codigoPostal"
+                              className="block text-xs font-medium text-gray-700 mb-1"
+                            >
+                              Código Postal
+                            </label>
+                            <input
+                              id="codigoPostal"
+                              type="text"
+                              required
+                              value={codigoPostal}
+                              onChange={(e) => setCodigoPostal(e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                              placeholder="Ej. S2000"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

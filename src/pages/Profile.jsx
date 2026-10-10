@@ -51,7 +51,10 @@ export const Profile = () => {
     setCargando(true);
 
     const { password, ...resto } = form;
-    const datos = { ...resto, localidadId: Number(resto.localidadId) };
+    const datos = {
+      ...resto,
+      localidadId: Number(resto.localidadId),
+    };
     if (password) {
       datos.password = password;
     }
@@ -159,6 +162,7 @@ export const Profile = () => {
               disabled={cargando}
             />
           </div>
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="localidadId">

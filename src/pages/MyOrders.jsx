@@ -324,6 +324,8 @@ export function MyOrders() {
                   ESTADO_BADGES[pedido.estado] ||
                   'bg-gray-50 text-gray-700 border-gray-200';
                 const tieneEnvio = Boolean(pedido.envio);
+                const tieneEnvioValido =
+                  tieneEnvio && pedido.envio.estado !== 'CANCELADO';
 
                 return (
                   <article
@@ -338,7 +340,9 @@ export function MyOrders() {
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeClass}`}
                         >
-                          {pedido.estado.replaceAll('_', ' ')}
+                          {pedido.estado === 'ENVIADO' && !tieneEnvioValido
+                            ? 'Listo para retiro'
+                            : pedido.estado.replaceAll('_', ' ')}
                         </span>
                       </div>
                       <span className="text-xs text-gray-500">
@@ -366,7 +370,7 @@ export function MyOrders() {
                           Entrega
                         </span>
                         <p className="font-medium text-gray-800 mt-0.5 truncate">
-                          {tieneEnvio && pedido.envio.estado !== 'CANCELADO'
+                          {tieneEnvioValido
                             ? `Envío: ${pedido.envio.domicilioEntrega}`
                             : tieneEnvio
                               ? 'Retiro en sucursal (envío cancelado)'

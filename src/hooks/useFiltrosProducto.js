@@ -5,6 +5,7 @@ export function useFiltrosProducto(productos) {
   const [marcaId, setMarcaId] = useState('');
   const [precioMin, setPrecioMin] = useState('');
   const [precioMax, setPrecioMax] = useState('');
+  const [orden, setOrden] = useState('nombre-asc');
 
   const marcas = useMemo(() => {
     const vistos = new Map();
@@ -23,18 +24,29 @@ export function useFiltrosProducto(productos) {
   const productosFiltrados = useMemo(() => {
     if (rangoPrecioInvalido) return [];
 
-    return productos.filter((p) => {
+    const filtrados = productos.filter((p) => {
       if (marcaId && String(p.marca?.id) !== String(marcaId)) return false;
       if (precioMin && Number(p.precioActual) < Number(precioMin)) return false;
       if (precioMax && Number(p.precioActual) > Number(precioMax)) return false;
       return true;
     });
-  }, [productos, marcaId, precioMin, precioMax, rangoPrecioInvalido]);
+
+    return [...filtrados].sort((a, b) => {
+      if (orden === 'precio-asc') {
+        return Number(a.precioActual ?? 0) - Number(b.precioActual ?? 0);
+      }
+      if (orden === 'precio-desc') {
+        return Number(b.precioActual ?? 0) - Number(a.precioActual ?? 0);
+      }
+      return (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' });
+    });
+  }, [productos, marcaId, precioMin, precioMax, rangoPrecioInvalido, orden]);
 
   const limpiarFiltros = () => {
     setMarcaId('');
     setPrecioMin('');
     setPrecioMax('');
+    setOrden('nombre-asc');
   };
 
   return {
@@ -46,8 +58,10 @@ export function useFiltrosProducto(productos) {
     setPrecioMin,
     precioMax,
     setPrecioMax,
+    orden,
+    setOrden,
     limpiarFiltros,
     rangoPrecioInvalido,
-    hayFiltrosActivos: Boolean(marcaId || precioMin || precioMax),
+    hayFiltrosActivos: Boolean(marcaId || precioMin || precioMax || (orden && orden !== 'nombre-asc')),
   };
 }

@@ -59,6 +59,8 @@ export function CartProvider({ children }) {
       return false;
     }
 
+    const maxStock = producto.stockDisponible != null ? producto.stockDisponible : Infinity;
+
     setItems((anteriores) => {
       const existe = anteriores.some(
         (item) => item.producto.id === producto.id
@@ -69,7 +71,7 @@ export function CartProvider({ children }) {
           item.producto.id === producto.id
             ? {
                 producto,
-                cantidad: item.cantidad + cantidad,
+                cantidad: Math.min(maxStock, item.cantidad + cantidad),
               }
             : item
         );
@@ -77,7 +79,7 @@ export function CartProvider({ children }) {
 
       return [
         ...anteriores,
-        { producto, cantidad },
+        { producto, cantidad: Math.min(maxStock, cantidad) },
       ];
     });
 
@@ -90,11 +92,12 @@ export function CartProvider({ children }) {
     }
 
     setItems((anteriores) =>
-      anteriores.map((item) =>
-        item.producto.id === productoId
-          ? { ...item, cantidad }
-          : item
-      )
+      anteriores.map((item) => {
+        if (item.producto.id !== productoId) return item;
+        const maxStock =
+          item.producto.stockDisponible != null ? item.producto.stockDisponible : Infinity;
+        return { ...item, cantidad: Math.min(maxStock, cantidad) };
+      })
     );
   }
 

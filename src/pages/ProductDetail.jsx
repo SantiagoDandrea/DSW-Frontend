@@ -24,6 +24,7 @@ export function ProductDetail() {
     mensaje: '',
   });
 
+
   useEffect(() => {
     let ignore = false;
 
@@ -31,6 +32,7 @@ export function ProductDetail() {
       .getProductoById(id)
       .then((producto) => {
         if (!ignore) {
+          setCantidad(1);
           setResultado({
             id,
             producto,
@@ -71,7 +73,6 @@ export function ProductDetail() {
 
   function handleAgregarAlCarrito() {
     const agregado = agregarProducto(producto, cantidad);
-
     if (agregado) {
       setCantidad(1);
     }
@@ -79,7 +80,7 @@ export function ProductDetail() {
     setAvisoCarrito({
       id,
       mensaje: agregado
-        ? 'Producto agregado al carrito.'
+        ? `${cantidad > 1 ? `${cantidad} unidades agregadas` : 'Producto agregado'} al carrito.`
         : 'No pudimos agregar este producto.',
     });
   }
@@ -184,51 +185,62 @@ export function ProductDetail() {
               : 'Precio no disponible'}
           </p>
 
-          <span
-            className={`inline-block w-fit px-3 py-1 rounded-full text-sm font-medium ${
-              producto.disponible
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}
-          >
-            {producto.disponible ? 'Disponible' : 'Sin stock'}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-block w-fit px-3 py-1 rounded-full text-sm font-medium ${
+                producto.disponible
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {producto.disponible ? 'Disponible' : 'Sin stock'}
+            </span>
 
-          <div className="mt-3 flex items-center gap-3">
-            <span className="text-sm text-gray-700">Cantidad:</span>
-
-            <div className="flex items-center border border-gray-300 rounded-lg">
-              <button
-                type="button"
-                disabled={!puedeAgregar || cantidad <= 1}
-                onClick={() => setCantidad((c) => c - 1)}
-                aria-label="Quitar una unidad"
-                className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                −
-              </button>
-
-              <span className="min-w-10 text-center px-2" aria-live="polite">
-                {cantidad}
+            {producto.disponible && producto.stockDisponible === 1 && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                ¡Última Unidad!
               </span>
-
-              <button
-                type="button"
-                disabled={!puedeAgregar}
-                onClick={() => setCantidad((c) => c + 1)}
-                aria-label="Agregar una unidad"
-                className="px-3 py-2 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                +
-              </button>
-            </div>
+            )}
           </div>
+
+          {puedeAgregar && (
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-sm font-medium text-gray-700">Cantidad:</span>
+              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <button
+                  type="button"
+                  disabled={cantidad <= 1}
+                  onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
+                  className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-gray-600 transition"
+                  aria-label="Disminuir cantidad"
+                >
+                  −
+                </button>
+                <span className="min-w-10 text-center px-2 font-semibold text-gray-800" aria-live="polite">
+                  {cantidad}
+                </span>
+                <button
+                  type="button"
+                  disabled={cantidad >= Math.max(1, producto.stockDisponible || 1)}
+                  onClick={() =>
+                    setCantidad((prev) =>
+                      Math.min(Math.max(1, producto.stockDisponible || 1), prev + 1)
+                    )
+                  }
+                  className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-gray-600 transition"
+                  aria-label="Aumentar cantidad"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
 
           <button
             type="button"
             disabled={!puedeAgregar}
             onClick={handleAgregarAlCarrito}
-            className="mt-3 px-5 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-3 px-5 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition shadow-xs"
           >
             Agregar al carrito
           </button>
@@ -241,7 +253,7 @@ export function ProductDetail() {
             {mensajeCarrito}
           </p>
 
-          {mensajeCarrito === 'Producto agregado al carrito.' && (
+          {mensajeCarrito && (
             <Link
               to="/carrito"
               className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
