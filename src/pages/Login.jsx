@@ -9,7 +9,7 @@ export const Login = () => {
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
 
-  const { login, isAuthenticated, esAdmin } = useAuth();
+  const { login, isAuthenticated, esAdmin, sesionVencida } = useAuth();
   const location = useLocation();
 
   const from = location.state?.from;
@@ -44,6 +44,12 @@ export const Login = () => {
             Ingresá a tu cuenta para gestionar tus compras
           </p>
         </div>
+
+        {sesionVencida && !error && (
+          <div role="status" className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
+            Tu sesión venció. Volvé a iniciar sesión para continuar.
+          </div>
+        )}
 
         {error && (
           <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg flex items-center gap-2">

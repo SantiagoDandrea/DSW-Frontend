@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [sesionVencida, setSesionVencida] = useState(false);
 
   const logout = useCallback(async () => {
     try {
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setToken(null);
       setUsuario(null);
+      setSesionVencida(false);
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       window.dispatchEvent(new CustomEvent('auth:logout'));
@@ -41,7 +43,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const handleUnauthorized = () => {
+    const handleUnauthorized = (event) => {
+      // Solo se avisa si la persona tenía una sesión abierta que el servidor dejó de aceptar
+      if (event.detail?.teniaSesion) {
+        setSesionVencida(true);
+      }
       setToken(null);
       setUsuario(null);
       localStorage.removeItem('token');
@@ -71,6 +77,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(tokenValue);
       setUsuario(userValue);
+      setSesionVencida(false);
 
       if (tokenValue) {
         localStorage.setItem('token', tokenValue);
@@ -92,6 +99,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(data.token);
       setUsuario(data.usuario);
+      setSesionVencida(false);
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
@@ -118,12 +126,13 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: Boolean(token),
       esAdmin: usuario?.esAdmin ?? (usuario?.rol === 'ADMIN'),
       loading,
+      sesionVencida,
       login,
       register,
       actualizarPerfil,
       logout,
     }),
-    [usuario, token, loading, login, register, actualizarPerfil, logout]
+    [usuario, token, loading, sesionVencida, login, register, actualizarPerfil, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
