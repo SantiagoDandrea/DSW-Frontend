@@ -542,7 +542,7 @@ export const AdminProductosPage = () => {
                   { value: '', label: 'Sin stock inicial' },
                   ...almacenes.map((a) => ({
                     value: a.id,
-                    label: a.descripcion ? `${a.descripcion} (${a.direccion || ''})` : `Almacén #${a.id}`,
+                    label: a.descripcion || `Almacén #${a.id}`,
                   })),
                 ]}
               />

@@ -304,7 +304,7 @@ export const AdminInventarioPage = () => {
                   {almacenes.length === 0 && <option value="">Sin almacenes registrados</option>}
                   {almacenes.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.descripcion} {a.direccion ? `(${a.direccion})` : ''}
+                      {a.descripcion}
                     </option>
                   ))}
                 </select>
@@ -343,7 +343,7 @@ export const AdminInventarioPage = () => {
                     <tr>
                       <th className="px-5 py-3">Producto</th>
                       <th className="px-5 py-3">Categoría</th>
-                      <th className="px-5 py-3">Almacén Seleccionado</th>
+                      <th className="px-5 py-3">Almacén</th>
                       <th className="px-5 py-3 text-center">Stock Disponible</th>
                       <th className="px-5 py-3 text-right">Acción</th>
                     </tr>
