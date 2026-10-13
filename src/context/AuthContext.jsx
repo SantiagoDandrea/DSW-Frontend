@@ -45,8 +45,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleUnauthorized = (event) => {
       // Solo se avisa si la persona tenía una sesión abierta que el servidor dejó de aceptar
+      // sesionVencida guarda el motivo: 'desactivada' si un admin dio de baja la cuenta, 'vencida' en otro caso
       if (event.detail?.teniaSesion) {
-        setSesionVencida(true);
+        setSesionVencida(/inactivo/i.test(event.detail.mensaje || '') ? 'desactivada' : 'vencida');
       }
       setToken(null);
       setUsuario(null);
