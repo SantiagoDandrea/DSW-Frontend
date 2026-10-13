@@ -101,7 +101,7 @@ export const CategoryProducts = () => {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             {nombreCategoria}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Explorá los productos disponibles en esta categoría.
           </p>
         </div>

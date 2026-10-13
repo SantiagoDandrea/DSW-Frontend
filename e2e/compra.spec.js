@@ -57,7 +57,7 @@ test('el cliente compra una heladera y consulta el pedido', async ({
     page.getByRole('link', {
       name: nombreProducto,
       exact: true,
-    })
+    }).first()
   ).toBeVisible();
 
   await page.getByRole('link', {

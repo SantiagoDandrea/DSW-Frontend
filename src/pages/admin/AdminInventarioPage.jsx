@@ -329,12 +329,12 @@ export const AdminInventarioPage = () => {
             ) : almacenes.length === 0 ? (
               <div className="p-12 text-center text-gray-500">
                 <p className="text-base font-semibold">No hay almacenes configurados</p>
-                <p className="text-xs text-gray-400 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
+                <p className="text-xs text-gray-500 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
               </div>
             ) : productosFiltradosStock.length === 0 ? (
               <div className="p-12 text-center text-gray-500">
                 <p className="text-base font-semibold">No se encontraron productos</p>
-                <p className="text-xs text-gray-400 mt-1">Intente ajustar los términos de búsqueda.</p>
+                <p className="text-xs text-gray-500 mt-1">Intente ajustar los términos de búsqueda.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -362,13 +362,13 @@ export const AdminInventarioPage = () => {
                                 {fotoMini ? (
                                   <img src={fotoMini} alt={prod.nombre} className="w-full h-full object-cover" />
                                 ) : (
-                                  <span className="text-[10px] text-gray-400">Sin foto</span>
+                                  <span className="text-[10px] text-gray-500">Sin foto</span>
                                 )}
                               </div>
                               <div>
                                 <p className="font-semibold text-gray-900 leading-snug">{prod.nombre}</p>
                                 {prod.marca?.nombre && (
-                                  <p className="text-xs text-gray-400">{prod.marca.nombre}</p>
+                                  <p className="text-xs text-gray-500">{prod.marca.nombre}</p>
                                 )}
                               </div>
                             </div>
@@ -385,7 +385,7 @@ export const AdminInventarioPage = () => {
                                 {cantidad} un.
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
                                 0 un.
                               </span>
                             )}
@@ -435,7 +435,7 @@ export const AdminInventarioPage = () => {
                   className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Ingrese la cantidad física disponible en el depósito seleccionado. Si coloca 0, el producto figurará sin existencias.
                 </p>
               </div>
