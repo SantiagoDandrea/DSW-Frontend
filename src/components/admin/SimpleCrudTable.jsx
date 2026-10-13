@@ -153,9 +153,7 @@ export const SimpleCrudTable = ({
       setItemAEliminar(null);
       recargar();
     } catch (err) {
-      const msg = err.status === 409 || err.status === 400
-        ? 'No se puede eliminar: tiene otros registros asociados (restricción de integridad).'
-        : (err.message || `No se pudo eliminar el ${itemName.toLowerCase()}.`);
+      const msg = err.message || `No se pudo eliminar el ${itemName.toLowerCase()}.`;
       setErrorGlobal(msg);
       setItemAEliminar(null);
     } finally {
@@ -273,7 +271,8 @@ export const SimpleCrudTable = ({
                   required={f.required}
                   value={formData[f.name] ?? ''}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  disabled={f.soloAlCrear && Boolean(itemAEditar)}
+                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-600"
                 >
                   <option value="" disabled>Seleccione una opción</option>
                   {f.options?.map((opt) => (

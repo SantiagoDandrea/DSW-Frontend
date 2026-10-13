@@ -241,7 +241,7 @@ export const AdminInventarioPage = () => {
       },
     ],
     fields: [
-      { name: 'productoId', label: 'Producto', type: 'select', required: true, options: productoOptions },
+      { name: 'productoId', label: 'Producto', type: 'select', required: true, soloAlCrear: true, options: productoOptions },
       { name: 'valor', label: 'Precio Comercial ($)', type: 'number', required: true },
       { name: 'fechaDesde', label: 'Fecha de Vigencia', type: 'datetime-local', required: true },
     ],
