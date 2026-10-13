@@ -2,6 +2,7 @@
 
 Grupo: Santiago D'Andrea, Martín De Benedetti, Santino Ravarotto, Guillermo Giannuzzi.
 Metodología: Kanban informal, coordinación diaria por Discord, revisión de pull requests entre integrantes antes de mergear.
+Tablero de seguimiento: [GitHub Projects](https://github.com/users/SantiagoDandrea/projects/3).
 
 ## 2026-08-14/25 — Base del frontend
 Se inicializa el proyecto con Vite, React 19 y Tailwind CSS 4 ([PR #1](https://github.com/SantiagoDandrea/DSW-Frontend/pull/1)) y se define la estructura de carpetas de `src/`: `pages`, `components`, `services`, `models`, `context` y `routes`, cada una con un README que explica su única responsabilidad ([PR #2](https://github.com/SantiagoDandrea/DSW-Frontend/pull/2)). Ambas se integran el 25/8.
