@@ -72,13 +72,6 @@ export const Home = () => {
           {/* Bloque Principal del Hero */}
           <div className="lg:col-span-7 p-6 sm:p-12 lg:p-16 flex flex-col justify-between space-y-8">
             <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 bg-blue-500 rounded-none" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-blue-400">
-                  Edición Comercial Oficial
-                </span>
-              </div>
-
               <h2 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight leading-[0.98] uppercase">
                 Tecnología, <br />
                 Descanso & <br />
@@ -91,10 +84,10 @@ export const Home = () => {
             </div>
 
             <div className="pt-4 space-y-6">
-              <div className="flex flex-col sm:flex-row items-stretch gap-0 border border-slate-700">
+              <div className="flex flex-col sm:flex-row items-stretch gap-0 border border-slate-700 max-w-xl">
                 <a
                   href="#categorias"
-                  className="px-8 py-4 bg-blue-600 hover:bg-white hover:text-slate-950 text-white font-bold text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 px-8 py-4 bg-blue-600 hover:bg-white hover:text-slate-950 text-white font-bold text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Ver Categorías</span>
                   <IconArrowRight className="w-4 h-4" />
@@ -102,7 +95,7 @@ export const Home = () => {
 
                 <Link
                   to="/buscar"
-                  className="px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest transition-colors border-t sm:border-t-0 sm:border-l border-slate-700 flex items-center justify-center gap-2"
+                  className="flex-1 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest transition-colors border-t sm:border-t-0 sm:border-l border-slate-700 flex items-center justify-center gap-2"
                 >
                   <IconSearch className="w-4 h-4 text-slate-400" />
                   <span>Todos los Productos</span>
