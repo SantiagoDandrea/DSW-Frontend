@@ -1,5 +1,6 @@
 // Modal de confirmación para pedir seguridad al usuario antes de realizar acciones importantes como borrar o cancelar.
 import { useEffect, useId, useRef } from 'react';
+import { IconAlert, IconInfo } from '../Icons';
 
 export const ConfirmModal = ({
   isOpen,
@@ -44,17 +45,17 @@ export const ConfirmModal = ({
   const btnColors = {
     danger: 'bg-rose-600 hover:bg-rose-700 text-white',
     warning: 'bg-amber-600 hover:bg-amber-700 text-white',
-    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
   };
 
   const iconColors = {
-    danger: 'bg-rose-100 text-rose-600',
-    warning: 'bg-amber-100 text-amber-600',
-    primary: 'bg-indigo-100 text-indigo-600',
+    danger: 'bg-rose-50 text-rose-600 border border-rose-200',
+    warning: 'bg-amber-50 text-amber-600 border border-amber-200',
+    primary: 'bg-blue-50 text-blue-600 border border-blue-200',
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div
         ref={dialogoRef}
         role="alertdialog"
@@ -62,24 +63,32 @@ export const ConfirmModal = ({
         aria-labelledby={tituloId}
         aria-describedby={mensajeId}
         tabIndex={-1}
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-gray-100 focus:outline-none"
+        className="bg-white rounded-none shadow-xl max-w-md w-full p-6 sm:p-8 border border-slate-200 focus:outline-none"
       >
         <div
           aria-hidden="true"
-          className={`w-12 h-12 rounded-full ${
+          className={`w-12 h-12 rounded-none ${
             iconColors[confirmVariant] || iconColors.danger
-          } flex items-center justify-center mx-auto mb-4 text-xl`}
+          } flex items-center justify-center mx-auto mb-4 border`}
         >
-          {confirmVariant === 'danger' ? '⚠️' : 'ℹ️'}
+          {confirmVariant === 'danger' ? (
+            <IconAlert className="w-6 h-6" />
+          ) : (
+            <IconInfo className="w-6 h-6" />
+          )}
         </div>
-        <h2 id={tituloId} className="text-lg font-bold text-gray-900 text-center mb-2">{title}</h2>
-        <p id={mensajeId} className="text-sm text-gray-600 text-center mb-6">{message}</p>
+        <h2 id={tituloId} className="text-lg font-display font-black uppercase tracking-tight text-slate-950 text-center mb-2">
+          {title}
+        </h2>
+        <p id={mensajeId} className="text-xs text-slate-600 text-center mb-6 leading-relaxed font-sans">
+          {message}
+        </p>
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 cursor-pointer transition"
+            className="px-5 py-2.5 text-xs font-sans font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 disabled:opacity-50 cursor-pointer transition"
           >
             Cancelar
           </button>
@@ -87,7 +96,7 @@ export const ConfirmModal = ({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className={`px-5 py-2 text-sm font-semibold rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer ${
+            className={`px-6 py-2.5 text-xs font-sans font-bold uppercase tracking-wider rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer ${
               btnColors[confirmVariant] || btnColors.danger
             }`}
           >

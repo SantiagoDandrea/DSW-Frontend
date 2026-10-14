@@ -8,6 +8,14 @@ import { localidadService } from '../../services/localidadService';
 import { almacenService } from '../../services/almacenService';
 import { proveedorService } from '../../services/proveedorService';
 import { formatearCuit } from '../../utils/formatters';
+import {
+  IconFolder,
+  IconTag,
+  IconCreditCard,
+  IconMapPin,
+  IconBuilding,
+  IconTruck,
+} from '../../components/Icons';
 
 const PROVINCIAS_ARGENTINA = [
   'Buenos Aires',
@@ -40,12 +48,12 @@ export const AdminTablasPage = () => {
   const [tabActiva, setTabActiva] = useState('categorias');
 
   const tabs = [
-    { id: 'categorias', label: 'Categorías', icon: '🗂️' },
-    { id: 'marcas', label: 'Marcas', icon: '🏷️' },
-    { id: 'medios-pago', label: 'Medios de Pago', icon: '💳' },
-    { id: 'localidades', label: 'Localidades', icon: '📍' },
-    { id: 'almacenes', label: 'Almacenes', icon: '🏭' },
-    { id: 'proveedores', label: 'Proveedores', icon: '🚚' },
+    { id: 'categorias', label: 'Categorías', icon: IconFolder },
+    { id: 'marcas', label: 'Marcas', icon: IconTag },
+    { id: 'medios-pago', label: 'Medios de Pago', icon: IconCreditCard },
+    { id: 'localidades', label: 'Localidades', icon: IconMapPin },
+    { id: 'almacenes', label: 'Almacenes', icon: IconBuilding },
+    { id: 'proveedores', label: 'Proveedores', icon: IconTruck },
   ];
 
   const servicios = useMemo(() => ({
@@ -89,22 +97,26 @@ export const AdminTablasPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-2 rounded-xl shadow-xs border border-gray-200 overflow-x-auto">
-        <div className="flex gap-1.5 min-w-max">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setTabActiva(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition cursor-pointer ${
-                tabActiva === tab.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          ))}
+      <div className="bg-white p-2 rounded-none border border-slate-200 shadow-xs overflow-x-auto">
+        <div className="flex gap-2 min-w-max">
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            const esActiva = tabActiva === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setTabActiva(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-none text-xs sm:text-sm font-sans font-bold uppercase tracking-wider transition duration-150 cursor-pointer ${
+                  esActiva
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100 border border-slate-200'
+                }`}
+              >
+                <IconComponent className="w-4 h-4 shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
