@@ -32,7 +32,7 @@ export async function apiFetch(endpoint, options = {}) {
       const teniaSesion = Boolean(token);
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
-      window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { status: 401, teniaSesion } }));
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { status: 401, teniaSesion, mensaje: data?.error || data?.message } }));
     }
 
     const errorMessage = data?.message || data?.error || `Error HTTP ${response.status}: ${response.statusText}`;
