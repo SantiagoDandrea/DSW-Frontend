@@ -1,9 +1,9 @@
-// Panel de administración para supervisar pedidos, cambiar sus estados de entrega o cancelarlos.
 import { useState, useEffect, useMemo } from 'react';
 import { pedidoService } from '../../services/pedidoService';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
+import { IconTruck, IconStore } from '../../components/Icons';
 
 function agruparDetalles(detalles) {
   if (!Array.isArray(detalles)) return [];
@@ -35,7 +35,7 @@ const ESTADOS_CANCELABLES = ['PENDIENTE', 'CONFIRMADO'];
 const ESTADOS_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-100 text-amber-800 border-amber-200' },
   CONFIRMADO: { label: 'Confirmado', color: 'bg-sky-100 text-sky-800 border-sky-200' },
-  EN_PREPARACION: { label: 'En Preparación', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+  EN_PREPARACION: { label: 'En Preparación', color: 'bg-blue-100 text-blue-800 border-blue-200' },
   ENVIADO: { label: 'Enviado', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ENTREGADO: { label: 'Entregado', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
   CANCELADO: { label: 'Cancelado', color: 'bg-rose-100 text-rose-800 border-rose-200' },
@@ -203,26 +203,26 @@ export const AdminPedidosPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-white p-6 rounded-none border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Gestión de Pedidos</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl font-display font-black uppercase text-slate-950 tracking-tight">Gestión de Pedidos</h2>
+          <p className="text-xs font-sans text-slate-500 mt-1">
             Supervisión del ciclo de compras, detalle de órdenes, transiciones de estado y cancelaciones.
           </p>
         </div>
         <button
           onClick={recargar}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-sans font-medium uppercase tracking-wider rounded-none border border-slate-300 transition cursor-pointer"
         >
-          ↻ Actualizar
+          <span>↻ Actualizar lista</span>
         </button>
       </div>
 
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Filtros de Búsqueda</h3>
+      <div className="bg-white p-5 sm:p-6 rounded-none border border-slate-200 shadow-xs space-y-3 font-sans">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Filtros de Búsqueda</h3>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div>
             <select
@@ -230,7 +230,7 @@ export const AdminPedidosPage = () => {
               aria-label="Filtrar por estado del pedido"
               value={filtros.estado}
               onChange={handleFiltroChange}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
             >
               <option value="">Todos los estados</option>
               {Object.keys(ESTADOS_INFO).map((est) => (
@@ -245,7 +245,7 @@ export const AdminPedidosPage = () => {
               value={filtros.fechaDesde}
               max={filtros.fechaHasta || undefined}
               onChange={handleFiltroChange}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               title="Fecha Desde"
               aria-label="Pedidos desde la fecha"
             />
@@ -257,7 +257,7 @@ export const AdminPedidosPage = () => {
               value={filtros.fechaHasta}
               min={filtros.fechaDesde || undefined}
               onChange={handleFiltroChange}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               title="Fecha Hasta"
               aria-label="Pedidos hasta la fecha"
             />
@@ -270,40 +270,40 @@ export const AdminPedidosPage = () => {
               onChange={(e) => setUsuarioInput(e.target.value)}
               placeholder="DNI o nombre de cliente..."
               aria-label="Buscar por DNI o nombre del cliente"
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
             />
           </div>
         </div>
         {rangoFechasInvalido && (
-          <p role="alert" className="text-sm text-rose-700">
+          <p role="alert" className="text-xs text-rose-600 font-bold">
             La fecha «Desde» no puede ser posterior a la fecha «Hasta». Corregí el rango para ver los pedidos.
           </p>
         )}
         <div className="flex justify-end">
           <button
             onClick={handleLimpiarFiltros}
-            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
+            className="text-xs font-bold uppercase tracking-wider text-rose-600 hover:text-rose-800 transition cursor-pointer"
           >
             Limpiar todos los filtros
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden">
         {cargando ? (
-          <div className="p-12 text-center text-gray-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-            <p className="text-sm">Cargando órdenes de compra...</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider">Cargando órdenes de compra...</p>
           </div>
         ) : pedidosVisibles.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p className="text-base font-semibold">No se encontraron pedidos</p>
-            <p className="text-xs text-gray-500 mt-1">Intente cambiar los filtros de fecha o estado.</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <p className="text-base font-bold uppercase text-slate-900">No se encontraron pedidos</p>
+            <p className="text-xs text-slate-500 mt-1">Intente cambiar los filtros de fecha o estado.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+            <table className="w-full text-left text-sm text-slate-700 font-sans">
+              <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-5 py-3">Nº Orden / Fecha</th>
                   <th scope="col" className="px-5 py-3">Cliente</th>
@@ -313,7 +313,7 @@ export const AdminPedidosPage = () => {
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {pedidosVisibles.map((p) => {
                   const tieneEnvio = Boolean(p.envio) && p.envio.estado !== 'CANCELADO';
                   const est = getEstadoInfo(p.estado, tieneEnvio);
@@ -321,48 +321,57 @@ export const AdminPedidosPage = () => {
                   const cancelable = ESTADOS_CANCELABLES.includes(p.estado);
 
                   return (
-                    <tr key={p.id} className="hover:bg-gray-50 transition">
+                    <tr key={p.id} className="hover:bg-slate-50 transition">
                       <td className="px-5 py-3">
-                        <div className="font-bold text-gray-900">#{p.id}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="font-bold text-slate-950">#{p.id}</div>
+                        <div className="text-xs text-slate-500">
                           {p.fecha ? new Date(p.fecha).toLocaleDateString('es-AR') : '-'}
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-bold text-slate-950">
                           {p.cliente ? `${p.cliente.nombre} ${p.cliente.apellido}` : 'Cliente'}
                         </div>
-                        <div className="text-xs text-gray-500">{p.cliente?.email || p.cliente?.dni}</div>
+                        <div className="text-xs text-slate-500">{p.cliente?.email || p.cliente?.dni}</div>
                       </td>
-                      <td className="px-5 py-3 font-extrabold text-gray-900">
+                      <td className="px-5 py-3 font-bold text-slate-950 font-sans">
                         ${Number(p.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-5 py-3 whitespace-nowrap">
-                        <span className={`inline-block whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-bold border ${est.color}`}>
+                        <span className={`inline-block whitespace-nowrap px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider border ${est.color}`}>
                           {est.label}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-xs text-gray-600">
+                      <td className="px-5 py-3 text-xs text-slate-700">
                         {tieneEnvio ? (
-                          <span>🚚 Domicilio ({p.envio.domicilioEntrega || 'Dirección registrada'})</span>
+                          <span className="flex items-center gap-1.5">
+                            <IconTruck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            <span>Domicilio ({p.envio.domicilioEntrega || 'Dirección registrada'})</span>
+                          </span>
                         ) : p.envio ? (
-                          <span>🏬 Retiro en sucursal (envío cancelado)</span>
+                          <span className="flex items-center gap-1.5">
+                            <IconStore className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                            <span>Retiro en sucursal (envío cancelado)</span>
+                          </span>
                         ) : (
-                          <span>🏬 Retiro en sucursal</span>
+                          <span className="flex items-center gap-1.5">
+                            <IconStore className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                            <span>Retiro en sucursal</span>
+                          </span>
                         )}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleVerDetalle(p.id)}
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition cursor-pointer"
+                            className="px-2.5 py-1 text-xs font-bold uppercase text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-none transition cursor-pointer"
                           >
                             Detalle
                           </button>
                           {transiciones.length > 0 && (
                             <button
                               onClick={() => handleAbrirCambiarEstado(p)}
-                              className="px-2.5 py-1 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-md transition cursor-pointer"
+                              className="px-2.5 py-1 text-xs font-bold uppercase text-sky-700 bg-sky-50 hover:bg-sky-600 hover:text-white border border-sky-200 rounded-none transition cursor-pointer"
                             >
                               Estado
                             </button>
@@ -370,7 +379,7 @@ export const AdminPedidosPage = () => {
                           {cancelable && (
                             <button
                               onClick={() => setPedidoACancelar(p)}
-                              className="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition cursor-pointer"
+                              className="px-2.5 py-1 text-xs font-bold uppercase text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-none transition cursor-pointer"
                             >
                               Cancelar
                             </button>
@@ -394,18 +403,18 @@ export const AdminPedidosPage = () => {
         maxWidth="max-w-2xl"
       >
         {pedidoDetalle && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl text-xs">
+          <div className="space-y-5 font-sans">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50/60 border border-slate-200 rounded-none text-xs">
               <div>
-                <p className="font-bold text-gray-700 uppercase tracking-wider mb-1">Cliente</p>
-                <p className="font-semibold text-gray-900">{pedidoDetalle.cliente?.nombre} {pedidoDetalle.cliente?.apellido}</p>
-                <p className="text-gray-500">DNI: {pedidoDetalle.cliente?.dni}</p>
-                <p className="text-gray-500">{pedidoDetalle.cliente?.email}</p>
+                <p className="font-bold text-slate-900 uppercase tracking-wider mb-1">Cliente</p>
+                <p className="font-bold text-slate-950">{pedidoDetalle.cliente?.nombre} {pedidoDetalle.cliente?.apellido}</p>
+                <p className="text-slate-600">DNI: {pedidoDetalle.cliente?.dni}</p>
+                <p className="text-slate-600">{pedidoDetalle.cliente?.email}</p>
               </div>
               <div>
-                <p className="font-bold text-gray-700 uppercase tracking-wider mb-1">Pago & Entrega</p>
-                <p className="text-gray-700"><strong>Medio de pago:</strong> {pedidoDetalle.medioPago?.nombre || 'Efectivo / Transferencia'}</p>
-                <p className="text-gray-700">
+                <p className="font-bold text-slate-900 uppercase tracking-wider mb-1">Pago & Entrega</p>
+                <p className="text-slate-700"><strong>Medio de pago:</strong> {pedidoDetalle.medioPago?.nombre || 'Efectivo / Transferencia'}</p>
+                <p className="text-slate-700">
                   <strong>Entrega:</strong>{' '}
                   {pedidoDetalle.envio && pedidoDetalle.envio.estado !== 'CANCELADO'
                     ? `Envío a domicilio (${pedidoDetalle.envio.domicilioEntrega})`
@@ -417,10 +426,10 @@ export const AdminPedidosPage = () => {
             </div>
 
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos ({detallesVisuales.length})</h3>
-              <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">Productos ({detallesVisuales.length})</h3>
+              <div className="border border-slate-200 rounded-none overflow-hidden">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-gray-50 font-bold text-gray-600 border-b border-gray-200">
+                  <thead className="bg-slate-50 font-bold uppercase text-slate-700 border-b border-slate-200">
                     <tr>
                       <th scope="col" className="p-3">Producto</th>
                       <th scope="col" className="p-3 text-center">Cant.</th>
@@ -428,13 +437,13 @@ export const AdminPedidosPage = () => {
                       <th scope="col" className="p-3 text-right">Subtotal</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-slate-100">
                     {detallesVisuales.map((det) => (
                       <tr key={det.productoId ?? det.id}>
-                        <td className="p-3 font-semibold text-gray-900">{det.producto?.nombre || `Producto #${det.productoId}`}</td>
-                        <td className="p-3 text-center font-bold text-gray-700">{det.cantidad}</td>
+                        <td className="p-3 font-bold text-slate-950">{det.producto?.nombre || `Producto #${det.productoId}`}</td>
+                        <td className="p-3 text-center font-bold text-slate-950">{det.cantidad}</td>
                         <td className="p-3 text-right">${Number(det.precioUnitario).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
-                        <td className="p-3 text-right font-bold text-gray-900">${Number(det.subtotal).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+                        <td className="p-3 text-right font-bold text-slate-950">${Number(det.subtotal).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -442,9 +451,9 @@ export const AdminPedidosPage = () => {
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
-              <span className="font-bold text-gray-700">Total Liquidado:</span>
-              <span className="text-xl font-extrabold text-indigo-700">
+            <div className="flex justify-between items-center pt-3 border-t border-slate-200 text-sm">
+              <span className="font-bold uppercase text-slate-900">Total Liquidado:</span>
+              <span className="text-xl font-display font-black text-blue-600">
                 ${Number(pedidoDetalle.total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -453,7 +462,7 @@ export const AdminPedidosPage = () => {
               <button
                 type="button"
                 onClick={() => setPedidoDetalle(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="px-5 py-2 text-xs font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
               >
                 Cerrar
               </button>
@@ -472,20 +481,20 @@ export const AdminPedidosPage = () => {
             : ''
         }`}
       >
-        <form onSubmit={handleConfirmarCambioEstado} className="space-y-4">
+        <form onSubmit={handleConfirmarCambioEstado} className="space-y-4 font-sans">
           {errorModal && (
-            <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
+            <div role="alert" className="p-3 bg-rose-50 border border-rose-300 text-rose-950 font-bold text-xs rounded-none">{errorModal}</div>
           )}
 
           <div>
-            <label htmlFor="pedido-nuevo-estado" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+            <label htmlFor="pedido-nuevo-estado" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
               Nuevo Estado Autorizado:
             </label>
             <select
               id="pedido-nuevo-estado"
               value={nuevoEstadoSeleccionado}
               onChange={(e) => setNuevoEstadoSeleccionado(e.target.value)}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none"
             >
               {(TRANSICIONES_PERMITIDAS[pedidoACambiarEstado?.estado] || []).map((trans) => {
                 let label = ESTADOS_INFO[trans]?.label || trans;
@@ -502,19 +511,19 @@ export const AdminPedidosPage = () => {
             </select>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setPedidoACambiarEstado(null)}
               disabled={guardando}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando}
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               {guardando ? 'Guardando...' : 'Confirmar Transición'}
             </button>

@@ -3,6 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
 import { pedidoService } from '../services/pedidoService';
+import {
+  IconCheck,
+  IconTruck,
+  IconShield,
+  IconPackage,
+} from '../components/Icons';
 
 function mostrarPrecio(valor) {
   return Number(valor).toLocaleString('es-AR', {
@@ -11,7 +17,6 @@ function mostrarPrecio(valor) {
   });
 }
 
-// El backend avisa la falta de stock con un mensaje que incluye cantidades internas; al cliente no se le muestran.
 function mensajeDeCompraFallida(error) {
   if (error.status === 409 && /^Stock insuficiente/.test(error.message || '')) {
     const producto = /para el producto "(.+?)"/.exec(error.message)?.[1];
@@ -23,8 +28,7 @@ function mensajeDeCompraFallida(error) {
 
   return error.status
     ? error.message
-    : 'No pudimos confirmar la respuesta del servidor. ' +
-        'Antes de reintentar, verificá si el pedido fue creado.';
+    : 'No pudimos confirmar la respuesta del servidor. Antes de reintentar, verificá si el pedido fue creado.';
 }
 
 export function Checkout() {
@@ -61,8 +65,7 @@ export function Checkout() {
   useEffect(() => {
     let ignore = false;
 
-    pedidoService
-      .getMediosPago()
+    pedidoService.getMediosPago()
       .then((datos) => {
         if (!ignore) {
           setMediosPago(datos);
@@ -168,7 +171,6 @@ export function Checkout() {
 
     try {
       const pedido = await pedidoService.crearPedido(datos);
-
       setPedidoCreado(pedido);
       vaciarCarrito();
     } catch (error) {
@@ -179,367 +181,373 @@ export function Checkout() {
     }
   }
 
-if (pedidoCreado) {
-  return (
-    <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-green-700">
-          Pedido creado correctamente
-        </h1>
+  if (pedidoCreado) {
+    return (
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-12 sm:py-16">
+        <div className="bg-white rounded-none border border-slate-200 shadow-sm p-6 sm:p-10 text-center">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-none bg-emerald-50 border border-emerald-400 text-emerald-600 flex items-center justify-center">
+            <IconCheck className="w-8 h-8" />
+          </div>
 
-        <p className="mt-4 text-gray-800">
-          Número de pedido: <strong>{pedidoCreado.id}</strong>
-        </p>
+          <h1 className="text-2xl sm:text-3xl font-display font-black text-slate-950 tracking-tight uppercase">
+            Pedido creado correctamente
+          </h1>
 
-        <p className="mt-2 text-gray-700">
-          Estado: {pedidoCreado.estado}
-        </p>
-
-        {pedidoCreado.envio && (
-          <p className="mt-2 text-gray-700">
-            Envío: {mostrarPrecio(pedidoCreado.envio.costo)}
+          <p className="mt-2 text-xs sm:text-sm text-slate-600 font-sans">
+            Tu orden ha sido registrada en el sistema y se encuentra lista para su procesamiento.
           </p>
-        )}
 
-        <p className="mt-4 text-xl font-bold text-gray-900">
-          Total: {mostrarPrecio(pedidoCreado.total)}
-        </p>
+          <div className="mt-8 p-6 bg-slate-50 rounded-none border border-slate-200 text-left space-y-3 font-sans">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
+              <span className="text-slate-600 uppercase">Número de pedido:</span>
+              <strong className="text-slate-950 text-base font-black">#{pedidoCreado.id}</strong>
+            </div>
 
-        <p className="mt-3 text-sm text-gray-600">
-          El pedido fue registrado con el medio de pago elegido.
-        </p>
+            <div className="flex justify-between items-center text-xs sm:text-sm">
+              <span className="text-slate-600 uppercase">Estado de la orden:</span>
+              <span className="px-2.5 py-0.5 rounded-none text-xs font-bold uppercase bg-amber-50 text-amber-900 border border-amber-300">
+                {pedidoCreado.estado}
+              </span>
+            </div>
 
-        <Link
-          to={`/pedidos/${pedidoCreado.id}`}
-          className="block mt-6 font-medium text-indigo-600 hover:text-indigo-800"
-        >
-          Ver detalle del pedido →
-        </Link>
+            {pedidoCreado.envio && (
+              <div className="flex justify-between items-center text-xs sm:text-sm">
+                <span className="text-slate-600 uppercase">Costo de envío:</span>
+                <span className="font-bold text-slate-950">
+                  {mostrarPrecio(pedidoCreado.envio.costo)}
+                </span>
+              </div>
+            )}
 
-        <Link
-          to="/mis-pedidos"
-          className="block mt-3 text-indigo-600 hover:text-indigo-800"
-        >
-          Ver mis pedidos
-        </Link>
+            <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline text-sm">
+              <span className="text-slate-950 font-bold uppercase">Total abonado / pactado:</span>
+              <span className="text-2xl font-display font-black text-slate-950">
+                {mostrarPrecio(pedidoCreado.total)}
+              </span>
+            </div>
+          </div>
 
-        <Link
-          to="/"
-          className="inline-block mt-6 px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-        >
-          Volver a la tienda
-        </Link>
-      </div>
-    </main>
-  );
-}
-if (items.length === 0) {
-  return (
-    <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">
-      <h1 className="text-2xl font-bold text-gray-900">
-        Tu carrito está vacío
-      </h1>
-
-      <Link
-        to="/"
-        className="inline-block mt-4 text-indigo-600"
-      >
-        Ir a la tienda
-      </Link>
-    </main>
-  );
-}
-  return (
-    <main className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        Confirmar pedido
-      </h1>
-
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <ul className="space-y-3">
-          {items.map(({ producto, cantidad }) => (
-            <li
-              key={producto.id}
-              className="flex justify-between gap-4 text-gray-700"
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to={`/pedidos/${pedidoCreado.id}`}
+              className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs rounded-none shadow-xs transition"
             >
-              <span>
-                {producto.nombre} × {cantidad}
-              </span>
+              Ver comprobante y detalle →
+            </Link>
 
-              <span>
-                {mostrarPrecio(
-                  Number(producto.precioActual ?? 0) * cantidad
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
+            <Link
+              to="/mis-pedidos"
+              className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 font-bold uppercase tracking-wider text-xs rounded-none transition shadow-xs"
+            >
+              Ir a mis pedidos
+            </Link>
 
-        <div className="mt-4 pt-4 border-t space-y-1.5 text-sm">
-          <div className="flex justify-between text-gray-700">
-            <span>Subtotal de productos:</span>
-            <span>{mostrarPrecio(subtotal)}</span>
-          </div>
-          <div className="flex justify-between text-gray-700">
-            <span>Costo de envío estimado:</span>
-            <span>
-              {!requiereEnvio
-                ? 'Gratis (Retiro en el local)'
-                : !tipoEnvio
-                ? 'Seleccioná la zona de envío'
-                : tipoEnvio === 'LOCAL'
-                ? `${mostrarPrecio(3000)} (Local - Las Parejas)`
-                : `${mostrarPrecio(15000)} (Nacional - Resto del país)`}
-            </span>
-          </div>
-          <div className="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-100">
-            <span>Total estimado:</span>
-            <span className="text-indigo-600">{mostrarPrecio(totalEstimado)}</span>
+            <Link
+              to="/"
+              className="px-6 py-3.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-xs rounded-none transition"
+            >
+              Volver a la tienda
+            </Link>
           </div>
         </div>
+      </main>
+    );
+  }
 
-        {cargando ? (
-          <p role="status" className="mt-6">
-            Cargando medios de pago...
-          </p>
-        ) : errorCarga ? (
-          <div className="mt-6">
-            <p role="alert" className="text-red-700">
-              {errorCarga}
-            </p>
-
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="mt-3 text-indigo-600"
-            >
-              Reintentar carga
-            </button>
+  if (items.length === 0) {
+    return (
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-16 text-center">
+        <div className="bg-white rounded-none p-10 border border-slate-200 shadow-xs">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-none bg-slate-50 border border-slate-200 text-slate-800 flex items-center justify-center">
+            <IconPackage className="w-8 h-8" />
           </div>
-        ) : mediosPago.length === 0 ? (
-          <p role="alert" className="mt-6 text-red-700">
-            No hay medios de pago disponibles.
+          <h1 className="text-2xl font-display font-black text-slate-950 mb-2 uppercase tracking-tight">
+            Tu carrito está vacío
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mb-6 font-sans">
+            Agregá productos desde el catálogo para proceder con la confirmación de tu orden.
           </p>
-        ) : (
-          <form
-            onSubmit={handleConfirmarCompra}
-            className="mt-6"
+          <Link
+            to="/"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-none text-xs font-black uppercase tracking-wider transition shadow-xs"
           >
-            <fieldset disabled={enviando} className="space-y-5">
-              <div>
-                <label
-                  htmlFor="medioPago"
-                  className="block font-medium text-gray-700 mb-2"
-                >
-                  Medio de pago
-                </label>
+            Ir a la tienda
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
-                <select
-                  id="medioPago"
-                  required
-                  value={medioPagoId}
-                  onChange={(event) =>
-                    setMedioPagoId(event.target.value)
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                >
-                  <option value="">Seleccioná una opción</option>
-
-                  {mediosPago.map((medio) => (
-                    <option key={medio.id} value={medio.id}>
-                      {medio.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="entrega"
-                  className="block font-medium text-gray-700 mb-2"
-                >
-                  Forma de entrega
-                </label>
-
-                <select
-                  id="entrega"
-                  value={requiereEnvio ? 'envio' : 'retiro'}
-                  onChange={(event) =>
-                    setRequiereEnvio(event.target.value === 'envio')
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                >
-                  <option value="retiro">Retiro en el local (Gratis)</option>
-                  <option value="envio">Envío a domicilio</option>
-                </select>
-              </div>
-
-              {requiereEnvio && (
-                <div className="space-y-4 bg-gray-50 border border-gray-200 p-4 rounded-xl">
-                  <div>
-                    <label
-                      htmlFor="tipoEnvio"
-                      className="block font-medium text-gray-700 mb-2"
-                    >
-                      Zona de entrega
-                    </label>
-
-                    <select
-                      id="tipoEnvio"
-                      required
-                      value={tipoEnvio}
-                      onChange={(event) => setTipoEnvio(event.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-3 bg-white"
-                    >
-                      <option value="">Seleccioná la zona de entrega</option>
-                      <option value="LOCAL">
-                        Envío local (Las Parejas) — $3.000
-                      </option>
-                      <option value="NACIONAL">
-                        Envío nacional (Resto del país) — $15.000
-                      </option>
-                    </select>
-                  </div>
-
-                  {tipoEnvio && (
-                    <div className="pt-2 border-t border-gray-200 space-y-4">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-800">
-                          Dirección de entrega {tipoEnvio === 'LOCAL' ? '(Las Parejas)' : ''}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="sm:col-span-2">
-                          <label
-                            htmlFor="calle"
-                            className="block text-xs font-medium text-gray-700 mb-1"
-                          >
-                            Calle
-                          </label>
-                          <input
-                            id="calle"
-                            type="text"
-                            required
-                            value={calle}
-                            onChange={(e) => setCalle(e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                            placeholder="Ej. San Martín"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="numero"
-                            className="block text-xs font-medium text-gray-700 mb-1"
-                          >
-                            Número
-                          </label>
-                          <input
-                            id="numero"
-                            type="text"
-                            inputMode="numeric"
-                            required
-                            value={numero}
-                            onChange={(e) => {
-                              const soloNumeros = e.target.value.replace(/\D/g, '');
-                              setNumero(soloNumeros);
-                            }}
-                            className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                            placeholder="Ej. 1234"
-                          />
-                        </div>
-                      </div>
-
-                      {tipoEnvio === 'NACIONAL' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div>
-                            <label
-                              htmlFor="localidadDestino"
-                              className="block text-xs font-medium text-gray-700 mb-1"
-                            >
-                              Localidad
-                            </label>
-                            <input
-                              id="localidadDestino"
-                              type="text"
-                              required
-                              value={localidadDestino}
-                              onChange={(e) => setLocalidadDestino(e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                              placeholder="Ej. Rosario"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor="provinciaDestino"
-                              className="block text-xs font-medium text-gray-700 mb-1"
-                            >
-                              Provincia
-                            </label>
-                            <input
-                              id="provinciaDestino"
-                              type="text"
-                              required
-                              value={provinciaDestino}
-                              onChange={(e) => setProvinciaDestino(e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                              placeholder="Ej. Santa Fe"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor="codigoPostal"
-                              className="block text-xs font-medium text-gray-700 mb-1"
-                            >
-                              Código Postal
-                            </label>
-                            <input
-                              id="codigoPostal"
-                              type="text"
-                              required
-                              value={codigoPostal}
-                              onChange={(e) => setCodigoPostal(e.target.value)}
-                              className="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                              placeholder="Ej. S2000"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {errorCompra && (
-                <p role="alert" className="text-red-700">
-                  {errorCompra}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={enviando}
-                className="w-full px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {enviando ? 'Creando pedido...' : 'Confirmar pedido'}
-              </button>
-            </fieldset>
-          </form>
-        )}
+  return (
+    <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="mb-8 border-b border-slate-200 pb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <span className="text-xs font-sans font-bold uppercase tracking-widest text-blue-600 block mb-0.5">
+            Paso final
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-display font-black text-slate-950 tracking-tight uppercase">
+            Confirmar pedido
+          </h1>
+        </div>
 
         <Link
           to="/carrito"
-          className={`inline-block mt-5 text-indigo-600 ${
-            enviando ? 'pointer-events-none opacity-50' : ''
-          }`}
-          aria-disabled={enviando}
-          tabIndex={enviando ? -1 : undefined}
+          className="text-xs font-sans font-bold uppercase tracking-wider text-slate-600 hover:text-blue-600 transition"
         >
-          Volver al carrito
+          ← Volver al carrito
         </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Columna Izquierda: Formulario de Pago y Envío */}
+        <div className="lg:col-span-7 bg-white rounded-none border border-slate-200 shadow-xs p-6 sm:p-8 space-y-6">
+          {cargando ? (
+            <div className="p-8 text-center text-slate-500 space-y-3 font-sans text-xs">
+              <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent" />
+              <p role="status">Cargando medios de pago disponibles...</p>
+            </div>
+          ) : errorCarga ? (
+            <div role="alert" className="p-4 bg-rose-50 border border-rose-300 rounded-none text-rose-950 text-xs font-sans">
+              <p className="font-bold uppercase tracking-wider">{errorCarga}</p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="mt-3 px-3.5 py-1.5 bg-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-none hover:bg-rose-700 shadow-xs"
+              >
+                Reintentar carga
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleConfirmarCompra} className="space-y-6">
+              <fieldset disabled={enviando} className="space-y-6">
+                {/* Selección de Medio de Pago */}
+                <div>
+                  <label htmlFor="medioPago" className="block text-xs font-bold uppercase tracking-wider text-slate-950 mb-2 font-sans">
+                    Medio de pago
+                  </label>
+                  <select
+                    id="medioPago"
+                    required
+                    value={medioPagoId}
+                    onChange={(event) => setMedioPagoId(event.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition shadow-xs"
+                  >
+                    <option value="">Seleccioná una opción de pago</option>
+                    {mediosPago.map((medio) => (
+                      <option key={medio.id} value={medio.id}>
+                        {medio.descripcion}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Forma de Entrega */}
+                <div>
+                  <label htmlFor="entrega" className="block text-xs font-bold uppercase tracking-wider text-slate-950 mb-2 font-sans">
+                    Forma de entrega
+                  </label>
+                  <select
+                    id="entrega"
+                    value={requiereEnvio ? 'envio' : 'retiro'}
+                    onChange={(event) => setRequiereEnvio(event.target.value === 'envio')}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition shadow-xs"
+                  >
+                    <option value="retiro">Retiro en el local — Gratis</option>
+                    <option value="envio">Envío a domicilio</option>
+                  </select>
+                </div>
+
+                {/* Opciones de Envío si aplica */}
+                {requiereEnvio && (
+                  <div className="bg-slate-50 border border-slate-200 p-5 rounded-none space-y-4">
+                    <div>
+                      <label htmlFor="tipoEnvio" className="block text-xs font-bold uppercase tracking-wider text-slate-950 mb-1.5 font-sans">
+                        Zona de entrega
+                      </label>
+                      <select
+                        id="tipoEnvio"
+                        required
+                        value={tipoEnvio}
+                        onChange={(event) => setTipoEnvio(event.target.value)}
+                        className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition shadow-xs"
+                      >
+                        <option value="">Seleccioná la zona de entrega</option>
+                        <option value="LOCAL">Envío local (Las Parejas) — $3.000</option>
+                        <option value="NACIONAL">Envío nacional (Resto del país) — $15.000</option>
+                      </select>
+                    </div>
+
+                    {tipoEnvio && (
+                      <div className="pt-3 border-t border-slate-200 space-y-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-950 block font-sans">
+                          Dirección de destino {tipoEnvio === 'LOCAL' ? '(Las Parejas)' : ''}
+                        </span>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="sm:col-span-2">
+                            <label htmlFor="calle" className="block text-xs font-sans font-bold uppercase text-slate-600 mb-1">
+                              Calle
+                            </label>
+                            <input
+                              id="calle"
+                              type="text"
+                              required
+                              value={calle}
+                              onChange={(e) => setCalle(e.target.value)}
+                              className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-xs"
+                              placeholder="Ej. San Martín"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="numero" className="block text-xs font-sans font-bold uppercase text-slate-600 mb-1">
+                              Número
+                            </label>
+                            <input
+                              id="numero"
+                              type="text"
+                              inputMode="numeric"
+                              required
+                              value={numero}
+                              onChange={(e) => {
+                                const soloNumeros = e.target.value.replace(/\D/g, '');
+                                setNumero(soloNumeros);
+                              }}
+                              className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-xs"
+                              placeholder="Ej. 1234"
+                            />
+                          </div>
+                        </div>
+
+                        {tipoEnvio === 'NACIONAL' && (
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                              <label htmlFor="localidadDestino" className="block text-xs font-sans font-bold uppercase text-slate-600 mb-1">
+                                Localidad
+                              </label>
+                              <input
+                                id="localidadDestino"
+                                type="text"
+                                required
+                                value={localidadDestino}
+                                onChange={(e) => setLocalidadDestino(e.target.value)}
+                                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-xs"
+                                placeholder="Ej. Rosario"
+                              />
+                            </div>
+
+                            <div>
+                              <label htmlFor="provinciaDestino" className="block text-xs font-sans font-bold uppercase text-slate-600 mb-1">
+                                Provincia
+                              </label>
+                              <input
+                                id="provinciaDestino"
+                                type="text"
+                                required
+                                value={provinciaDestino}
+                                onChange={(e) => setProvinciaDestino(e.target.value)}
+                                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-xs"
+                                placeholder="Ej. Santa Fe"
+                              />
+                            </div>
+
+                            <div>
+                              <label htmlFor="codigoPostal" className="block text-xs font-sans font-bold uppercase text-slate-600 mb-1">
+                                Código Postal
+                              </label>
+                              <input
+                                id="codigoPostal"
+                                type="text"
+                                required
+                                value={codigoPostal}
+                                onChange={(e) => setCodigoPostal(e.target.value)}
+                                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-xs"
+                                placeholder="Ej. S2505"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {errorCompra && (
+                  <div role="alert" className="p-3.5 bg-rose-50 border border-rose-300 text-rose-950 text-xs font-sans font-bold rounded-none shadow-xs">
+                    {errorCompra}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={enviando}
+                  className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs rounded-none shadow-xs hover:shadow-sm transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {enviando ? 'Creando pedido...' : 'Confirmar pedido'}
+                </button>
+              </fieldset>
+            </form>
+          )}
+        </div>
+
+        {/* Columna Derecha: Resumen de Orden */}
+        <aside className="lg:col-span-5 bg-white rounded-none border border-slate-200 shadow-xs p-6 sm:p-8 space-y-6 sticky top-28">
+          <h2 className="text-base font-display font-black uppercase text-slate-950 border-b border-slate-200 pb-3">
+            Detalle del pedido ({items.length} {items.length === 1 ? 'ítem' : 'ítems'})
+          </h2>
+
+          <ul className="divide-y divide-slate-200 max-h-80 overflow-y-auto pr-1 space-y-2">
+            {items.map(({ producto, cantidad }) => (
+              <li key={producto.id} className="pt-2 flex justify-between gap-3 text-xs font-sans">
+                <div>
+                  <span className="font-bold text-slate-950 block">{producto.nombre}</span>
+                  <span className="text-slate-500">Cantidad: {cantidad}</span>
+                </div>
+                <span className="font-bold text-slate-950 shrink-0">
+                  {mostrarPrecio(Number(producto.precioActual ?? 0) * cantidad)}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="pt-4 border-t border-slate-200 space-y-2 text-xs font-sans">
+            <div className="flex justify-between text-slate-700">
+              <span>Subtotal productos:</span>
+              <span className="font-bold text-slate-950">{mostrarPrecio(subtotal)}</span>
+            </div>
+
+            <div className="flex justify-between text-slate-700">
+              <span>Costo de entrega:</span>
+              <span className="font-bold text-slate-950">
+                {!requiereEnvio
+                  ? 'Gratis (Retiro en local)'
+                  : !tipoEnvio
+                    ? 'Seleccioná zona'
+                    : tipoEnvio === 'LOCAL'
+                      ? `${mostrarPrecio(3000)} (Local)`
+                      : `${mostrarPrecio(15000)} (Nacional)`}
+              </span>
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline text-sm">
+              <span className="font-bold uppercase tracking-wider text-slate-950">Total a abonar:</span>
+              <span className="text-2xl font-display font-black text-slate-950">
+                {mostrarPrecio(totalEstimado)}
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-600 font-sans space-y-1.5">
+            <div className="flex items-center gap-2">
+              <IconShield className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Emisión de comprobante legal de compra</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <IconTruck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Preparación inmediata una vez confirmado</span>
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );

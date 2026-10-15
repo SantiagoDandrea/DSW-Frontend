@@ -4,10 +4,11 @@ import { stockService } from '../../services/stockService';
 import { precioService } from '../../services/precioService';
 import { productoService } from '../../services/productoService';
 import { almacenService } from '../../services/almacenService';
-import { SimpleCrudTable } from '../../components/admin/SimpleCrudTable';
 import { AdminAlert } from '../../components/admin/AdminAlert';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
+import { SimpleCrudTable } from '../../components/admin/SimpleCrudTable';
+import { IconPackage, IconTag } from '../../components/Icons';
 
 export const AdminInventarioPage = () => {
   const [tabActiva, setTabActiva] = useState('stock');
@@ -253,28 +254,28 @@ export const AdminInventarioPage = () => {
       <AdminAlert type="error" message={errorCatalogo} onClose={() => setErrorCatalogo(null)} />
       <AdminAlert type="success" message={mensajeExitoStock} onClose={() => setMensajeExitoStock(null)} />
 
-      <div className="bg-white p-2 rounded-xl shadow-xs border border-gray-200 overflow-x-auto">
+      <div className="bg-white p-2 rounded-none border border-slate-200 shadow-xs overflow-x-auto">
         <div className="flex gap-2 min-w-max">
           <button
             onClick={() => setTabActiva('stock')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-none text-xs sm:text-sm font-bold uppercase tracking-wider transition cursor-pointer ${
               tabActiva === 'stock'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950 border border-slate-200'
             }`}
           >
-            <span>📦</span>
+            <IconPackage className="w-4 h-4" />
             <span>Stock por Almacén</span>
           </button>
           <button
             onClick={() => setTabActiva('precios')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-none text-xs sm:text-sm font-bold uppercase tracking-wider transition cursor-pointer ${
               tabActiva === 'precios'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950 border border-slate-200'
             }`}
           >
-            <span>💲</span>
+            <IconTag className="w-4 h-4" />
             <span>Historial de Precios</span>
           </button>
         </div>
@@ -282,24 +283,24 @@ export const AdminInventarioPage = () => {
 
       {tabActiva === 'stock' ? (
         <div className="space-y-4">
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="bg-white p-6 rounded-none border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Stock por Almacén</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-xl font-display font-black uppercase text-slate-950 tracking-tight">Stock por Almacén</h2>
+              <p className="text-xs text-slate-500 mt-1">
                 Visualice y ajuste las existencias disponibles por cada almacén o depósito.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center gap-2">
-                <label htmlFor="selector-almacen" className="text-xs font-bold uppercase tracking-wider text-gray-600 whitespace-nowrap">
+                <label htmlFor="selector-almacen" className="text-xs font-bold uppercase tracking-wider text-slate-700 whitespace-nowrap">
                   Almacén:
                 </label>
                 <select
                   id="selector-almacen"
                   value={almacenSeleccionadoId}
                   onChange={(e) => setAlmacenSeleccionadoId(e.target.value)}
-                  className="px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none transition"
                 >
                   {almacenes.length === 0 && <option value="">Sin almacenes registrados</option>}
                   {almacenes.map((a) => (
@@ -315,31 +316,31 @@ export const AdminInventarioPage = () => {
                 placeholder="Buscar producto..."
                 value={busquedaProducto}
                 onChange={(e) => setBusquedaProducto(e.target.value)}
-                className="px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full sm:w-56"
+                className="px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none w-full sm:w-56 transition"
               />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden">
             {cargandoStock ? (
-              <div className="p-12 text-center text-gray-500">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-                <p className="text-sm">Cargando inventario del almacén...</p>
+              <div className="p-12 text-center text-slate-500">
+                <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2" />
+                <p className="text-xs font-bold uppercase tracking-wider">Cargando inventario del almacén...</p>
               </div>
             ) : almacenes.length === 0 ? (
-              <div className="p-12 text-center text-gray-500">
-                <p className="text-base font-semibold">No hay almacenes configurados</p>
-                <p className="text-xs text-gray-500 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
+              <div className="p-12 text-center text-slate-500">
+                <p className="text-base font-bold uppercase text-slate-900">No hay almacenes configurados</p>
+                <p className="text-xs text-slate-500 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
               </div>
             ) : productosFiltradosStock.length === 0 ? (
-              <div className="p-12 text-center text-gray-500">
-                <p className="text-base font-semibold">No se encontraron productos</p>
-                <p className="text-xs text-gray-500 mt-1">Intente ajustar los términos de búsqueda.</p>
+              <div className="p-12 text-center text-slate-500">
+                <p className="text-base font-bold uppercase text-slate-900">No se encontraron productos</p>
+                <p className="text-xs text-slate-500 mt-1">Intente ajustar los términos de búsqueda.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-600">
-                  <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                <table className="w-full text-left text-sm text-slate-700">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200">
                     <tr>
                       <th className="px-5 py-3">Producto</th>
                       <th className="px-5 py-3">Categoría</th>
@@ -348,44 +349,44 @@ export const AdminInventarioPage = () => {
                       <th className="px-5 py-3 text-right">Acción</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-slate-100">
                     {productosFiltradosStock.map((prod) => {
                       const stockExistente = mapaStockPorProducto[prod.id];
                       const cantidad = stockExistente ? stockExistente.cantidad : 0;
                       const fotoMini = prod.imagenes?.[0]?.url;
 
                       return (
-                        <tr key={prod.id} className="hover:bg-gray-50 transition">
+                        <tr key={prod.id} className="hover:bg-slate-50/70 transition">
                           <td className="px-5 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                              <div className="w-9 h-9 rounded-none bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
                                 {fotoMini ? (
                                   <img src={fotoMini} alt={prod.nombre} className="w-full h-full object-cover" />
                                 ) : (
-                                  <span className="text-[10px] text-gray-500">Sin foto</span>
+                                  <span className="text-[10px] text-slate-500 font-medium">Sin foto</span>
                                 )}
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-900 leading-snug">{prod.nombre}</p>
+                                <p className="font-bold text-slate-900 leading-snug">{prod.nombre}</p>
                                 {prod.marca?.nombre && (
-                                  <p className="text-xs text-gray-500">{prod.marca.nombre}</p>
+                                  <p className="text-xs text-slate-500">{prod.marca.nombre}</p>
                                 )}
                               </div>
                             </div>
                           </td>
-                          <td className="px-5 py-3 text-gray-700">
+                          <td className="px-5 py-3 text-slate-600 text-xs">
                             {prod.categoria?.nombre || '-'}
                           </td>
-                          <td className="px-5 py-3 text-gray-700 font-medium">
+                          <td className="px-5 py-3 text-slate-600 text-xs font-medium">
                             {almacenActual?.descripcion || `Almacén #${almacenSeleccionadoId}`}
                           </td>
                           <td className="px-5 py-3 text-center">
                             {cantidad > 0 ? (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 {cantidad} un.
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
                                 0 un.
                               </span>
                             )}
@@ -393,7 +394,7 @@ export const AdminInventarioPage = () => {
                           <td className="px-5 py-3 text-right">
                             <button
                               onClick={() => handleAbrirAjuste(prod)}
-                              className="px-3 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition cursor-pointer"
+                              className="px-3 py-1 text-xs font-bold uppercase text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-none transition cursor-pointer"
                             >
                               Ajustar Stock
                             </button>
@@ -415,13 +416,13 @@ export const AdminInventarioPage = () => {
           >
             <form onSubmit={handleGuardarAjuste} className="space-y-4">
               {errorModalStock && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs rounded-none">
                   {errorModalStock}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1" htmlFor="input-cantidad-stock">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1" htmlFor="input-cantidad-stock">
                   Cantidad de unidades en este almacén *
                 </label>
                 <input
@@ -432,21 +433,21 @@ export const AdminInventarioPage = () => {
                   required
                   value={cantidadAjuste}
                   onChange={(e) => setCantidadAjuste(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   Ingrese la cantidad física disponible en el depósito seleccionado. Si coloca 0, el producto figurará sin existencias.
                 </p>
               </div>
 
-              <div className="pt-4 flex items-center justify-between border-t border-gray-100">
+              <div className="pt-4 flex items-center justify-between border-t border-slate-200">
                 {productoAjuste && mapaStockPorProducto[productoAjuste.id] ? (
                   <button
                     type="button"
                     disabled={guardandoAjuste}
                     onClick={() => setStockAEliminar(mapaStockPorProducto[productoAjuste.id])}
-                    className="text-xs font-semibold text-rose-600 hover:text-rose-800 transition cursor-pointer"
+                    className="text-xs font-bold uppercase tracking-wider text-rose-600 hover:text-rose-800 transition cursor-pointer"
                   >
                     Eliminar registro
                   </button>
@@ -457,14 +458,14 @@ export const AdminInventarioPage = () => {
                     type="button"
                     onClick={() => setModalStockAbierto(false)}
                     disabled={guardandoAjuste}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="px-5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={guardandoAjuste}
-                    className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+                    className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer"
                   >
                     {guardandoAjuste ? 'Guardando...' : 'Guardar Stock'}
                   </button>

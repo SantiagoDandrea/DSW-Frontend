@@ -9,8 +9,8 @@ export const AdminRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-[300px]">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-        <p className="mt-3 text-sm text-gray-500 font-medium">Verificando permisos...</p>
+        <div className="w-10 h-10 border-4 border-slate-900 border-t-blue-600 rounded-none animate-spin"></div>
+        <p className="mt-3 text-xs font-sans font-bold uppercase tracking-wider text-slate-900">Verificando permisos...</p>
       </div>
     );
   }

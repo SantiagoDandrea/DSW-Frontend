@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { localidadService } from '../services/localidadService';
+import { IconAlert } from '../components/Icons';
 
 export const Register = () => {
   const [form, setForm] = useState({
@@ -62,28 +63,34 @@ export const Register = () => {
   };
 
   return (
-    <main className="flex-1 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 sm:p-8">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Crear Cuenta</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Registrate para empezar a comprar
+    <main className="flex-1 flex items-center justify-center px-4 py-12 sm:py-16 bg-slate-50">
+      <div className="w-full max-w-lg bg-white rounded-none border border-slate-200 shadow-sm p-6 sm:p-10">
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-none bg-blue-600 flex items-center justify-center text-white font-black text-2xl shadow-xs font-display">
+            M
+          </div>
+          <span className="inline-block px-3 py-1 rounded-none text-[10px] font-sans font-bold uppercase tracking-wider bg-blue-600 text-white mb-2">
+            Alta de Cliente
+          </span>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight font-display uppercase">
+            Crear Cuenta
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 font-sans">
+            Completá tus datos para disfrutar de compras rápidas y seguimiento de pedidos
           </p>
         </div>
 
         {error && (
-          <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg flex items-center gap-2">
-            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+          <div role="alert" className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-900 text-xs rounded-none font-sans flex items-center gap-2">
+            <IconAlert className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 font-sans">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="dni">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="dni">
                 DNI
               </label>
               <input
@@ -96,13 +103,13 @@ export const Register = () => {
                 value={form.dni}
                 onChange={handleChange}
                 placeholder="30111222"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                 disabled={cargando}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="telefono">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="telefono">
                 Teléfono
               </label>
               <input
@@ -113,7 +120,7 @@ export const Register = () => {
                 value={form.telefono}
                 onChange={handleChange}
                 placeholder="3471112233"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                 disabled={cargando}
               />
             </div>
@@ -121,7 +128,7 @@ export const Register = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nombre">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="nombre">
                 Nombre
               </label>
               <input
@@ -131,13 +138,14 @@ export const Register = () => {
                 required
                 value={form.nombre}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Juan"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                 disabled={cargando}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="apellido">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="apellido">
                 Apellido
               </label>
               <input
@@ -147,14 +155,15 @@ export const Register = () => {
                 required
                 value={form.apellido}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Pérez"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                 disabled={cargando}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="email">
               Correo Electrónico
             </label>
             <input
@@ -165,13 +174,13 @@ export const Register = () => {
               value={form.email}
               onChange={handleChange}
               placeholder="ejemplo@correo.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               disabled={cargando}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="password">
               Contraseña
             </label>
             <input
@@ -184,13 +193,13 @@ export const Register = () => {
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               disabled={cargando}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="localidadId">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="localidadId">
               Localidad
             </label>
             <select
@@ -199,7 +208,7 @@ export const Register = () => {
               required
               value={form.localidadId}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               disabled={cargando}
             >
               <option value="" disabled>Seleccioná tu localidad</option>
@@ -214,15 +223,15 @@ export const Register = () => {
           <button
             type="submit"
             disabled={cargando}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-wider text-xs rounded-none shadow-xs transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-4"
           >
-            {cargando ? 'Creando cuenta...' : 'Registrarme'}
+            {cargando ? 'Registrando cuenta...' : 'Confirmar y Crear Cuenta'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          ¿Ya tenés una cuenta?{' '}
-          <Link to="/login" className="text-indigo-600 hover:text-indigo-800 font-medium">
+        <div className="mt-8 pt-6 border-t border-slate-200 text-center text-xs text-slate-500 font-sans">
+          ¿Ya tenés una cuenta registrada?{' '}
+          <Link to="/login" className="text-blue-600 hover:text-blue-800 font-bold underline underline-offset-4">
             Iniciar sesión
           </Link>
         </div>
