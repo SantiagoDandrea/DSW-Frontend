@@ -8,7 +8,7 @@ import { AdminAlert } from '../../components/admin/AdminAlert';
 
 const ESTADOS_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-100 text-amber-800 border-amber-200' },
-  EN_PREPARACION: { label: 'En Preparación', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+  EN_PREPARACION: { label: 'En Preparación', color: 'bg-blue-100 text-blue-800 border-blue-200' },
   EN_TRANSITO: { label: 'En Tránsito', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ENTREGADO: { label: 'Entregado', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
   CANCELADO: { label: 'Cancelado', color: 'bg-rose-100 text-rose-800 border-rose-200' },
@@ -133,17 +133,17 @@ export const AdminEnviosPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-white p-6 rounded-none border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Gestión de Envíos</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl font-display font-black uppercase text-slate-950 tracking-tight">Gestión de Envíos</h2>
+          <p className="text-xs font-sans text-slate-500 mt-1">
             Entregas a domicilio de todos los pedidos: seguimiento por estado, corrección de domicilio y cancelación.
           </p>
         </div>
         <button
           type="button"
           onClick={recargar}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-sans font-medium uppercase tracking-wider rounded-none border border-slate-300 transition cursor-pointer"
         >
           ↻ Actualizar
         </button>
@@ -152,14 +152,14 @@ export const AdminEnviosPage = () => {
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Filtros de Búsqueda</h3>
+      <div className="bg-white p-5 sm:p-6 rounded-none border border-slate-200 shadow-xs space-y-3 font-sans">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Filtros de Búsqueda</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <select
             aria-label="Filtrar por estado del envío"
             value={estado}
             onChange={(e) => setEstado(e.target.value)}
-            className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
           >
             <option value="">Todos los estados</option>
             {Object.entries(ESTADOS_INFO).map(([clave, info]) => (
@@ -173,35 +173,35 @@ export const AdminEnviosPage = () => {
             value={pedidoIdInput}
             onChange={(e) => setPedidoIdInput(e.target.value)}
             placeholder="Nº de pedido..."
-            className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
           />
         </div>
         <div className="flex justify-end">
           <button
             type="button"
             onClick={handleLimpiarFiltros}
-            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
+            className="text-xs font-bold uppercase tracking-wider text-rose-600 hover:text-rose-800 transition cursor-pointer"
           >
             Limpiar todos los filtros
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden">
         {cargando ? (
-          <div role="status" className="p-12 text-center text-gray-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-            <p className="text-sm">Cargando envíos...</p>
+          <div role="status" className="p-12 text-center text-slate-500 font-sans">
+            <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider">Cargando envíos...</p>
           </div>
         ) : envios.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p className="text-base font-semibold">No se encontraron envíos</p>
-            <p className="text-xs text-gray-500 mt-1">Probá cambiando el estado o el número de pedido.</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <p className="text-base font-bold uppercase text-slate-900">No se encontraron envíos</p>
+            <p className="text-xs text-slate-500 mt-1">Probá cambiando el estado o el número de pedido.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+            <table className="w-full text-left text-sm text-slate-700 font-sans">
+              <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-5 py-3">Envío</th>
                   <th scope="col" className="px-5 py-3">Pedido / Cliente</th>
@@ -211,24 +211,24 @@ export const AdminEnviosPage = () => {
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {envios.map((envio) => {
-                  const info = ESTADOS_INFO[envio.estado] || { label: envio.estado, color: 'bg-gray-100 text-gray-800 border-gray-200' };
+                  const info = ESTADOS_INFO[envio.estado] || { label: envio.estado, color: 'bg-slate-100 text-slate-900 border-slate-200' };
                   const cliente = envio.pedido?.cliente;
 
                   return (
-                    <tr key={envio.id} className="hover:bg-gray-50 transition">
-                      <td className="px-5 py-3 font-bold text-gray-900">#{envio.id}</td>
+                    <tr key={envio.id} className="hover:bg-slate-50 transition">
+                      <td className="px-5 py-3 font-bold text-slate-950">#{envio.id}</td>
                       <td className="px-5 py-3">
-                        <div className="font-semibold text-gray-900">Pedido #{envio.pedidoId}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="font-bold text-slate-950">Pedido #{envio.pedidoId}</div>
+                        <div className="text-xs text-slate-500">
                           {cliente ? `${cliente.nombre} ${cliente.apellido}` : '-'}
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-xs text-gray-700">{envio.domicilioEntrega}</td>
-                      <td className="px-5 py-3 font-semibold text-gray-900">{mostrarPrecio(envio.costo)}</td>
+                      <td className="px-5 py-3 text-xs text-slate-700">{envio.domicilioEntrega}</td>
+                      <td className="px-5 py-3 font-bold text-slate-950 font-sans">{mostrarPrecio(envio.costo)}</td>
                       <td className="px-5 py-3">
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${info.color}`}>
+                        <span className={`px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider border ${info.color}`}>
                           {info.label}
                         </span>
                       </td>
@@ -236,7 +236,7 @@ export const AdminEnviosPage = () => {
                         <div className="flex items-center justify-end gap-1.5">
                           <Link
                             to="/admin/pedidos"
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition"
+                            className="px-2.5 py-1 text-xs font-bold uppercase text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-none transition"
                           >
                             Ver pedidos
                           </Link>
@@ -244,7 +244,7 @@ export const AdminEnviosPage = () => {
                             <button
                               type="button"
                               onClick={() => handleAbrirEditar(envio)}
-                              className="px-2.5 py-1 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-md transition cursor-pointer"
+                              className="px-2.5 py-1 text-xs font-bold uppercase text-sky-700 bg-sky-50 hover:bg-sky-600 hover:text-white border border-sky-200 rounded-none transition cursor-pointer"
                             >
                               Domicilio
                             </button>
@@ -253,7 +253,7 @@ export const AdminEnviosPage = () => {
                             <button
                               type="button"
                               onClick={() => setEnvioACancelar(envio)}
-                              className="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition cursor-pointer"
+                              className="px-2.5 py-1 text-xs font-bold uppercase text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-none transition cursor-pointer"
                             >
                               Cancelar
                             </button>
@@ -275,16 +275,16 @@ export const AdminEnviosPage = () => {
         title={`Editar domicilio - Envío #${envioAEditar?.id}`}
         subtitle={`Pedido #${envioAEditar?.pedidoId}`}
       >
-        <form onSubmit={handleGuardarDomicilio} className="space-y-4">
+        <form onSubmit={handleGuardarDomicilio} className="space-y-4 font-sans">
           {errorModal && (
-            <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
+            <div role="alert" className="p-3 bg-rose-50 border border-rose-300 text-rose-950 font-bold text-xs rounded-none">
               {errorModal}
             </div>
           )}
 
           <div>
-            <label htmlFor="nuevo-domicilio" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-              Domicilio de entrega <span className="text-rose-500">*</span>
+            <label htmlFor="nuevo-domicilio" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+              Domicilio de entrega <span className="text-rose-600">*</span>
             </label>
             <input
               id="nuevo-domicilio"
@@ -292,23 +292,23 @@ export const AdminEnviosPage = () => {
               required
               value={nuevoDomicilio}
               onChange={(e) => setNuevoDomicilio(e.target.value)}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
             />
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setEnvioAEditar(null)}
               disabled={guardando}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando || !nuevoDomicilio.trim()}
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             >
               {guardando ? 'Guardando...' : 'Guardar domicilio'}
             </button>

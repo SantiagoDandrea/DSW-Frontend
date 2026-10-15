@@ -6,6 +6,7 @@ import { localidadService } from '../../services/localidadService';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
+import { IconPlus, IconSearch } from '../../components/Icons';
 
 const INITIAL_FORM = {
   dni: '',
@@ -23,13 +24,13 @@ const InputField = ({ label, required, ...props }) => {
 
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+      <label htmlFor={id} className="block text-xs font-sans font-bold uppercase tracking-wider text-slate-700 mb-1">
         {label} {required && '*'}
       </label>
       <input
         id={id}
         required={required}
-        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 transition"
         {...props}
       />
     </div>
@@ -41,20 +42,20 @@ const SelectField = ({ label, required, options = [], helperText, ...props }) =>
 
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+      <label htmlFor={id} className="block text-xs font-sans font-bold uppercase tracking-wider text-slate-700 mb-1">
         {label} {required && '*'}
       </label>
       <select
         id={id}
         required={required}
-        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 transition"
         {...props}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
-      {helperText && <p className="text-[11px] text-amber-700 mt-1">{helperText}</p>}
+      {helperText && <p className="text-[11px] font-sans text-amber-700 mt-1">{helperText}</p>}
     </div>
   );
 };
@@ -305,33 +306,38 @@ export const AdminUsuariosPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-white p-6 rounded-none border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Gestión de Usuarios</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <span className="inline-block px-3 py-1 rounded-none text-xs font-sans font-bold uppercase tracking-wider bg-blue-600 text-white mb-2">
+            Módulo de Seguridad y Cuentas
+          </span>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 font-display uppercase">Gestión de Usuarios</h2>
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Administración de cuentas de clientes y administradores del sistema.
           </p>
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-xs transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-sans font-bold uppercase tracking-wider rounded-none shadow-xs transition cursor-pointer"
         >
-          + Nuevo Usuario
+          <IconPlus className="w-4 h-4" />
+          <span>Nuevo Usuario</span>
         </button>
       </div>
 
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-        <div className="sm:col-span-2">
+      <div className="bg-white p-4 sm:p-5 rounded-none border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-center font-sans">
+        <div className="sm:col-span-2 relative">
+          <IconSearch className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder="Buscar por DNI, nombre, apellido o correo..."
             aria-label="Buscar usuarios por DNI, nombre, apellido o correo"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
           />
         </div>
         <div>
@@ -339,7 +345,7 @@ export const AdminUsuariosPage = () => {
             aria-label="Filtrar por rol"
             value={filtroRol}
             onChange={(e) => setFiltroRol(e.target.value)}
-            className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
           >
             <option value="">Todos los roles</option>
             <option value="CLIENTE">Clientes</option>
@@ -348,21 +354,21 @@ export const AdminUsuariosPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden">
         {cargando ? (
-          <div className="p-12 text-center text-gray-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-            <p className="text-sm">Cargando usuarios...</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <div className="inline-block h-8 w-8 border-4 border-slate-200 border-t-blue-600 rounded-none animate-spin mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Cargando usuarios...</p>
           </div>
         ) : usuariosFiltrados.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p className="text-base font-semibold">No se encontraron usuarios</p>
-            <p className="text-xs text-gray-500 mt-1">Pruebe ajustando los términos de búsqueda.</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <p className="text-sm font-bold text-slate-900 uppercase">No se encontraron usuarios</p>
+            <p className="text-xs text-slate-500 mt-1 font-sans">Pruebe ajustando los términos de búsqueda.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+            <table className="w-full text-left text-xs sm:text-sm text-slate-700 font-sans">
+              <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-5 py-3">Usuario</th>
                   <th scope="col" className="px-5 py-3">DNI</th>
@@ -373,53 +379,51 @@ export const AdminUsuariosPage = () => {
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {usuariosFiltrados.map((u) => {
                   const esActual = u.dni === usuarioActual?.dni;
                   const estaActivo = u.activo !== false;
                   return (
-                    <tr key={u.dni} className="hover:bg-gray-50 transition">
+                    <tr key={u.dni} className="hover:bg-slate-50 transition">
                       <td className="px-5 py-3">
-                        <div className="font-semibold text-gray-900 flex items-center gap-1.5">
+                        <div className="font-bold text-slate-950 flex items-center gap-1.5">
                           <span>{u.nombre} {u.apellido}</span>
                           {esActual && (
-                            <span className="text-[10px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 font-bold rounded">Tú</span>
+                            <span className="text-[10px] px-1.5 py-0.5 bg-blue-600 text-white font-sans font-bold rounded-none">Tú</span>
                           )}
                         </div>
-                        <div className="text-xs text-gray-500">{u.email}</div>
+                        <div className="text-xs text-slate-500 font-sans">{u.email}</div>
                       </td>
-                      <td className="px-5 py-3 font-mono text-xs text-gray-700">{u.dni}</td>
+                      <td className="px-5 py-3 font-sans text-xs font-bold text-slate-900">{u.dni}</td>
                       <td className="px-5 py-3">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                            u.rol === 'ADMIN'
-                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                              : 'bg-slate-100 text-slate-700 border border-slate-200'
-                          }`}
+                          className={`inline-block px-2.5 py-0.5 rounded-none text-xs font-sans font-bold uppercase tracking-wider border ${u.rol === 'ADMIN'
+                              ? 'bg-purple-50 text-purple-800 border-purple-200'
+                              : 'bg-slate-100 text-slate-800 border-slate-200'
+                            }`}
                         >
                           {u.rol}
                         </span>
                       </td>
                       <td className="px-5 py-3">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                            estaActivo
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border-rose-200'
-                          }`}
+                          className={`inline-block px-2.5 py-0.5 rounded-none text-xs font-sans font-bold uppercase tracking-wider border ${estaActivo
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-rose-50 text-rose-800 border-rose-200'
+                            }`}
                         >
                           {estaActivo ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-5 py-3 font-sans text-xs">
                         {u.localidad?.nombre || '-'}
                       </td>
-                      <td className="px-5 py-3">{u.telefono || '-'}</td>
+                      <td className="px-5 py-3 font-sans text-xs">{u.telefono || '-'}</td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleAbrirEditar(u)}
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition cursor-pointer"
+                            className="px-3 py-1 text-xs font-sans font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white rounded-none transition cursor-pointer"
                           >
                             Editar
                           </button>
@@ -433,10 +437,10 @@ export const AdminUsuariosPage = () => {
                                 ? 'Desactivar usuario'
                                 : 'Activar usuario'
                             }
-                            className={`px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                            className={`px-3 py-1 text-xs font-sans font-bold uppercase tracking-wider rounded-none border transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                               estaActivo
-                                ? 'text-amber-700 bg-amber-50 hover:bg-amber-100'
-                                : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                                ? 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-600 hover:text-white'
+                                : 'text-emerald-800 bg-emerald-50 border-emerald-200 hover:bg-emerald-600 hover:text-white'
                             }`}
                           >
                             {estaActivo ? 'Desactivar' : 'Activar'}
@@ -458,9 +462,9 @@ export const AdminUsuariosPage = () => {
         title={usuarioAEditar ? `Editar ${usuarioAEditar.nombre} ${usuarioAEditar.apellido}` : 'Nuevo Usuario'}
         subtitle={usuarioAEditar ? `DNI: ${usuarioAEditar.dni}` : 'Alta de cuenta y credenciales'}
       >
-        <form onSubmit={handleSubmitForm} className="space-y-4">
+        <form onSubmit={handleSubmitForm} className="space-y-4 font-sans">
           {errorModal && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
+            <div className="p-3 bg-rose-50 border border-rose-300 text-rose-950 text-xs rounded-none font-bold">
               {errorModal}
             </div>
           )}
@@ -544,19 +548,19 @@ export const AdminUsuariosPage = () => {
             />
           </div>
 
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setModalAbierto(false)}
               disabled={guardando}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-sans font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando}
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 text-xs font-sans font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               {guardando ? 'Guardando...' : usuarioAEditar ? 'Guardar Cambios' : 'Crear Usuario'}
             </button>

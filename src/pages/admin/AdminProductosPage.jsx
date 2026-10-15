@@ -10,6 +10,7 @@ import { precioService } from '../../services/precioService';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
 import { AdminAlert } from '../../components/admin/AdminAlert';
+import { IconPlus, IconSearch } from '../../components/Icons';
 
 const INITIAL_FORM = {
   nombre: '',
@@ -28,13 +29,13 @@ const InputField = ({ label, required, ...props }) => {
 
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+      <label htmlFor={id} className="block text-xs font-sans font-bold uppercase tracking-wider text-slate-700 mb-1">
         {label} {required && '*'}
       </label>
       <input
         id={id}
         required={required}
-        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition"
         {...props}
       />
     </div>
@@ -46,13 +47,13 @@ const SelectField = ({ label, required, options = [], ...props }) => {
 
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+      <label htmlFor={id} className="block text-xs font-sans font-bold uppercase tracking-wider text-slate-700 mb-1">
         {label} {required && '*'}
       </label>
       <select
         id={id}
         required={required}
-        className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition"
         {...props}
       >
         {options.map((opt) => (
@@ -344,38 +345,42 @@ export const AdminProductosPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-white p-6 rounded-none border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Catálogo de Productos</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl font-display font-black uppercase text-slate-950 tracking-tight">Catálogo de Productos</h2>
+          <p className="text-xs font-sans text-slate-500 mt-1">
             Administración del catálogo comercial, categorías, marcas y precios.
           </p>
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-xs transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-sans font-bold uppercase tracking-wider rounded-none shadow-xs transition cursor-pointer"
         >
-          + Nuevo Producto
+          <IconPlus className="w-4 h-4" />
+          <span>Nuevo Producto</span>
         </button>
       </div>
 
       <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
       <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
 
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
-        <input
-          type="text"
-          placeholder="Buscar por nombre..."
-          aria-label="Buscar productos por nombre"
-          value={busquedaInput}
-          onChange={(e) => setBusquedaInput(e.target.value)}
-          className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        />
+      <div className="bg-white p-4 sm:p-5 rounded-none border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 items-center font-sans">
+        <div className="relative">
+          <IconSearch className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            aria-label="Buscar productos por nombre"
+            value={busquedaInput}
+            onChange={(e) => setBusquedaInput(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+          />
+        </div>
         <select
           aria-label="Filtrar por categoría"
           value={filtroCategoria}
           onChange={(e) => setFiltroCategoria(e.target.value)}
-          className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          className="w-full px-3.5 py-2 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
         >
           <option value="">Todas las categorías</option>
           {categorias.map((c) => (
@@ -386,7 +391,7 @@ export const AdminProductosPage = () => {
           aria-label="Filtrar por marca"
           value={filtroMarca}
           onChange={(e) => setFiltroMarca(e.target.value)}
-          className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          className="w-full px-3.5 py-2 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
         >
           <option value="">Todas las marcas</option>
           {marcas.map((m) => (
@@ -395,27 +400,27 @@ export const AdminProductosPage = () => {
         </select>
         <button
           onClick={() => { setBusquedaInput(''); setFiltroNombre(''); setFiltroCategoria(''); setFiltroMarca(''); }}
-          className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold border border-gray-200 transition cursor-pointer"
+          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-none text-xs font-sans font-medium uppercase tracking-wider transition cursor-pointer"
         >
           Limpiar filtros
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden">
         {cargando ? (
-          <div className="p-12 text-center text-gray-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-            <p className="text-sm">Cargando catálogo...</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider">Cargando catálogo...</p>
           </div>
         ) : productos.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p className="text-base font-semibold">No se encontraron productos</p>
-            <p className="text-xs text-gray-500 mt-1">Intente ajustar los filtros o cree un nuevo producto.</p>
+          <div className="p-12 text-center text-slate-500 font-sans">
+            <p className="text-base font-bold uppercase text-slate-900">No se encontraron productos</p>
+            <p className="text-xs text-slate-500 mt-1">Intente ajustar los filtros o cree un nuevo producto.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+            <table className="w-full text-left text-sm text-slate-700 font-sans">
+              <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-5 py-3">Producto</th>
                   <th scope="col" className="px-5 py-3">Categoría</th>
@@ -425,24 +430,24 @@ export const AdminProductosPage = () => {
                   <th scope="col" className="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {productos.map((prod) => {
                   const fotoMini = prod.imagenes?.[0]?.url;
                   return (
-                    <tr key={prod.id} className="hover:bg-gray-50 transition">
+                    <tr key={prod.id} className="hover:bg-slate-50 transition">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-none bg-slate-50 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
                             {fotoMini ? (
                               <img src={fotoMini} alt={prod.nombre} className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-xs text-gray-500">Sin foto</span>
+                              <span className="text-xs text-slate-400">Sin foto</span>
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900 leading-snug">{prod.nombre}</p>
+                            <p className="font-bold text-slate-950 leading-snug">{prod.nombre}</p>
                             {prod.descripcion && (
-                              <p className="text-xs text-gray-500 line-clamp-1">{prod.descripcion}</p>
+                              <p className="text-xs text-slate-500 line-clamp-1">{prod.descripcion}</p>
                             )}
                           </div>
                         </div>
@@ -450,20 +455,20 @@ export const AdminProductosPage = () => {
                       <td className="px-5 py-3">{prod.categoria?.nombre || '-'}</td>
                       <td className="px-5 py-3">{prod.marca?.nombre || '-'}</td>
                       <td className="px-5 py-3">{prod.proveedor?.nombre || '-'}</td>
-                      <td className="px-5 py-3 font-semibold text-gray-900">
+                      <td className="px-5 py-3 font-bold text-slate-950 font-sans">
                         ${Number(prod.precioActual || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleAbrirEditar(prod)}
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition cursor-pointer"
+                            className="px-2.5 py-1 text-xs font-bold uppercase text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-none transition cursor-pointer"
                           >
                             Editar
                           </button>
                           <button
                             onClick={() => setProductoAEliminar(prod)}
-                            className="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition cursor-pointer"
+                            className="px-2.5 py-1 text-xs font-bold uppercase text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-none transition cursor-pointer"
                           >
                             Eliminar
                           </button>
@@ -484,9 +489,9 @@ export const AdminProductosPage = () => {
         title={productoAEditar ? `Editar "${productoAEditar.nombre}"` : 'Nuevo Producto'}
         subtitle="Complete los datos comerciales del producto"
       >
-        <form onSubmit={handleSubmitForm} className="space-y-4">
+        <form onSubmit={handleSubmitForm} className="space-y-4 font-sans">
           {errorModal && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
+            <div className="p-3 bg-rose-50 border border-rose-300 text-rose-950 font-bold text-xs rounded-none">
               {errorModal}
             </div>
           )}
@@ -500,13 +505,13 @@ export const AdminProductosPage = () => {
           />
 
           <div>
-            <label htmlFor="producto-descripcion" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Descripción</label>
+            <label htmlFor="producto-descripcion" className="block text-xs font-sans font-bold uppercase tracking-wider text-slate-700 mb-1">Descripción</label>
             <textarea
               id="producto-descripcion"
               rows={2}
               value={formData.descripcion}
               onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-              className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-sans focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none"
               placeholder="Breve descripción o especificaciones"
             />
           </div>
@@ -537,7 +542,7 @@ export const AdminProductosPage = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
             <InputField
               label={productoAEditar ? 'Precio ($)' : 'Precio Inicial ($)'}
               type="number"
@@ -560,7 +565,7 @@ export const AdminProductosPage = () => {
           </div>
 
           {!productoAEditar && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
               <SelectField
                 label="Almacén para stock inicial"
                 value={formData.almacenId}
@@ -585,8 +590,8 @@ export const AdminProductosPage = () => {
           )}
 
           {productoAEditar && (
-            <div className="pt-2 border-t border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">
+            <div className="pt-2 border-t border-slate-200 font-sans">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">
                 Imágenes
               </p>
 
@@ -595,21 +600,21 @@ export const AdminProductosPage = () => {
                   {imagenesProducto.map((img) => (
                     <li
                       key={img.id}
-                      className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                      className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-none px-3 py-2"
                     >
                       <img
                         src={img.url}
                         alt=""
-                        className="w-10 h-10 object-cover rounded"
+                        className="w-10 h-10 object-cover rounded-none border border-slate-200"
                       />
-                      <span className="flex-1 text-sm text-gray-700 truncate">
+                      <span className="flex-1 text-xs text-slate-700 truncate">
                         {img.url}
                       </span>
                       <button
                         type="button"
                         disabled={guardandoImagen}
                         onClick={() => handleEliminarImagen(img.id)}
-                        className="text-sm text-red-700 hover:text-red-800 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                        className="text-xs font-bold uppercase text-rose-700 hover:text-rose-900 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                       >
                         Eliminar
                       </button>
@@ -619,7 +624,7 @@ export const AdminProductosPage = () => {
               )}
 
               {errorImagen && (
-                <p role="alert" className="text-sm text-red-700 mb-2">
+                <p role="alert" className="text-xs text-rose-700 mb-2 font-bold">
                   {errorImagen}
                 </p>
               )}
@@ -631,13 +636,13 @@ export const AdminProductosPage = () => {
                   value={nuevaImagenUrl}
                   onChange={(e) => setNuevaImagenUrl(e.target.value)}
                   placeholder="https://ejemplo.com/foto.jpg"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
                 <button
                   type="button"
                   disabled={guardandoImagen || !nuevaImagenUrl.trim()}
                   onClick={handleAgregarImagen}
-                  className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-blue-600 text-white rounded-none text-xs font-bold uppercase tracking-wider hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-xs"
                 >
                   Agregar
                 </button>
@@ -645,19 +650,19 @@ export const AdminProductosPage = () => {
             </div>
           )}
 
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setModalFormAbierto(false)}
               disabled={guardando}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-sans font-medium uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando}
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 text-xs font-sans font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               {guardando ? 'Guardando...' : productoAEditar ? 'Guardar Cambios' : 'Crear Producto'}
             </button>

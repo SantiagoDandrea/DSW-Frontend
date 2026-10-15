@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useId } from 'react';
 import { AdminModal } from './AdminModal';
 import { ConfirmModal } from './ConfirmModal';
 import { AdminAlert } from './AdminAlert';
+import { IconSearch, IconPlus, IconPackage } from '../Icons';
 
 export const SimpleCrudTable = ({
   title,
@@ -153,9 +154,10 @@ export const SimpleCrudTable = ({
       setItemAEliminar(null);
       recargar();
     } catch (err) {
-      const msg = err.status === 409 || err.status === 400
-        ? 'No se puede eliminar: tiene otros registros asociados (restricción de integridad).'
-        : (err.message || `No se pudo eliminar el ${itemName.toLowerCase()}.`);
+      const msg =
+        err.status === 409 || err.status === 400
+          ? 'No se puede eliminar: tiene otros registros asociados (restricción de integridad referencial).'
+          : err.message || `No se pudo eliminar el ${itemName.toLowerCase()}.`;
       setErrorGlobal(msg);
       setItemAEliminar(null);
     } finally {
@@ -164,51 +166,59 @@ export const SimpleCrudTable = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden space-y-4">
-      <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="bg-white rounded-none border border-slate-200 shadow-xs overflow-hidden space-y-4">
+      <div className="p-5 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-          {description && <p className="text-sm text-gray-500 mt-0.5">{description}</p>}
+          <h2 className="text-xl font-display font-black uppercase text-slate-950 tracking-tight">{title}</h2>
+          {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-xs transition cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-none shadow-xs transition duration-150 cursor-pointer"
         >
-          <span>+</span>
+          <IconPlus className="w-4 h-4" />
           <span>Nuevo {itemName}</span>
         </button>
       </div>
 
-      <div className="px-5 space-y-2">
+      <div className="px-5 sm:px-6 space-y-2">
         <AdminAlert type="success" message={mensajeExito} onClose={() => setMensajeExito(null)} />
         <AdminAlert type="error" message={errorGlobal} onClose={() => setErrorGlobal(null)} />
       </div>
 
-      <div className="px-5">
-        <input
-          type="text"
-          placeholder={`Buscar en ${title.toLowerCase()}...`}
-          aria-label={`Buscar en ${title.toLowerCase()}`}
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        />
+      <div className="px-5 sm:px-6">
+        <div className="relative">
+          <IconSearch className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder={`Buscar en ${title.toLowerCase()}...`}
+            aria-label={`Buscar en ${title.toLowerCase()}`}
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
+          />
+        </div>
       </div>
 
       <div className="overflow-x-auto">
         {cargando ? (
-          <div className="p-12 text-center text-gray-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2" />
-            <p className="text-sm">Cargando datos...</p>
+          <div className="p-12 text-center text-slate-500">
+            <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider">Cargando datos...</p>
           </div>
         ) : itemsFiltrados.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p className="text-base font-semibold">No se encontraron registros</p>
-            <p className="text-xs text-gray-500 mt-1">Cree un nuevo elemento o modifique la búsqueda.</p>
+          <div className="p-12 text-center text-slate-400">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-none bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
+              <IconPackage className="w-6 h-6" />
+            </div>
+            <p className="text-sm font-bold uppercase text-slate-900">No se encontraron registros</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Cree un nuevo elemento o modifique la búsqueda.
+            </p>
           </div>
         ) : (
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500 border-y border-gray-200">
+          <table className="w-full text-left text-xs sm:text-sm text-slate-700">
+            <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600 border-y border-slate-200">
               <tr>
                 {columns.map((col) => (
                   <th key={col.key} className="px-5 py-3">{col.label}</th>
@@ -216,25 +226,25 @@ export const SimpleCrudTable = ({
                 <th scope="col" className="px-5 py-3 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100">
               {itemsFiltrados.map((item) => (
-                <tr key={item[itemKey]} className="hover:bg-gray-50 transition">
+                <tr key={item[itemKey]} className="hover:bg-slate-50/70 transition duration-150">
                   {columns.map((col) => (
-                    <td key={col.key} className="px-5 py-3">
-                      {col.render ? col.render(item) : (item[col.key] ?? '-')}
+                    <td key={col.key} className="px-5 py-3.5">
+                      {col.render ? col.render(item) : item[col.key] ?? '-'}
                     </td>
                   ))}
-                  <td className="px-5 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => handleAbrirEditar(item)}
-                        className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-none transition cursor-pointer"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => setItemAEliminar(item)}
-                        className="px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-md transition cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-none transition cursor-pointer"
                       >
                         Eliminar
                       </button>
@@ -251,20 +261,25 @@ export const SimpleCrudTable = ({
         isOpen={modalAbierto}
         onClose={() => setModalAbierto(false)}
         title={itemAEditar ? `Editar ${itemName}` : `Nuevo ${itemName}`}
-        subtitle="Complete los campos solicitados"
+        subtitle="Complete los campos requeridos para continuar"
       >
         <form onSubmit={handleSubmitForm} className="space-y-4">
           {errorModal && (
-            <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">{errorModal}</div>
+            <div
+              role="alert"
+              className="p-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs rounded-none"
+            >
+              {errorModal}
+            </div>
           )}
 
           {fields.map((f) => (
             <div key={f.name}>
               <label
                 htmlFor={`${idBase}-${f.name}`}
-                className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1"
               >
-                {f.label} {f.required && <span className="text-rose-500">*</span>}
+                {f.label} {f.required && <span className="text-rose-600">*</span>}
               </label>
               {f.type === 'select' ? (
                 <select
@@ -273,7 +288,7 @@ export const SimpleCrudTable = ({
                   required={f.required}
                   value={formData[f.name] ?? ''}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
                 >
                   <option value="" disabled>Seleccione una opción</option>
                   {f.options?.map((opt) => (
@@ -293,26 +308,26 @@ export const SimpleCrudTable = ({
                   inputMode={f.inputMode}
                   value={formData[f.name] ?? ''}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
                 />
               )}
-              {f.helperText && <p className="text-xs text-gray-500 mt-1">{f.helperText}</p>}
+              {f.helperText && <p className="text-[11px] text-slate-500 mt-1">{f.helperText}</p>}
             </div>
           ))}
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setModalAbierto(false)}
               disabled={guardando}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 bg-white border border-slate-300 rounded-none hover:bg-slate-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando}
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               {guardando ? 'Guardando...' : itemAEditar ? 'Guardar Cambios' : `Crear ${itemName}`}
             </button>

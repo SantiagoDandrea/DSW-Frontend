@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext';
 import { useCart } from './context/useCart';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
+import { Footer } from './components/Footer';
 import { AppRoutes } from './routes/AppRoutes';
 
 function AppLayout() {
@@ -38,8 +39,10 @@ function AppLayout() {
     (path) => location.pathname.startsWith(path)
   );
 
+  const esAdmin = location.pathname.startsWith('/admin');
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col print:bg-white print:min-h-0">
+    <div className="min-h-[100dvh] bg-white text-slate-900 flex flex-col print:bg-white print:min-h-0 antialiased selection:bg-blue-600 selection:text-white">
       <Header cartCount={cantidadTotal} />
 
       {showSearchBar && (
@@ -48,7 +51,11 @@ function AppLayout() {
         </div>
       )}
 
-      <AppRoutes />
+      <div className="flex-1 flex flex-col">
+        <AppRoutes />
+      </div>
+
+      {!esAdmin && <Footer />}
     </div>
   );
 }

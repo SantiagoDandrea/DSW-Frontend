@@ -1,5 +1,6 @@
 // Ventana modal reutilizable para mostrar formularios y detalles en el panel de administración.
 import { useEffect, useId, useRef } from 'react';
+import { IconClose } from '../Icons';
 
 export const AdminModal = ({
   isOpen,
@@ -39,27 +40,29 @@ export const AdminModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div
         ref={dialogoRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={tituloId}
         tabIndex={-1}
-        className={`bg-white rounded-2xl shadow-xl w-full ${maxWidth} my-8 border border-gray-100 overflow-hidden focus:outline-none`}
+        className={`bg-white rounded-none shadow-xl w-full ${maxWidth} my-8 border border-slate-200 overflow-hidden focus:outline-none`}
       >
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 bg-slate-900 text-white border-b border-slate-800 flex items-center justify-between">
           <div>
-            <h2 id={tituloId} className="text-lg font-bold text-gray-900">{title}</h2>
-            {subtitle && <p className="text-xs text-gray-600 mt-0.5">{subtitle}</p>}
+            <h2 id={tituloId} className="text-base font-display font-black uppercase text-white tracking-tight">
+              {title}
+            </h2>
+            {subtitle && <p className="text-xs font-sans text-slate-300 mt-0.5">{subtitle}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 rounded-lg p-1 transition cursor-pointer text-xl font-bold leading-none"
+            className="text-slate-400 hover:text-white p-1 rounded-none transition cursor-pointer"
             aria-label="Cerrar"
           >
-            &times;
+            <IconClose className="w-5 h-5" />
           </button>
         </div>
         <div className="p-6">{children}</div>
