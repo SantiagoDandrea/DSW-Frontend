@@ -242,7 +242,7 @@ export const AdminInventarioPage = () => {
       },
     ],
     fields: [
-      { name: 'productoId', label: 'Producto', type: 'select', required: true, options: productoOptions },
+      { name: 'productoId', label: 'Producto', type: 'select', required: true, soloAlCrear: true, options: productoOptions },
       { name: 'valor', label: 'Precio Comercial ($)', type: 'number', required: true },
       { name: 'fechaDesde', label: 'Fecha de Vigencia', type: 'datetime-local', required: true },
     ],
@@ -330,12 +330,12 @@ export const AdminInventarioPage = () => {
             ) : almacenes.length === 0 ? (
               <div className="p-12 text-center text-slate-500">
                 <p className="text-base font-bold uppercase text-slate-900">No hay almacenes configurados</p>
-                <p className="text-xs text-slate-400 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
+                <p className="text-xs text-slate-500 mt-1">Cree al menos un almacén en la sección Tablas Maestras.</p>
               </div>
             ) : productosFiltradosStock.length === 0 ? (
               <div className="p-12 text-center text-slate-500">
                 <p className="text-base font-bold uppercase text-slate-900">No se encontraron productos</p>
-                <p className="text-xs text-slate-400 mt-1">Intente ajustar los términos de búsqueda.</p>
+                <p className="text-xs text-slate-500 mt-1">Intente ajustar los términos de búsqueda.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -363,7 +363,7 @@ export const AdminInventarioPage = () => {
                                 {fotoMini ? (
                                   <img src={fotoMini} alt={prod.nombre} className="w-full h-full object-cover" />
                                 ) : (
-                                  <span className="text-[10px] text-slate-400">Sin foto</span>
+                                  <span className="text-[10px] text-slate-500 font-medium">Sin foto</span>
                                 )}
                               </div>
                               <div>
@@ -386,7 +386,7 @@ export const AdminInventarioPage = () => {
                                 {cantidad} un.
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
                                 0 un.
                               </span>
                             )}

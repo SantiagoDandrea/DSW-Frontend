@@ -57,7 +57,11 @@ export const Login = () => {
         {sesionVencida && !error && (
           <div role="status" className="mb-5 p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-none font-sans flex items-center gap-2">
             <IconAlert className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>Tu sesión venció. Volvé a iniciar sesión para continuar.</span>
+            <span>
+              {sesionVencida === 'desactivada'
+                ? 'Tu cuenta fue desactivada. Contactá al administrador.'
+                : 'Tu sesión venció. Volvé a iniciar sesión para continuar.'}
+            </span>
           </div>
         )}
 
