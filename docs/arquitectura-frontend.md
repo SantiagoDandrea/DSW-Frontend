@@ -23,28 +23,45 @@ El frontend tiene como finalidad conectarse con la API REST ya desarrollada en `
 
 ## 2. Estructura de Directorios del Proyecto
 
-Siguiendo la arquitectura por capas ya iniciada en el repositorio:
+Siguiendo la arquitectura por capas implementada en el repositorio:
 
 ```text
 src/
 ├── assets/             # Imágenes estáticas, íconos y recursos locales
-├── components/         # Componentes reutilizables de UI (atómicos / presentacionales)
-│   ├── common/         # Botones, Modales, Spinners, Inputs, Alertas, Badges
-│   ├── layout/         # Header, Footer, Navbar, AdminSidebar
-│   ├── products/       # ProductCard, ProductGrid, ProductFilters
-│   └── cart/           # CartDrawer / CartItem / CheckoutResume
+├── components/         # Componentes reutilizables de UI
+│   ├── admin/          # AdminAlert, AdminLayout, AdminModal, ConfirmModal, SimpleCrudTable
+│   ├── CategoryCard.jsx
+│   ├── Footer.jsx
+│   ├── Header.jsx
+│   ├── Icons.jsx
+│   ├── ProductCard.jsx
+│   ├── ProductFilters.jsx
+│   └── SearchBar.jsx
+├── constants/          # Constantes globales (ej. PROVINCIAS_ARGENTINA)
 ├── context/            # Estados globales con React Context API
 │   ├── AuthContext.jsx # Usuario autenticado, token JWT, login/logout, rol (esAdmin)
 │   └── CartContext.jsx # Productos en carrito, cantidades, totales, sincronización local
-├── models/             # Clases o tipos que modelan los datos de negocio (normalización)
-│   ├── Usuario.js
-│   ├── Producto.js
+├── hooks/              # Custom hooks de la aplicación
+├── models/             # Clases que modelan los datos de negocio con normalización fromJSON
+│   ├── Categoria.js
+│   ├── Envio.js
+│   ├── Localidad.js
 │   ├── Pedido.js
-│   └── Envio.js
+│   ├── Producto.js
+│   └── Usuario.js
 ├── pages/              # Vistas completas asociadas a una ruta
-│   ├── public/         # Home, CategoryProducts, ProductDetail, Login, Register, NotFound
-│   ├── customer/       # MisPedidos, DetallePedido, MiPerfil, Checkout
-│   └── admin/          # AdminDashboard, AdminProductos, AdminStock, AdminPedidos, etc.
+│   ├── admin/          # AdminProductosPage, AdminInventarioPage, AdminPedidosPage, AdminEnviosPage, AdminUsuariosPage, AdminTablasPage
+│   ├── Cart.jsx
+│   ├── CategoryProducts.jsx
+│   ├── Checkout.jsx
+│   ├── Home.jsx
+│   ├── Login.jsx
+│   ├── MyOrders.jsx
+│   ├── OrderDetail.jsx
+│   ├── ProductDetail.jsx
+│   ├── Profile.jsx
+│   ├── Register.jsx
+│   └── SearchResults.jsx
 ├── routes/             # Definición centralizada de rutas y guards de protección
 │   ├── AppRoutes.jsx   # Mapa completo de rutas
 │   ├── ProtectedRoute.jsx # Guard para usuarios autenticados
@@ -53,9 +70,11 @@ src/
 │   ├── api.js          # Cliente HTTP base (Base URL, inyección de JWT, manejo de errores)
 │   ├── authService.js
 │   ├── categoriaService.js
-│   ├── productoService.js
+│   ├── crudServiceFactory.js # Factoría genérica para CRUDs administrativos
+│   ├── envioService.js
 │   ├── pedidoService.js
-│   └── envioService.js
+│   └── productoService.js
+├── utils/              # Funciones auxiliares de formateo y urls
 ├── App.jsx             # Shell principal con Providers (Auth, Cart) y Router
 └── main.jsx            # Punto de entrada de la aplicación
 ```
@@ -68,30 +87,34 @@ src/
 
 | Ruta                     | Componente         | Descripción                                                                                      |
 | :----------------------- | :----------------- | :----------------------------------------------------------------------------------------------- |
-| `/`                      | `Home`             | Banner, categorías principales y productos destacados.                                           |
+| `/`                      | `Home`             | Banner dinámico, categorías principales y productos destacados.                                  |
 | `/categoria/:categoryId` | `CategoryProducts` | Grid de productos filtrados por categoría.                                                       |
 | `/producto/:id`          | `ProductDetail`    | Galería de imágenes, descripción, precio vigente, stock disponible y botón "Agregar al Carrito". |
+| `/buscar`                | `SearchResults`    | Búsqueda por término con filtros dinámicos por marca y precio.                                   |
 | `/login`                 | `Login`            | Formulario de email y password, redirección según origen o rol.                                  |
-| `/registro`              | `Register`         | Alta de clientes (asociando localidad).                                                          |
+| `/registro`              | `Register`         | Alta de clientes (con selección de provincia e ingreso de localidad y código postal).            |
+| `/carrito`               | `Cart`             | Resumen de productos en el carrito, ajuste de cantidades y cálculo de subtotal.                 |
 
 ### B. Vistas de Cliente Autenticado (`CLIENTE` o `ADMIN`)
 
-| Ruta                     | Componente        | Descripción                                                                                                                             |
-| :----------------------- | :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
-| `/carrito` o `/checkout` | `CheckoutPage`    | Confirmación de items, selección de medio de pago, opción de entrega a domicilio o retiro, y creación del pedido (`POST /api/pedidos`). |
-| `/mis-pedidos`           | `MyOrdersPage`    | Listado histórico de pedidos del usuario, estado actual (`PENDIENTE`, `EN_PREPARACION`, etc.) y accesos rápidos.                        |
-| `/pedidos/:id`           | `OrderDetailPage` | Detalle exhaustivo del pedido, productos, subtotal, datos de envío y botón de cancelar (si el estado lo permite).                       |
-| `/perfil`                | `ProfilePage`     | Datos personales del usuario autenticado (`GET /api/auth/me`).                                                                          |
+| Ruta           | Componente    | Descripción                                                                                                                             |
+| :------------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `/checkout`    | `Checkout`    | Confirmación de items, selección de medio de pago, opción de entrega a domicilio o retiro, y creación del pedido (`POST /api/pedidos`). |
+| `/mis-pedidos` | `MyOrders`    | Listado histórico de pedidos del usuario, estado actual (`PENDIENTE`, `EN_PREPARACION`, etc.) y accesos rápidos.                        |
+| `/pedidos/:id` | `OrderDetail` | Detalle exhaustivo del pedido, productos, subtotal, comprobante imprimible, datos de envío y botón de cancelar.                          |
+| `/perfil`      | `Profile`     | Datos personales del usuario autenticado (`GET/PUT /api/auth/me`), incluyendo provincia, localidad y CP.                                |
 
 ### C. Vistas de Administración (`ADMIN`)
 
-| Ruta               | Componente           | Descripción                                                                                                   |
-| :----------------- | :------------------- | :------------------------------------------------------------------------------------------------------------ |
-| `/admin`           | `AdminDashboard`     | Resumen general, métricas y accesos rápidos a gestión.                                                        |
-| `/admin/productos` | `AdminProductsPage`  | Tabla CRUD de productos, edición de precios y fotos.                                                          |
-| `/admin/stock`     | `AdminStockPage`     | Gestión de stock de productos por almacén.                                                                    |
-| `/admin/pedidos`   | `AdminOrdersPage`    | Listado global de pedidos de todos los clientes y actualización de estados (`PATCH /api/pedidos/:id/estado`). |
-| `/admin/envios`    | `AdminShipmentsPage` | Monitoreo de despachos y cambios de estado de logística.                                                      |
+| Ruta                 | Componente            | Descripción                                                                                                   |
+| :------------------- | :-------------------- | :------------------------------------------------------------------------------------------------------------ |
+| `/admin`             | `AdminLayout`         | Layout principal del panel de administración (redirecciona por defecto a `/admin/productos`).                 |
+| `/admin/productos`   | `AdminProductosPage`  | Tabla CRUD de productos, edición de precios y fotos.                                                          |
+| `/admin/inventario`  | `AdminInventarioPage` | Gestión y consulta de stock de productos por almacén con selector.                                            |
+| `/admin/pedidos`     | `AdminPedidosPage`    | Listado global de pedidos de todos los clientes y actualización de estados (`PATCH /api/pedidos/:id/estado`). |
+| `/admin/envios`      | `AdminEnviosPage`     | Monitoreo de despachos y cambios de estado de logística.                                                      |
+| `/admin/usuarios`    | `AdminUsuariosPage`   | Gestión de usuarios, roles y activación/desactivación de cuentas.                                             |
+| `/admin/tablas`      | `AdminTablasPage`     | CRUD unificado para tablas maestras (categorías, marcas, medios de pago, localidades, almacenes, proveedores).|
 
 ---
 
