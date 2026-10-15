@@ -1,7 +1,7 @@
 // Pantalla del perfil de usuario para ver y actualizar datos personales, localidad o contraseña.
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/useAuth';
-import { localidadService } from '../services/localidadService';
+import { PROVINCIAS_ARGENTINA } from '../constants/provincias';
 import { IconAlert, IconCheck } from '../components/Icons';
 
 export const Profile = () => {
@@ -11,33 +11,14 @@ export const Profile = () => {
     apellido: usuario?.apellido || '',
     email: usuario?.email || '',
     telefono: usuario?.telefono || '',
-    localidadId: usuario?.localidad?.id || '',
+    provincia: usuario?.localidad?.provincia || '',
+    localidad: usuario?.localidad?.nombre || '',
+    codigoPostal: usuario?.localidad?.codigoPostal || '',
     password: '',
   });
-  const [localidades, setLocalidades] = useState([]);
   const [error, setError] = useState(null);
   const [exito, setExito] = useState(false);
   const [cargando, setCargando] = useState(false);
-
-  useEffect(() => {
-    let ignore = false;
-
-    localidadService.getLocalidades()
-      .then((data) => {
-        if (!ignore) {
-          setLocalidades(data);
-        }
-      })
-      .catch((err) => {
-        if (!ignore) {
-          console.error(err);
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,8 +34,13 @@ export const Profile = () => {
 
     const { password, ...resto } = form;
     const datos = {
-      ...resto,
-      localidadId: Number(resto.localidadId),
+      nombre: resto.nombre.trim(),
+      apellido: resto.apellido.trim(),
+      email: resto.email.trim(),
+      telefono: resto.telefono.trim(),
+      provincia: resto.provincia.trim(),
+      localidad: resto.localidad.trim(),
+      codigoPostal: resto.codigoPostal.trim(),
     };
     if (password) {
       datos.password = password;
@@ -114,7 +100,7 @@ export const Profile = () => {
           <div className="sm:text-right">
             <span className="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Localidad asignada</span>
             <span className="text-sm font-bold text-white uppercase">
-              {usuario.localidad ? `${usuario.localidad.nombre} (${usuario.localidad.provincia})` : 'Sin asignar'}
+              {usuario.localidad ? `${usuario.localidad.nombre}, ${usuario.localidad.provincia} (CP ${usuario.localidad.codigoPostal})` : 'Sin asignar'}
             </span>
           </div>
         </div>
@@ -209,25 +195,61 @@ export const Profile = () => {
               </div>
 
               <div className="mt-4">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="localidadId">
-                  Localidad de Entrega Habitual
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="provincia">
+                  Provincia
                 </label>
                 <select
-                  id="localidadId"
-                  name="localidadId"
+                  id="provincia"
+                  name="provincia"
                   required
-                  value={form.localidadId}
+                  value={form.provincia}
                   onChange={handleChange}
                   className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
                   disabled={cargando}
                 >
-                  <option value="" disabled>Seleccioná tu localidad</option>
-                  {localidades.map((localidad) => (
-                    <option key={localidad.id} value={localidad.id}>
-                      {localidad.nombre} ({localidad.provincia})
+                  <option value="" disabled>Seleccioná tu provincia</option>
+                  {PROVINCIAS_ARGENTINA.map((provincia) => (
+                    <option key={provincia} value={provincia}>
+                      {provincia}
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="localidad">
+                    Localidad de Entrega Habitual
+                  </label>
+                  <input
+                    id="localidad"
+                    name="localidad"
+                    type="text"
+                    required
+                    value={form.localidad}
+                    onChange={handleChange}
+                    placeholder="Ej: San Rafael, Rosario"
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
+                    disabled={cargando}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="codigoPostal">
+                    Código Postal
+                  </label>
+                  <input
+                    id="codigoPostal"
+                    name="codigoPostal"
+                    type="text"
+                    required
+                    value={form.codigoPostal}
+                    onChange={handleChange}
+                    placeholder="Ej: 5600"
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-none text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
+                    disabled={cargando}
+                  />
+                </div>
               </div>
             </div>
 

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
+import { useAuth } from '../context/useAuth';
 import { pedidoService } from '../services/pedidoService';
 import {
   IconCheck,
@@ -33,6 +34,7 @@ function mensajeDeCompraFallida(error) {
 
 export function Checkout() {
   const { items, subtotal, vaciarCarrito } = useCart();
+  const { usuario } = useAuth();
 
   const [mediosPago, setMediosPago] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -44,9 +46,17 @@ export function Checkout() {
   const [tipoEnvio, setTipoEnvio] = useState(''); // '' | 'LOCAL' | 'NACIONAL'
   const [calle, setCalle] = useState('');
   const [numero, setNumero] = useState('');
-  const [localidadDestino, setLocalidadDestino] = useState('');
-  const [provinciaDestino, setProvinciaDestino] = useState('');
-  const [codigoPostal, setCodigoPostal] = useState('');
+  const [localidadDestino, setLocalidadDestino] = useState(() => usuario?.localidad?.nombre || '');
+  const [provinciaDestino, setProvinciaDestino] = useState(() => usuario?.localidad?.provincia || '');
+  const [codigoPostal, setCodigoPostal] = useState(() => usuario?.localidad?.codigoPostal || '');
+
+  useEffect(() => {
+    if (usuario?.localidad) {
+      setLocalidadDestino((prev) => prev || usuario.localidad.nombre || '');
+      setProvinciaDestino((prev) => prev || usuario.localidad.provincia || '');
+      setCodigoPostal((prev) => prev || usuario.localidad.codigoPostal || '');
+    }
+  }, [usuario]);
 
   const costoEnvioEstimado = requiereEnvio
     ? tipoEnvio === 'LOCAL'

@@ -16,33 +16,7 @@ import {
   IconBuilding,
   IconTruck,
 } from '../../components/Icons';
-
-const PROVINCIAS_ARGENTINA = [
-  'Buenos Aires',
-  'Catamarca',
-  'Chaco',
-  'Chubut',
-  'Ciudad Autónoma de Buenos Aires',
-  'Córdoba',
-  'Corrientes',
-  'Entre Ríos',
-  'Formosa',
-  'Jujuy',
-  'La Pampa',
-  'La Rioja',
-  'Mendoza',
-  'Misiones',
-  'Neuquén',
-  'Río Negro',
-  'Salta',
-  'San Juan',
-  'San Luis',
-  'Santa Cruz',
-  'Santa Fe',
-  'Santiago del Estero',
-  'Tierra del Fuego',
-  'Tucumán',
-];
+import { PROVINCIAS_ARGENTINA } from '../../constants/provincias';
 
 export const AdminTablasPage = () => {
   const [tabActiva, setTabActiva] = useState('categorias');

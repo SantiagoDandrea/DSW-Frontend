@@ -1,8 +1,8 @@
 // Pantalla de registro de nuevos usuarios donde se completan los datos de la cuenta.
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
-import { localidadService } from '../services/localidadService';
+import { PROVINCIAS_ARGENTINA } from '../constants/provincias';
 import { IconAlert } from '../components/Icons';
 
 export const Register = () => {
@@ -13,34 +13,15 @@ export const Register = () => {
     email: '',
     password: '',
     telefono: '',
-    localidadId: '',
+    provincia: '',
+    localidad: '',
+    codigoPostal: '',
   });
-  const [localidades, setLocalidades] = useState([]);
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let ignore = false;
-
-    localidadService.getLocalidades()
-      .then((data) => {
-        if (!ignore) {
-          setLocalidades(data);
-        }
-      })
-      .catch((err) => {
-        if (!ignore) {
-          console.error(err);
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +34,12 @@ export const Register = () => {
     setCargando(true);
 
     try {
-      await register({ ...form, localidadId: Number(form.localidadId) });
+      await register({
+        ...form,
+        provincia: form.provincia.trim(),
+        localidad: form.localidad.trim(),
+        codigoPostal: form.codigoPostal.trim(),
+      });
       navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'No se pudo crear la cuenta. Revisá los datos ingresados.');
@@ -199,25 +185,61 @@ export const Register = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="localidadId">
-              Localidad
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="provincia">
+              Provincia
             </label>
             <select
-              id="localidadId"
-              name="localidadId"
+              id="provincia"
+              name="provincia"
               required
-              value={form.localidadId}
+              value={form.provincia}
               onChange={handleChange}
               className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
               disabled={cargando}
             >
-              <option value="" disabled>Seleccioná tu localidad</option>
-              {localidades.map((localidad) => (
-                <option key={localidad.id} value={localidad.id}>
-                  {localidad.nombre} ({localidad.provincia})
+              <option value="" disabled>Seleccioná tu provincia</option>
+              {PROVINCIAS_ARGENTINA.map((provincia) => (
+                <option key={provincia} value={provincia}>
+                  {provincia}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="localidad">
+                Localidad / Ciudad
+              </label>
+              <input
+                id="localidad"
+                name="localidad"
+                type="text"
+                required
+                value={form.localidad}
+                onChange={handleChange}
+                placeholder="Ej: San Rafael, Rosario"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                disabled={cargando}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="codigoPostal">
+                Código Postal
+              </label>
+              <input
+                id="codigoPostal"
+                name="codigoPostal"
+                type="text"
+                required
+                value={form.codigoPostal}
+                onChange={handleChange}
+                placeholder="Ej: 5600"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-none text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                disabled={cargando}
+              />
+            </div>
           </div>
 
           <button
