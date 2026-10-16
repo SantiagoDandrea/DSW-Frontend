@@ -207,3 +207,7 @@ La restitución del stock no está cubierta por los E2E actuales.
 Se actualizaron los selectores del E2E para los textos y la tabla
 del nuevo diseño. El nombre del producto se obtiene con textContent
 para evitar diferencias causadas por la transformación visual a mayúsculas.
+
+- Backend: 16 tests aprobados en 5 archivos, incluido el test de
+  integración de creación de pedidos (ejecución local del 15/10/2026).
+- Prisma migrate status: las 5 migraciones existentes están aplicadas.
