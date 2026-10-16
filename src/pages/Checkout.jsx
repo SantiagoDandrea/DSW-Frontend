@@ -35,28 +35,26 @@ function mensajeDeCompraFallida(error) {
 export function Checkout() {
   const { items, subtotal, vaciarCarrito } = useCart();
   const { usuario } = useAuth();
-
   const [mediosPago, setMediosPago] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState('');
   const [errorCompra, setErrorCompra] = useState('');
-
   const [medioPagoId, setMedioPagoId] = useState('');
   const [requiereEnvio, setRequiereEnvio] = useState(false);
   const [tipoEnvio, setTipoEnvio] = useState(''); // '' | 'LOCAL' | 'NACIONAL'
   const [calle, setCalle] = useState('');
   const [numero, setNumero] = useState('');
-  const [localidadDestino, setLocalidadDestino] = useState(() => usuario?.localidad?.nombre || '');
-  const [provinciaDestino, setProvinciaDestino] = useState(() => usuario?.localidad?.provincia || '');
-  const [codigoPostal, setCodigoPostal] = useState(() => usuario?.localidad?.codigoPostal || '');
+  const [localidadEditada, setLocalidadDestino] = useState(null);
+  const [provinciaEditada, setProvinciaDestino] = useState(null);
+  const [codigoPostalEditado, setCodigoPostal] = useState(null);
+  const localidadDestino =
+  localidadEditada ?? usuario?.localidad?.nombre ?? '';
 
-  useEffect(() => {
-    if (usuario?.localidad) {
-      setLocalidadDestino((prev) => prev || usuario.localidad.nombre || '');
-      setProvinciaDestino((prev) => prev || usuario.localidad.provincia || '');
-      setCodigoPostal((prev) => prev || usuario.localidad.codigoPostal || '');
-    }
-  }, [usuario]);
+  const provinciaDestino =
+  provinciaEditada ?? usuario?.localidad?.provincia ?? '';
+
+  const codigoPostal =
+  codigoPostalEditado ?? usuario?.localidad?.codigoPostal ?? '';
 
   const costoEnvioEstimado = requiereEnvio
     ? tipoEnvio === 'LOCAL'
